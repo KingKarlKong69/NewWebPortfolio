@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg:#060713;
+  --nav-bg: rgba(255,255,255,0.02);
+}
+
+html,body,#__next{
+  height:100%;
+  width:100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: linear-gradient(180deg, #000000 0%, #030609 50%, #000408 100%) !important;
+  background-attachment: fixed !important;
+  scroll-behavior: smooth;
+}
+
+body{
+  background: linear-gradient(180deg, #000000 0%, #030609 50%, #000408 100%) !important;
+  background-attachment: fixed !important;
+  background-image: 
+    radial-gradient(1200px 500px at 85% 110%, rgba(0,229,255,0.25), transparent 40%),
+    radial-gradient(800px 400px at 50% 50%, rgba(59,130,246,0.08), transparent 55%) !important;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+  position: relative;
+  /* Keep horizontal artwork clipped without turning <body> into a
+     separate vertical scroll container. */
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  display: none;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass {
+  background: rgba(10,10,25,0.5);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(0,229,255,0.15);
+}
+
+.glow-border {
+  box-shadow: 0 0 40px rgba(0,229,255,0.2), inset 0 0 30px rgba(0,229,255,0.08);
+}
+
+.soft-glow {
+  box-shadow: 0 0 50px rgba(139,92,246,0.25);
+}
+
+.cyan-glow {
+  box-shadow: 0 0 30px rgba(0,229,255,0.3), 0 0 60px rgba(0,229,255,0.15);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #00E5FF 0%, #3B82F6 50%, #8B5CF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.journey-hex-outline {
+  filter: drop-shadow(0 0 7px var(--hex-stroke)) drop-shadow(0 0 16px var(--hex-stroke));
+}
+
+.journey-spine-head {
+  animation: journeySpineHead 1.8s ease-in-out infinite;
+}
+
+.journey-terminal-dot.is-complete {
+  animation: journeyTerminalComplete 2.2s ease-in-out infinite;
+}
+
+.journey-item.is-dimmed .journey-badge-core,
+.journey-item.is-dimmed .journey-copy {
+  transition: filter 220ms ease;
+}
+
+.journey-item.is-dimmed .journey-badge-core {
+  filter: brightness(0.86) saturate(0.88);
+}
+
+.journey-item.is-dimmed .journey-copy {
+  filter: saturate(0.92);
+}
+
+.journey-hex-outline-glow,
+.journey-hex-outline-core {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke: var(--hex-stroke);
+  stroke-linejoin: round;
+}
+
+.journey-hex-outline-glow {
+  animation: journeyHexGlow 2.4s ease-in-out infinite;
+  opacity: 0.46;
+  stroke-width: 7;
+}
+
+.journey-hex-outline-core {
+  animation: journeyHexTrace 3.1s ease-in-out infinite;
+  opacity: 0.95;
+  stroke-dasharray: 64 18;
+  stroke-linecap: round;
+  stroke-width: 2.8;
+}
+
+@keyframes journeyHexGlow {
+  0%,
+  100% {
+    opacity: 0.38;
+    filter: blur(2px);
+  }
+
+  50% {
+    opacity: 0.9;
+    filter: blur(3.5px);
+  }
+}
+
+@keyframes journeyHexTrace {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -164;
+    opacity: 0.72;
+  }
+}
+
+@keyframes journeySpineHead {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(0,229,255,1), 0 0 34px rgba(0,229,255,0.72), 0 0 52px rgba(56,189,248,0.28);
+  }
+
+  50% {
+    box-shadow: 0 0 18px rgba(255,255,255,1), 0 0 44px rgba(0,229,255,0.9), 0 0 78px rgba(168,85,247,0.34);
+  }
+}
+
+@keyframes journeyTerminalComplete {
+  0%,
+  100% {
+    transform: translate(-50%, 50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, 50%) scale(1.24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-hex-outline-glow,
+  .journey-hex-outline-core,
+  .journey-spine-head,
+  .journey-terminal-dot.is-complete {
+    animation: none;
+  }
+}

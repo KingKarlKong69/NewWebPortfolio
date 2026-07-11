@@ -1,0 +1,62 @@
+export const PROJECTS = [
+  {
+    id: 'tnp-oms',
+    number: '01',
+    eyebrow: 'Capstone Project',
+    title: 'TNP Orphanage Management System',
+    shortTitle: 'TNP-OMS',
+    description: 'A full-stack capstone and research project created to support orphanage management workflows.',
+    role: 'Research Lead & Full Stack Developer',
+    impact: null,
+    technologies: ['HTML', 'JavaScript', 'PHP', 'Firebase'],
+    screenshot: '/projects/CapstoneOMS.png',
+    screenshotAvailable: true,
+    accent: '#00e5ff',
+    secondaryAccent: '#6557ff'
+  },
+  {
+    id: 'warehouse-internship',
+    number: '02',
+    eyebrow: 'Internship Project',
+    title: 'Warehouse Management System',
+    shortTitle: 'Warehouse',
+    description: 'A configurable project entry reserved for the supplied warehouse internship application preview.',
+    role: 'Full Stack Web Developer Intern',
+    impact: null,
+    technologies: [],
+    screenshot: '/projects/WarehouseInternship.png',
+    screenshotAvailable: true,
+    accent: '#22d3ee',
+    secondaryAccent: '#8b5cf6'
+  },
+  {
+    id: 'coffee-shop',
+    number: '03',
+    eyebrow: 'Featured Project',
+    title: 'Coffee Shop Project',
+    shortTitle: 'Coffee Shop',
+    description: 'A configurable project entry reserved for the supplied coffee shop application preview.',
+    role: null,
+    impact: null,
+    technologies: [],
+    screenshot: '/projects/CoffeeShop.png',
+    screenshotAvailable: true,
+    accent: '#38bdf8',
+    secondaryAccent: '#a855f7'
+  },
+  {
+    id: 'silver-thatch',
+    number: '04',
+    eyebrow: 'Featured Project',
+    title: 'Silver Thatch',
+    shortTitle: 'Silver Thatch',
+    description: 'A configurable project entry reserved for the supplied Silver Thatch application preview.',
+    role: null,
+    impact: null,
+    technologies: [],
+    screenshot: '/projects/SilverThatch.png',
+    screenshotAvailable: true,
+    accent: '#67e8f9',
+    secondaryAccent: '#7c3aed'
+  }
+]
