@@ -449,6 +449,38 @@
   object-fit: contain;
 }
 
+.dialogGalleryControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.8rem;
+  color: #8ea1b6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dialogGalleryControls button {
+  border: 1px solid rgba(103, 232, 249, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(5, 16, 30, 0.78);
+  padding: 0.55rem 0.75rem;
+  color: #67e8f9;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.dialogGalleryControls button:hover,
+.dialogGalleryControls button:focus-visible {
+  border-color: rgba(103, 232, 249, 0.72);
+  background: rgba(9, 31, 48, 0.92);
+  color: #d9fbff;
+  outline: none;
+}
+
 .dialogPlaceholder {
   display: flex;
   min-height: 320px;

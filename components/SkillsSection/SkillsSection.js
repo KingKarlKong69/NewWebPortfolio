@@ -21,8 +21,8 @@ export default function SkillsSection() {
   const nextCategoryDelayRef = useRef(AUTO_CATEGORY_DELAY)
   const [activeCategoryId, setActiveCategoryId] = useState(SKILL_CATEGORIES[0].id)
   const [isInView, setIsInView] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
   const [scheduleVersion, setScheduleVersion] = useState(0)
-  const [webglSupported, setWebglSupported] = useState(true)
   const reducedMotion = useReducedMotion()
 
   const activeCategory = useMemo(
@@ -34,19 +34,13 @@ export default function SkillsSection() {
     const section = sectionRef.current
     if (!section) return undefined
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting),
-      {rootMargin: '18% 0px 18% 0px', threshold: 0.08}
-    )
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting)
+      if (entry.isIntersecting) setHasEntered(true)
+    }, {rootMargin: '18% 0px 18% 0px', threshold: 0.08})
     observer.observe(section)
 
     return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const canvas = document.createElement('canvas')
-    const supported = Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'))
-    setWebglSupported(supported)
   }, [])
 
   useEffect(() => {
@@ -132,7 +126,7 @@ export default function SkillsSection() {
               category={activeCategory}
               active={isInView}
               reducedMotion={Boolean(reducedMotion)}
-              webglSupported={webglSupported}
+              renderWebGL={hasEntered}
             />
           </motion.div>
 

@@ -9,6 +9,7 @@ import styles from './ProjectsSection.module.css'
 
 const AUTO_PROJECT_DELAY = 4000
 const MANUAL_PROJECT_DELAY = 8000
+const SCREENSHOT_DELAY = 3000
 
 const ProjectLaptopScene = dynamic(() => import('./ProjectLaptopScene'), {
   ssr: false,
@@ -17,6 +18,38 @@ const ProjectLaptopScene = dynamic(() => import('./ProjectLaptopScene'), {
 
 function ProjectDialog({ project, onClose }) {
   const dialogRef = useRef(null)
+  const [screenshots, setScreenshots] = useState([])
+  const [activeScreenshot, setActiveScreenshot] = useState(0)
+  const [isLoadingScreenshots, setIsLoadingScreenshots] = useState(false)
+
+  useEffect(() => {
+    if (!project) return undefined
+
+    const controller = new AbortController()
+    setScreenshots([])
+    setActiveScreenshot(0)
+    setIsLoadingScreenshots(true)
+
+    fetch(`/api/projects/${encodeURIComponent(project.id)}`, {signal: controller.signal})
+      .then((response) => response.ok ? response.json() : {images: []})
+      .then(({images}) => {
+        if (controller.signal.aborted) return
+        const discoveredImages = Array.isArray(images) ? images : []
+        setScreenshots(discoveredImages.length > 0
+          ? discoveredImages
+          : (project.screenshotAvailable && project.screenshot ? [project.screenshot] : []))
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          setScreenshots(project.screenshotAvailable && project.screenshot ? [project.screenshot] : [])
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingScreenshots(false)
+      })
+
+    return () => controller.abort()
+  }, [project])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -27,6 +60,18 @@ function ProjectDialog({ project, onClose }) {
     return () => dialog.removeEventListener('close', handleClose)
   }, [onClose, project])
 
+  useEffect(() => {
+    if (!project || screenshots.length <= 1) return undefined
+    const timeout = window.setTimeout(() => {
+      setActiveScreenshot((index) => (index + 1) % screenshots.length)
+    }, SCREENSHOT_DELAY)
+    return () => window.clearTimeout(timeout)
+  }, [activeScreenshot, project, screenshots.length])
+
+  const moveScreenshot = (direction) => {
+    setActiveScreenshot((index) => (index + direction + screenshots.length) % screenshots.length)
+  }
+
   if (!project) return null
 
   return (
@@ -35,15 +80,24 @@ function ProjectDialog({ project, onClose }) {
         <X size={20} />
       </button>
       <div className={styles.dialogPreview} style={{'--project-accent': project.accent, '--project-secondary': project.secondaryAccent}}>
-        {project.screenshotAvailable
-          ? <img src={project.screenshot} alt={`${project.title} project screenshot`} />
+        {isLoadingScreenshots
+          ? <div className={styles.dialogPlaceholder}><span>Loading screens…</span></div>
+          : screenshots.length > 0
+            ? <img src={screenshots[activeScreenshot]} alt={`${project.title} screen ${activeScreenshot + 1} of ${screenshots.length}`} />
           : (
             <div className={styles.dialogPlaceholder} role="img" aria-label={`Preview placeholder for ${project.title}`}>
               <span>{project.shortTitle}</span>
-              <small>{project.screenshot.split('/').pop()} is ready to be added</small>
+              <small>Add screenshots to public/projects/{project.id}/</small>
             </div>
           )}
       </div>
+      {screenshots.length > 1 && (
+        <div className={styles.dialogGalleryControls} aria-label="Project screenshots">
+          <button type="button" onClick={() => moveScreenshot(-1)}>Previous</button>
+          <span aria-live="polite">{activeScreenshot + 1} / {screenshots.length}</span>
+          <button type="button" onClick={() => moveScreenshot(1)}>Next</button>
+        </div>
+      )}
       <p className={styles.dialogEyebrow}>Project {project.number}</p>
       <h3 id="project-dialog-title">{project.title}</h3>
       <p>{project.description}</p>
@@ -61,6 +115,7 @@ export default function ProjectsSection() {
   const nextProjectDelayRef = useRef(AUTO_PROJECT_DELAY)
   const [activeIndex, setActiveIndex] = useState(0)
   const [isInView, setIsInView] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
   const [scheduleVersion, setScheduleVersion] = useState(0)
   const [dialogProject, setDialogProject] = useState(null)
   const reducedMotion = useReducedMotion()
@@ -69,10 +124,10 @@ export default function ProjectsSection() {
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return undefined
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting),
-      {threshold: 0.08, rootMargin: '15% 0px 15% 0px'}
-    )
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting)
+      if (entry.isIntersecting) setHasEntered(true)
+    }, {threshold: 0.08, rootMargin: '15% 0px 15% 0px'})
     observer.observe(section)
     return () => observer.disconnect()
   }, [])
@@ -139,6 +194,7 @@ export default function ProjectsSection() {
               projects={PROJECTS}
               activeIndex={activeIndex}
               active={isInView}
+              mounted={hasEntered}
               reducedMotion={Boolean(reducedMotion)}
             />
             <div className={styles.screenCaption} aria-live="polite">

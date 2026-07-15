@@ -9,17 +9,17 @@
   },
   "dependencies": {
     "@react-three/drei": "^9.46.4",
-    "@react-three/fiber": "^8.13.0",
-    "@react-three/postprocessing": "^2.10.6",
+    "@react-three/fiber": "8.18.0",
     "animejs": "^4.5.0",
     "autoprefixer": "10.4.14",
     "framer-motion": "10.12.4",
     "lucide-react": "^1.21.0",
     "next": "13.5.6",
+    "postprocessing": "6.39.1",
     "postcss": "8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwindcss": "3.4.8",
-    "three": "^0.164.0"
+    "three": "0.168.0"
   }
 }

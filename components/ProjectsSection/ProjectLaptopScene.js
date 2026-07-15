@@ -1,6 +1,7 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import ActiveFrameLoop from '../ActiveFrameLoop'
 import styles from './ProjectsSection.module.css'
 
 const SCREEN_VERTEX_SHADER = `
@@ -422,14 +423,16 @@ function LaptopScene({ projects, activeIndex, active, reducedMotion }) {
 export default function ProjectLaptopScene(props) {
   return (
     <div className={styles.laptopCanvas} aria-hidden="true">
-      <Canvas
+      {props.mounted && <Canvas
         camera={{position: [0, 2.2, 10.2], fov: 40}}
         dpr={[1, 1.55]}
+        frameloop="demand"
         gl={{alpha: true, antialias: true, powerPreference: 'high-performance'}}
         shadows={false}
       >
+        <ActiveFrameLoop active={props.active} />
         <LaptopScene {...props} />
-      </Canvas>
+      </Canvas>}
     </div>
   )
 }

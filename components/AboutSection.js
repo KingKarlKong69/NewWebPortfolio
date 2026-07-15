@@ -2,8 +2,9 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { animate, remove, set } from 'animejs'
 import { motion, useReducedMotion } from 'framer-motion'
 import { BookOpen, BriefcaseBusiness, Code2, FileText, GraduationCap } from 'lucide-react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import ActiveFrameLoop from './ActiveFrameLoop'
 
 const milestones = [
   {
@@ -213,6 +214,8 @@ function Milestone({ milestone, index, setItemRef }){
 
 export default function AboutSection(){
   const prefersReducedMotion = useReducedMotion()
+  const [journeyCanvasMounted, setJourneyCanvasMounted] = useState(false)
+  const [journeyCanvasActive, setJourneyCanvasActive] = useState(false)
   const sectionRef = useRef()
   const timelineRef = useRef()
   const headingRef = useRef()
@@ -223,6 +226,18 @@ export default function AboutSection(){
   const itemRefs = useRef([])
   const frameRef = useRef(null)
   const activatedItemsRef = useRef([])
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return undefined
+    const observer = new IntersectionObserver(([entry]) => {
+      const active = entry.isIntersecting
+      setJourneyCanvasActive(active)
+      if (active) setJourneyCanvasMounted(true)
+    }, {rootMargin: '30% 0px', threshold: 0.01})
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
 
   const setItemRef = (index) => (node) => {
     itemRefs.current[index] = node
@@ -617,9 +632,15 @@ export default function AboutSection(){
         className="relative flex items-start overflow-visible py-0"
       >
         <div className="pointer-events-none absolute inset-0 opacity-55">
-          <Canvas camera={{position:[0,0,7],fov:48}} gl={{alpha:true,antialias:true,powerPreference:'high-performance'}} dpr={[1,1.35]}>
+          {journeyCanvasMounted && <Canvas
+            camera={{position:[0,0,7],fov:48}}
+            gl={{alpha:true,antialias:true,powerPreference:'high-performance'}}
+            dpr={[1,1.35]}
+            frameloop="demand"
+          >
+            <ActiveFrameLoop active={journeyCanvasActive} />
             <JourneyAtmosphere />
-          </Canvas>
+          </Canvas>}
         </div>
 
         <div className="relative z-10 mx-auto max-w-[1120px]">

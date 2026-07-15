@@ -1,8 +1,18 @@
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { motion } from 'framer-motion'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
+
+class KLMarkSVGLoader extends SVGLoader {
+  parse(text) {
+    const compatibleText = text
+      .replace(/url\(#gradient_2\)/g, '#224EFB')
+      .replace(/url\(#gradient_3\)/g, '#2A30FE')
+
+    return super.parse(compatibleText)
+  }
+}
 
 const cyan = '#00E5FF'
 const blue = '#4F8CFF'
@@ -238,6 +248,13 @@ function EnergyParticles({ hoverBoost, intensity = 1 }) {
 
 function BeamParticles({ hoverBoost, clickBurst, intensity = 1 }) {
   const pointsRef = useRef()
+  const palette = useMemo(() => ({
+    cyan: new THREE.Color(cyan),
+    blue: new THREE.Color(blue),
+    purple: new THREE.Color(purple),
+    white: new THREE.Color(whiteHot),
+    mixed: new THREE.Color()
+  }), [])
   const particleData = useMemo(() => Array.from({ length: 170 }, (_, index) => {
     const r1 = seededNoise(index * 1.83 + 12.4)
     const r2 = seededNoise(index * 4.11 + 3.7)
@@ -265,9 +282,6 @@ function BeamParticles({ hoverBoost, clickBurst, intensity = 1 }) {
     const positions = pointsRef.current.geometry.attributes.position.array
     const colors = pointsRef.current.geometry.attributes.color.array
     const energy = 1 + hoverBoost.current * 0.7 + clickBurst.current * 2.2
-    const cyanColor = new THREE.Color(cyan)
-    const blueColor = new THREE.Color(blue)
-    const purpleColor = new THREE.Color(purple)
 
     particleData.forEach((particle, index) => {
       const rawY = particle.baseY + state.clock.elapsedTime * particle.speed * energy
@@ -275,7 +289,11 @@ function BeamParticles({ hoverBoost, clickBurst, intensity = 1 }) {
       const t = THREE.MathUtils.clamp((y + 1.48) / 2.96, 0, 1)
       const centerHeat = Math.pow(Math.max(0, 1 - Math.abs(t - 0.43) * 3.1), 3)
       const lowerTint = Math.pow(Math.max(0, 1 - Math.abs(t - 0.12) * 5.2), 2) * 0.14
-      const beamColor = cyanColor.clone().lerp(blueColor, t * 0.75).lerp(purpleColor, lowerTint).lerp(new THREE.Color(whiteHot), centerHeat)
+      const beamColor = palette.mixed
+        .copy(palette.cyan)
+        .lerp(palette.blue, t * 0.75)
+        .lerp(palette.purple, lowerTint)
+        .lerp(palette.white, centerHeat)
       const offset = index * 3
 
       positions[offset] = Math.sin(state.clock.elapsedTime * 3.1 + particle.phase + y * 4.4) * particle.xAmp * (1 + clickBurst.current * 1.2)
@@ -310,6 +328,11 @@ function BeamStreaks({ hoverBoost, clickBurst, intensity = 1 }) {
   const meshRef = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const color = useMemo(() => new THREE.Color(), [])
+  const palette = useMemo(() => ({
+    cyan: new THREE.Color(cyan),
+    purple: new THREE.Color(purple),
+    white: new THREE.Color(whiteHot)
+  }), [])
   const streakData = useMemo(() => Array.from({ length: 44 }, (_, index) => {
     const r1 = seededNoise(index * 2.19 + 4.4)
     const r2 = seededNoise(index * 6.31 + 1.9)
@@ -329,8 +352,6 @@ function BeamStreaks({ hoverBoost, clickBurst, intensity = 1 }) {
   useFrame((state) => {
     if (!meshRef.current) return
     const energy = 1 + hoverBoost.current * 0.8 + clickBurst.current * 2.1
-    const cyanColor = new THREE.Color(cyan)
-    const purpleColor = new THREE.Color(purple)
 
     streakData.forEach((streak, index) => {
       const rawY = streak.baseY + state.clock.elapsedTime * streak.speed * energy
@@ -348,7 +369,10 @@ function BeamStreaks({ hoverBoost, clickBurst, intensity = 1 }) {
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(index, dummy.matrix)
 
-      color.copy(cyanColor).lerp(purpleColor, Math.max(0, 0.38 - t) * 1.8).lerp(new THREE.Color(whiteHot), hot * 0.7)
+      color
+        .copy(palette.cyan)
+        .lerp(palette.purple, Math.max(0, 0.38 - t) * 1.8)
+        .lerp(palette.white, hot * 0.7)
       meshRef.current.setColorAt(index, color)
     })
 
@@ -536,6 +560,13 @@ function OrbitingDashFragments({
   const meshRef = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const color = useMemo(() => new THREE.Color(), [])
+  const palette = useMemo(() => ({
+    cyan: new THREE.Color(0x00e5ff),
+    blue: new THREE.Color(0x4f8cff),
+    purple: new THREE.Color(0x8b5cf6),
+    magenta: new THREE.Color(0xf15cff),
+    white: new THREE.Color(whiteHot)
+  }), [])
   const fragmentData = useMemo(() => Array.from({ length: count }, (_, index) => {
     const r1 = seededNoise(index + seed)
     const r2 = seededNoise(index * 3.19 + seed)
@@ -580,10 +611,6 @@ function OrbitingDashFragments({
       const sideMix = THREE.MathUtils.clamp((Math.cos(angle) + 1) / 2, 0, 1)
       const frontHeat = front ? Math.max(0, -Math.sin(angle)) : 0
       const whiteMix = THREE.MathUtils.clamp(fragment.brightness * (hot ? 0.62 : frontHeat * 0.28), 0, hot ? 0.42 : 0.14)
-      const cyanColor = new THREE.Color(0x00e5ff)
-      const blueColor = new THREE.Color(0x4f8cff)
-      const purpleColor = new THREE.Color(0x8b5cf6)
-      const magentaColor = new THREE.Color(0xf15cff)
 
       dummy.position.set(
         point.x,
@@ -595,11 +622,11 @@ function OrbitingDashFragments({
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(index, dummy.matrix)
 
-      color.copy(cyanColor)
-        .lerp(blueColor, (1 - sideMix) * fragment.colorAccent * 0.38)
-        .lerp(purpleColor, sideMix)
-        .lerp(magentaColor, sideMix * fragment.colorAccent * 0.25)
-        .lerp(new THREE.Color(whiteHot), whiteMix)
+      color.copy(palette.cyan)
+        .lerp(palette.blue, (1 - sideMix) * fragment.colorAccent * 0.38)
+        .lerp(palette.purple, sideMix)
+        .lerp(palette.magenta, sideMix * fragment.colorAccent * 0.25)
+        .lerp(palette.white, whiteMix)
       meshRef.current.setColorAt(index, color)
     })
 
@@ -649,6 +676,13 @@ function FrontAccretionDisk({ hoverBoost, clickBurst, intensity = 1 }) {
 
 function CompactRingParticles({ hoverBoost, clickBurst, intensity = 1 }) {
   const pointsRef = useRef()
+  const palette = useMemo(() => ({
+    cyan: new THREE.Color(cyan),
+    blue: new THREE.Color(blue),
+    purple: new THREE.Color(purple),
+    white: new THREE.Color(whiteHot),
+    mixed: new THREE.Color()
+  }), [])
   const particleData = useMemo(() => Array.from({ length: 420 }, (_, index) => {
     const r1 = seededNoise(index * 2.17 + 5.8)
     const r2 = seededNoise(index * 4.73 + 11.2)
@@ -681,19 +715,17 @@ function CompactRingParticles({ hoverBoost, clickBurst, intensity = 1 }) {
     const positions = pointsRef.current.geometry.attributes.position.array
     const colors = pointsRef.current.geometry.attributes.color.array
     const energy = 1 + hoverBoost.current * 0.7 + clickBurst.current * 1.8
-    const cyanColor = new THREE.Color(cyan)
-    const blueColor = new THREE.Color(blue)
-    const purpleColor = new THREE.Color(purple)
 
     particleData.forEach((particle, index) => {
       const angle = particle.angle + state.clock.elapsedTime * particle.speed * energy
       const frontArc = Math.max(0, -Math.sin(angle))
       const sideMix = THREE.MathUtils.clamp((Math.cos(angle) + 1) / 2, 0, 1)
       const twinkle = 0.72 + Math.sin(state.clock.elapsedTime * 3.4 + particle.phase) * 0.28
-      const color = cyanColor.clone()
-        .lerp(blueColor, 0.28 + frontArc * 0.2)
-        .lerp(purpleColor, sideMix * 0.55)
-        .lerp(new THREE.Color(whiteHot), frontArc * 0.45)
+      const color = palette.mixed
+        .copy(palette.cyan)
+        .lerp(palette.blue, 0.28 + frontArc * 0.2)
+        .lerp(palette.purple, sideMix * 0.55)
+        .lerp(palette.white, frontArc * 0.45)
       const offset = index * 3
 
       positions[offset] = Math.cos(angle) * particle.radiusX
@@ -824,7 +856,7 @@ function PlasmaBeam({ hoverBoost, clickBurst, intensity = 1 }) {
 
 function KLMonogram({ hoverBoost, clickBurst, intensity = 1 }) {
   const groupRef = useRef()
-  const svgData = useLoader(SVGLoader, '/assets/kl-mark.svg')
+  const svgData = useLoader(KLMarkSVGLoader, '/assets/kl-mark.svg')
   const materials = useMemo(() => {
     const makeMaterial = (color, emissive) => new THREE.MeshPhysicalMaterial({
       color,
@@ -1011,6 +1043,8 @@ export default function HolographicKLLogo({
 }) {
   const [hovered, setHovered] = useState(false)
   const [burstToken, setBurstToken] = useState(0)
+  const [canvasVisible, setCanvasVisible] = useState(false)
+  const containerRef = useRef(null)
   const canvasMask = compact
     ? 'radial-gradient(ellipse at 50% 56%, #000 0%, #000 62%, rgba(0,0,0,0.76) 74%, rgba(0,0,0,0.22) 88%, transparent 100%)'
     : 'radial-gradient(circle at 50% 50%, #000 0%, #000 58%, rgba(0,0,0,0.78) 70%, rgba(0,0,0,0.24) 82%, transparent 96%)'
@@ -1018,8 +1052,22 @@ export default function HolographicKLLogo({
     ? 'none'
     : 'drop-shadow(0 0 10px rgba(0,229,255,0.85)) drop-shadow(0 0 18px rgba(139,92,246,0.55))'
 
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return undefined
+    const updateVisibility = () => {
+      const bounds = container.getBoundingClientRect()
+      setCanvasVisible(bounds.width > 1 && bounds.height > 1 && container.getClientRects().length > 0)
+    }
+    updateVisibility()
+    const observer = new ResizeObserver(updateVisibility)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <motion.div
+      ref={containerRef}
       className={`relative h-full w-full ${className}`}
       style={{
         background: 'transparent',
@@ -1033,7 +1081,7 @@ export default function HolographicKLLogo({
       aria-label="Karl Lopez holographic KL logo"
       role="img"
     >
-      <Canvas
+      {canvasVisible && <Canvas
         className="!overflow-visible !bg-transparent"
         style={{ background: 'transparent' }}
         dpr={[1, 1.5]}
@@ -1060,7 +1108,7 @@ export default function HolographicKLLogo({
           intensity={intensity}
           sceneScale={sceneScale}
         />
-      </Canvas>
+      </Canvas>}
     </motion.div>
   )
 }

@@ -3,6 +3,7 @@ import { createTimeline } from 'animejs'
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import ActiveFrameLoop from './ActiveFrameLoop'
 import { useActiveNavSection } from './navigationState'
 
 const colorThemes = [
@@ -709,6 +710,8 @@ export default function TechCore({ onHoverChange }) {
   const [rageBurst, setRageBurst] = useState(0)
   const [limitCharge, setLimitCharge] = useState(0)
   const [autonomousAction, setAutonomousAction] = useState(null)
+  const [canvasMounted, setCanvasMounted] = useState(false)
+  const [canvasActive, setCanvasActive] = useState(false)
   const containerRef = useRef()
   const dragStartRef = useRef({ x: 0, y: 0 })
   const dragOriginRef = useRef({ x: 0, y: 0 })
@@ -727,6 +730,18 @@ export default function TechCore({ onHoverChange }) {
   const limitTimeoutRef = useRef()
   const limitChargeIntervalRef = useRef()
   const limitStartRef = useRef(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return undefined
+    const observer = new IntersectionObserver(([entry]) => {
+      const active = entry.isIntersecting
+      setCanvasActive(active)
+      if (active) setCanvasMounted(true)
+    }, {rootMargin: '35% 0px', threshold: 0.01})
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -1010,15 +1025,17 @@ export default function TechCore({ onHoverChange }) {
         triggerClickChoreography()
       }}
     >
-      <Canvas
+      {canvasMounted && <Canvas
         className="!overflow-visible"
         camera={{ position: [0, 0, 8], fov: 45 }}
+        dpr={[1, 1.5]}
+        frameloop="demand"
         gl={{
           antialias: true,
-          alpha: true,
-          pixelRatio: 1.5
+          alpha: true
         }}
       >
+        <ActiveFrameLoop active={canvasActive} />
         {/* Stars background */}
         <StarField />
 
@@ -1042,7 +1059,7 @@ export default function TechCore({ onHoverChange }) {
           navSignal={navSignalRef.current}
           clickSignal={clickSignalRef.current}
         />
-      </Canvas>
+      </Canvas>}
 
       {/* Glow overlay */}
       <motion.div

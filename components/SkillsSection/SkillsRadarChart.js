@@ -1,6 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import ActiveFrameLoop from '../ActiveFrameLoop'
 import styles from './SkillsSection.module.css'
 
 const CHART_RADIUS = 2.22
@@ -271,7 +272,7 @@ function RadarFallback({ items }) {
   )
 }
 
-export default function SkillsRadarChart({ category, active, reducedMotion, webglSupported }) {
+export default function SkillsRadarChart({ category, active, reducedMotion, renderWebGL }) {
   const [hoveredSkill, setHoveredSkill] = useState(null)
   const summary = `${category.label} radar chart with ${category.items.length} data points. Values are also listed beside the chart.`
 
@@ -281,16 +282,17 @@ export default function SkillsRadarChart({ category, active, reducedMotion, webg
 
   return (
     <div className={`${styles.radarShell} relative mx-auto aspect-square w-full max-w-[390px]`} role="img" aria-label={summary}>
-      {webglSupported ? (
+      {renderWebGL ? (
         <Canvas
           orthographic
           camera={{position: [0, 0, 8], zoom: 55}}
           dpr={[1, 1.5]}
-          frameloop={active ? 'always' : 'demand'}
+          frameloop="demand"
           gl={{alpha: true, antialias: true, powerPreference: 'high-performance'}}
           className="!bg-transparent"
           aria-hidden="true"
         >
+          <ActiveFrameLoop active={active} />
           <RadarScene
             items={category.items}
             active={active}

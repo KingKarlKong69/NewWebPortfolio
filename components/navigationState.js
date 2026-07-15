@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export const NAV_ITEMS = [
   { label: 'Home', id: 'home' },
@@ -9,7 +9,9 @@ export const NAV_ITEMS = [
   { label: 'Contact', id: 'contact' }
 ]
 
-const NAV_EVENT = 'portfolio-nav-change'
+export const NAV_EVENT = 'portfolio-nav-change'
+
+const NavigationContext = createContext(null)
 
 const getHashSection = () => {
   if (typeof window === 'undefined') return 'home'
@@ -52,12 +54,55 @@ const getSectionInView = () => {
   }, null)?.id || 'home'
 }
 
-export function useActiveNavSection() {
+function useNavigationController() {
   const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
-    const syncFromLocation = () => setActiveSection(getHashSection())
-    const syncFromEvent = (event) => setActiveSection(event.detail?.section || getHashSection())
+    let locationFrameId = null
+    let hashAnchorObserver = null
+    let hashAnchorSection = null
+
+    const releaseHashAnchor = () => {
+      hashAnchorSection = null
+      hashAnchorObserver?.disconnect()
+      hashAnchorObserver = null
+      if (locationFrameId) window.cancelAnimationFrame(locationFrameId)
+      locationFrameId = null
+    }
+
+    const scheduleHashAnchor = () => {
+      if (!hashAnchorSection) return
+      if (locationFrameId) window.cancelAnimationFrame(locationFrameId)
+      locationFrameId = window.requestAnimationFrame(() => {
+        locationFrameId = null
+        // `auto` inherits the global smooth-scroll rule and briefly activates every
+        // WebGL section crossed by a direct hash load. Force a single-frame jump.
+        document.getElementById(hashAnchorSection)?.scrollIntoView({behavior: 'instant', block: 'start'})
+      })
+    }
+
+    const startHashAnchor = (section) => {
+      releaseHashAnchor()
+      hashAnchorSection = section
+      hashAnchorObserver = new ResizeObserver(scheduleHashAnchor)
+      hashAnchorObserver.observe(document.body)
+      scheduleHashAnchor()
+    }
+
+    const syncFromLocation = () => {
+      const nextSection = getHashSection()
+      setActiveSection(nextSection)
+
+      if (!window.location.hash) return
+      // Keep the initial hash target anchored while fonts and dynamic sections
+      // settle above it. ResizeObserver handles real layout changes without a
+      // timeout or synthetic resize event; the first user intent releases it.
+      startHashAnchor(nextSection)
+    }
+    const syncFromEvent = (event) => {
+      releaseHashAnchor()
+      setActiveSection(event.detail?.section || getHashSection())
+    }
     let frameId = null
 
     const syncFromScroll = () => {
@@ -71,22 +116,33 @@ export function useActiveNavSection() {
     }
 
     syncFromLocation()
-    syncFromScroll()
+    if (!window.location.hash) syncFromScroll()
     window.addEventListener('hashchange', syncFromLocation)
+    window.addEventListener('popstate', syncFromLocation)
     window.addEventListener(NAV_EVENT, syncFromEvent)
     window.addEventListener('scroll', syncFromScroll, { passive: true })
     window.addEventListener('resize', syncFromScroll)
+    window.addEventListener('wheel', releaseHashAnchor, { passive: true })
+    window.addEventListener('touchstart', releaseHashAnchor, { passive: true })
+    window.addEventListener('pointerdown', releaseHashAnchor, { passive: true })
+    window.addEventListener('keydown', releaseHashAnchor)
 
     return () => {
       if (frameId) window.cancelAnimationFrame(frameId)
+      releaseHashAnchor()
       window.removeEventListener('hashchange', syncFromLocation)
+      window.removeEventListener('popstate', syncFromLocation)
       window.removeEventListener(NAV_EVENT, syncFromEvent)
       window.removeEventListener('scroll', syncFromScroll)
       window.removeEventListener('resize', syncFromScroll)
+      window.removeEventListener('wheel', releaseHashAnchor)
+      window.removeEventListener('touchstart', releaseHashAnchor)
+      window.removeEventListener('pointerdown', releaseHashAnchor)
+      window.removeEventListener('keydown', releaseHashAnchor)
     }
   }, [])
 
-  const navigateToSection = (section) => {
+  const navigateToSection = useCallback((section) => {
     setActiveSection(section)
 
     if (typeof window === 'undefined') return
@@ -94,14 +150,38 @@ export function useActiveNavSection() {
     const target = document.getElementById(section)
 
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
       window.history.pushState(null, '', `#${section}`)
     } else if (window.location.hash !== `#${section}`) {
       window.history.pushState(null, '', `#${section}`)
     }
 
     window.dispatchEvent(new CustomEvent(NAV_EVENT, { detail: { section } }))
+  }, [])
+
+  return useMemo(
+    () => ({activeSection, navigateToSection}),
+    [activeSection, navigateToSection]
+  )
+}
+
+export function NavigationProvider({children}) {
+  const navigation = useNavigationController()
+
+  return (
+    <NavigationContext.Provider value={navigation}>
+      {children}
+    </NavigationContext.Provider>
+  )
+}
+
+export function useActiveNavSection() {
+  const navigation = useContext(NavigationContext)
+
+  if (!navigation) {
+    throw new Error('useActiveNavSection must be used within NavigationProvider')
   }
 
-  return { activeSection, navigateToSection }
+  return navigation
 }

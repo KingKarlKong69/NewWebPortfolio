@@ -1,12 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { Download } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 import { NAV_ITEMS, useActiveNavSection } from './navigationState'
-
-const HolographicKLLogo = dynamic(() => import('./HolographicKLLogo'), {
-  ssr: false
-})
 
 export default function NavBar(){
   const { activeSection, navigateToSection } = useActiveNavSection()
@@ -67,14 +62,6 @@ export default function NavBar(){
         onFocusCapture={() => setNavVisible(true)}
         className="fixed left-0 right-0 top-0 z-50 bg-transparent px-4 py-3 md:pl-24 md:pr-8 md:py-5"
       >
-      <div className="pointer-events-none fixed left-3 top-3 z-50 h-[54px] w-[54px] lg:hidden">
-        <HolographicKLLogo
-          cameraDistance={8.15}
-          intensity={1.08}
-          showMask={false}
-        />
-      </div>
-
       <nav
         aria-label="Mobile navigation"
         className="fixed right-5 top-9 z-50 flex flex-col items-start gap-8 text-[7px] font-bold uppercase tracking-[0.08em] text-gray-400 md:hidden"
@@ -86,7 +73,10 @@ export default function NavBar(){
             <motion.a
               key={item.id}
               href={`#${item.id}`}
-              onClick={() => navigateToSection(item.id)}
+              onClick={(event) => {
+                event.preventDefault()
+                navigateToSection(item.id)
+              }}
               className={`relative cursor-pointer transition-colors ${isActive ? 'text-cyan-200' : 'text-gray-400 hover:text-cyan-200 focus:text-cyan-200'}`}
               whileHover={{x: -2, color:'#A5F3FC'}}
               whileFocus={{x: -2, color:'#A5F3FC'}}
@@ -106,7 +96,10 @@ export default function NavBar(){
               <motion.a
                 key={item.id}
                 href={`#${item.id}`}
-                onClick={() => navigateToSection(item.id)}
+                onClick={(event) => {
+                  event.preventDefault()
+                  navigateToSection(item.id)
+                }}
                 className={`group relative cursor-pointer transition-colors ${isActive ? 'text-white' : 'text-gray-300 hover:text-white'}`}
                 whileHover={{color:'#ffffff'}}
               >

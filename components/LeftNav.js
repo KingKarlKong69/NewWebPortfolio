@@ -1,14 +1,7 @@
 import { motion } from 'framer-motion'
 import { Briefcase, Code2, Home, Mail, ServerCog, User } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { useActiveNavSection } from './navigationState'
 
-const HolographicKLLogo = dynamic(() => import('./HolographicKLLogo'), {
-  ssr: false
-})
-
-const DEFAULT_LOGO_INTENSITY = 1.08
-const SIDEBAR_LOGO_SCALE = 0.8
 const SIDEBAR_BEAM_EDGE_WIDTH = 90
 
 const navItems = [
@@ -36,18 +29,18 @@ function LinkedInMark({ size = 17, className = '' }) {
   )
 }
 
-function TwitterXMark({ size = 17, className = '' }) {
+function FacebookMark({ size = 17, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
-      <path d="m5 5 14 14M19 5 5 19" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M13.55 21v-8h2.78l.42-3.12h-3.2V7.9c0-.9.26-1.52 1.6-1.52h1.7V3.6c-.3-.04-1.31-.12-2.49-.12-2.46 0-4.15 1.46-4.15 4.15v2.25H7.65V13h2.78v8h3.12Z" />
     </svg>
   )
 }
 
 const socialItems = [
-  { icon: GitHubMark, label: 'GitHub' },
-  { icon: LinkedInMark, label: 'LinkedIn' },
-  { icon: TwitterXMark, label: 'Twitter / X' }
+  { icon: GitHubMark, label: 'GitHub', href: 'https://github.com/KingKarlKong69' },
+  { icon: LinkedInMark, label: 'LinkedIn', href: 'https://www.linkedin.com/in/karl-lopez-b3472539a/' },
+  { icon: FacebookMark, label: 'Facebook', href: 'https://www.facebook.com/karl.lopez.75491' }
 ]
 
 export default function LeftNav(){
@@ -67,21 +60,7 @@ export default function LeftNav(){
         style={{width: SIDEBAR_BEAM_EDGE_WIDTH}}
       />
 
-      <div className="relative mt-1 h-[172px] w-[224px] shrink-0 translate-x-[54px] overflow-visible">
-        <motion.div
-          initial={{opacity:0}}
-          animate={{opacity:1}}
-          transition={{delay:0.35,duration:0.8}}
-          className="h-full w-full"
-        >
-          <HolographicKLLogo
-            cameraDistance={8.15}
-            intensity={DEFAULT_LOGO_INTENSITY}
-            sceneScale={SIDEBAR_LOGO_SCALE}
-            showMask={false}
-          />
-        </motion.div>
-      </div>
+      <div aria-hidden="true" className="mt-1 h-[172px] shrink-0" />
 
       <nav className="relative mt-3 flex translate-x-[12px] flex-col items-center gap-7">
         {navItems.map((item, idx) => {
@@ -92,7 +71,10 @@ export default function LeftNav(){
             <motion.a
               key={item.label}
               href={`#${item.id}`}
-              onClick={() => navigateToSection(item.id)}
+              onClick={(event) => {
+                event.preventDefault()
+                navigateToSection(item.id)
+              }}
               initial={{opacity:0,scale:0.72}}
               animate={{opacity:1,scale:1}}
               transition={{delay:0.45 + idx*0.08}}
@@ -121,9 +103,13 @@ export default function LeftNav(){
           return (
             <motion.a
               key={item.label}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{scale:1.12}}
               className="group relative flex h-6 w-6 cursor-pointer items-center justify-center"
               aria-label={item.label}
+              title={item.label}
             >
               <Icon size={17} className="text-slate-500 transition-all duration-300 group-hover:text-cyan-200 group-hover:drop-shadow-[0_0_9px_rgba(0,229,255,0.65)]" />
             </motion.a>
