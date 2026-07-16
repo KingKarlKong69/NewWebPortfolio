@@ -5,6 +5,7 @@ import TechCore from './TechCore'
 import TerminalPanel from './TerminalPanel'
 import Stats from './Stats'
 import IdentityCard from './IdentityCard'
+import { useActiveNavSection } from './navigationState'
 
 const rotatingRoles = [
 	'Full Stack Developer',
@@ -81,6 +82,7 @@ function ScrollExploreCue(){
 }
 
 export default function Hero(){
+	const { navigateToSection } = useActiveNavSection()
 	const typedRole = useTypedRotatingText(rotatingRoles)
 	const floorHorizonY = 86
 	const floorBottomY = 420
@@ -274,10 +276,10 @@ export default function Hero(){
 					</motion.p>
 
 					<motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{delay:0.6, duration:0.8}} className="flex justify-center gap-3 pt-3 sm:gap-4 lg:justify-start lg:gap-5 lg:pt-5">
-						<motion.button whileHover={{scale:1.04,boxShadow: '0 0 34px rgba(0,229,255,0.52)'}} whileTap={{scale:0.94}} className="min-w-[136px] rounded-md bg-gradient-to-r from-cyan-300 to-purple-600 px-4 py-3 font-mono text-[9px] font-black tracking-wide text-black shadow-[0_0_28px_rgba(0,229,255,0.25)] min-[375px]:min-w-[150px] min-[375px]:text-[10px] sm:px-7 sm:text-[12px] lg:min-w-0 lg:px-8 lg:py-[18px] lg:text-[14px]">
+						<motion.button type="button" onClick={() => navigateToSection('projects')} whileHover={{scale:1.04,boxShadow: '0 0 34px rgba(0,229,255,0.52)'}} whileTap={{scale:0.94}} className="min-w-[136px] rounded-md bg-gradient-to-r from-cyan-300 to-purple-600 px-4 py-3 font-mono text-[9px] font-black tracking-wide text-black shadow-[0_0_28px_rgba(0,229,255,0.25)] min-[375px]:min-w-[150px] min-[375px]:text-[10px] sm:px-7 sm:text-[12px] lg:min-w-0 lg:px-8 lg:py-[18px] lg:text-[14px]">
 							VIEW MY WORK <span className="ml-2">-&gt;</span>
 						</motion.button>
-						<motion.button whileHover={{scale:1.04,boxShadow: '0 0 20px rgba(0,229,255,0.26)', borderColor:'rgba(0,229,255,0.56)'}} className="min-w-[136px] rounded-md border border-cyan-400/20 bg-white/[0.015] px-4 py-3 font-mono text-[9px] font-black tracking-wide text-white backdrop-blur-md transition hover:bg-cyan-400/10 min-[375px]:min-w-[150px] min-[375px]:text-[10px] sm:px-7 sm:text-[12px] lg:min-w-0 lg:px-8 lg:py-[18px] lg:text-[14px]">
+						<motion.button type="button" onClick={() => navigateToSection('contact')} whileHover={{scale:1.04,boxShadow: '0 0 20px rgba(0,229,255,0.26)', borderColor:'rgba(0,229,255,0.56)'}} whileTap={{scale:0.94}} className="min-w-[136px] rounded-md border border-cyan-400/20 bg-white/[0.015] px-4 py-3 font-mono text-[9px] font-black tracking-wide text-white backdrop-blur-md transition hover:bg-cyan-400/10 min-[375px]:min-w-[150px] min-[375px]:text-[10px] sm:px-7 sm:text-[12px] lg:min-w-0 lg:px-8 lg:py-[18px] lg:text-[14px]">
 							GET IN TOUCH
 						</motion.button>
 					</motion.div>

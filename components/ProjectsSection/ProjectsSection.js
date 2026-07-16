@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 import { motion, useReducedMotion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { Clock3, ExternalLink, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ProjectDetails from './ProjectDetails'
 import ProjectNavigation from './ProjectNavigation'
@@ -75,11 +75,16 @@ function ProjectDialog({ project, onClose }) {
   if (!project) return null
 
   return (
-    <dialog ref={dialogRef} className={styles.projectDialog} aria-labelledby="project-dialog-title">
+    <dialog
+      ref={dialogRef}
+      className={styles.projectDialog}
+      aria-labelledby="project-dialog-title"
+      style={{'--project-accent': project.accent, '--project-secondary': project.secondaryAccent}}
+    >
       <button type="button" className={styles.dialogClose} onClick={() => dialogRef.current?.close()} aria-label="Close project details">
         <X size={20} />
       </button>
-      <div className={styles.dialogPreview} style={{'--project-accent': project.accent, '--project-secondary': project.secondaryAccent}}>
+      <div className={styles.dialogPreview}>
         {isLoadingScreenshots
           ? <div className={styles.dialogPlaceholder}><span>Loading screens…</span></div>
           : screenshots.length > 0
@@ -105,6 +110,25 @@ function ProjectDialog({ project, onClose }) {
         <div><dt>Role</dt><dd>{project.role || 'Pending project information'}</dd></div>
         <div><dt>Impact</dt><dd>{project.impact || 'Pending project information'}</dd></div>
       </dl>
+      <div className={styles.dialogActions}>
+        {project.liveUrl ? (
+          <a
+            className={styles.dialogLiveLink}
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${project.title} live site`}
+          >
+            View Live Site
+            <ExternalLink size={17} strokeWidth={1.8} aria-hidden="true" />
+          </a>
+        ) : (
+          <span className={styles.dialogLiveUnavailable} role="status">
+            <Clock3 size={17} strokeWidth={1.8} aria-hidden="true" />
+            Deployment Coming Soon
+          </span>
+        )}
+      </div>
     </dialog>
   )
 }
