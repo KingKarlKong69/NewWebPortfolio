@@ -14,9 +14,38 @@ export const blackHoleFragmentShader = /* glsl */ `
   uniform float uMotion;
   uniform float uQuality;
   uniform float uScale;
+  uniform float uHorizonScale;
+  uniform float uLensingStrength;
+  uniform float uRotationSpeed;
+  uniform float uNoiseSpeed;
+  uniform float uGasDensity;
+  uniform float uDiskThickness;
+  uniform float uCloudScale;
+  uniform float uFineDetail;
+  uniform float uFilamentStrength;
+  uniform float uCloudBreakup;
+  uniform float uForegroundThickness;
+  uniform float uForegroundBreakup;
+  uniform float uGasDevelopment;
+  uniform float uPhotonGlow;
+  uniform float uPhotonThickness;
+  uniform float uEquatorialGlow;
+  uniform float uExposure;
+  uniform float uHotColorBoost;
+  uniform float uPointerStrength;
+  uniform float uShowBackground;
+  uniform float uShowDisk;
+  uniform float uShowForeground;
+  uniform float uShowPhotonRing;
+  uniform float uShowEquatorial;
+  uniform float uShowLensing;
+  uniform float uDebugView;
   uniform vec2 uResolution;
   uniform vec2 uCenter;
   uniform vec2 uPointer;
+  uniform vec3 uOuterColor;
+  uniform vec3 uMiddleColor;
+  uniform vec3 uHotColor;
 
   varying vec2 vUv;
 
@@ -104,7 +133,7 @@ export const blackHoleFragmentShader = /* glsl */ `
   }
 
   void main() {
-    vec2 center = uCenter + uPointer * vec2(0.008, 0.006);
+    vec2 center = uCenter + uPointer * vec2(0.008, 0.006) * uPointerStrength;
     vec2 p = (vUv - center) * 2.0;
     p.x *= uResolution.x / max(1.0, uResolution.y);
     p /= max(0.1, uScale);
@@ -122,17 +151,18 @@ export const blackHoleFragmentShader = /* glsl */ `
 
       rayPosition += rayDirection * stepSize;
       float radius = length(rayPosition);
-      float gravity = 0.052 / (radius * radius + 0.16);
+      float gravity = 0.052 * uLensingStrength * uShowLensing /
+        (radius * radius + 0.16);
       rayDirection = normalize(rayDirection - normalize(rayPosition) * gravity * stepSize);
 
-      if (radius < HORIZON_RADIUS) {
+      if (radius < HORIZON_RADIUS * uHorizonScale) {
         hitHorizon = 1.0;
         break;
       }
 
       vec3 diskPosition = rotateX(rayPosition, -0.34);
       float diskRadius = length(diskPosition.xz);
-      float diskThickness = 0.052 + diskRadius * 0.018;
+      float diskThickness = (0.052 + diskRadius * 0.018) * uDiskThickness;
       float verticalDensity = exp(-abs(diskPosition.y) / diskThickness);
       float innerMask = smoothstep(0.82, 1.08, diskRadius);
       float outerMask = 1.0 - smoothstep(3.05, 4.05, diskRadius);
@@ -140,22 +170,29 @@ export const blackHoleFragmentShader = /* glsl */ `
 
       float angle = atan(diskPosition.z, diskPosition.x);
       float angularVelocity = 1.12 / pow(max(0.72, diskRadius), 0.78);
-      float flowAngle = angle - uTime * uMotion * angularVelocity;
+      float flowAngle = angle -
+        uTime * uMotion * uRotationSpeed * angularVelocity;
       vec3 flowCoordinates = vec3(
-        cos(flowAngle) * diskRadius * 2.35,
-        sin(flowAngle) * diskRadius * 2.35,
-        uTime * uMotion * 0.085
+        cos(flowAngle) * diskRadius * 2.35 * uCloudScale,
+        sin(flowAngle) * diskRadius * 2.35 * uCloudScale,
+        uTime * uMotion * uNoiseSpeed * 0.085
       );
       float turbulence = fbm(flowCoordinates);
       float fineTurbulence = noise3(
-        flowCoordinates * 2.75 + vec3(3.0, -2.0, uTime * uMotion * 0.17)
+        flowCoordinates * (2.75 * max(0.1, uFineDetail)) +
+          vec3(3.0, -2.0, uTime * uMotion * uNoiseSpeed * 0.17)
       );
       float streaks = 0.5 + 0.5 * sin(
-        flowAngle * 18.0 + diskRadius * 17.0 - uTime * uMotion * 2.2
+        flowAngle * 18.0 + diskRadius * 17.0 -
+          uTime * uMotion * uRotationSpeed * 2.2
       );
-      float cloudField = turbulence * 0.78 + fineTurbulence * 0.34 + streaks * 0.24;
-      float filaments = smoothstep(0.24, 0.92, cloudField);
-      float density = verticalDensity * radialMask * (0.13 + filaments * 1.34);
+      float cloudField = turbulence * 0.78 +
+        fineTurbulence * 0.34 * uFineDetail +
+        streaks * 0.24 * uFilamentStrength;
+      float filaments = smoothstep(0.24 + uCloudBreakup * 0.26, 0.92, cloudField);
+      float density = verticalDensity * radialMask *
+        (0.13 * (1.0 - uCloudBreakup * 0.72) + filaments * 1.34) *
+        uGasDensity * uShowDisk;
 
       float heat = 1.0 - smoothstep(0.92, 3.25, diskRadius);
       float doppler = 0.72 + 0.48 * smoothstep(
@@ -163,11 +200,8 @@ export const blackHoleFragmentShader = /* glsl */ `
         1.0,
         diskPosition.x / max(0.01, diskRadius)
       );
-      vec3 outerColor = vec3(0.18, 0.045, 0.012);
-      vec3 middleColor = vec3(1.0, 0.28, 0.045);
-      vec3 hotColor = vec3(1.55, 1.08, 0.66);
-      vec3 diskColor = mix(outerColor, middleColor, smoothstep(0.0, 0.72, heat));
-      diskColor = mix(diskColor, hotColor, pow(heat, 2.2));
+      vec3 diskColor = mix(uOuterColor, uMiddleColor, smoothstep(0.0, 0.72, heat));
+      diskColor = mix(diskColor, uHotColor * uHotColorBoost, pow(heat, 2.2));
       diskColor *= doppler;
 
       float emission = density * (0.46 + heat * 2.2);
@@ -184,26 +218,39 @@ export const blackHoleFragmentShader = /* glsl */ `
 
     vec3 color = accumulatedLight;
     if (hitHorizon < 0.5) {
-      color += backgroundSpace(rayDirection, uTime * uMotion) * (1.0 - absorption);
+      color += backgroundSpace(rayDirection, uTime * uMotion) *
+        (1.0 - absorption) * uShowBackground;
     }
 
     // Keep the event horizon optically black while still allowing the
     // foreground accretion material to cross it in the following pass.
-    float horizonMask = 1.0 - smoothstep(0.292, 0.322, screenRadius);
+    float horizonMask = 1.0 - smoothstep(
+      0.292 * uHorizonScale,
+      0.322 * uHorizonScale,
+      screenRadius
+    );
     color *= 1.0 - horizonMask;
 
     float ringIrregularity =
       sin(atan(p.y, p.x) * 9.0 - uTime * uMotion * 0.18) * 0.004;
-    float photonRing =
-      exp(-pow((screenRadius - 0.365 - ringIrregularity) * 38.0, 2.0));
-    float lensHalo = exp(-pow((screenRadius - 0.405) * 12.0, 2.0));
+    float photonRing = exp(-pow(
+      (screenRadius - 0.365 * uHorizonScale - ringIrregularity) *
+        (38.0 / max(0.22, uPhotonThickness)),
+      2.0
+    ));
+    float lensHalo = exp(-pow(
+      (screenRadius - 0.405 * uHorizonScale) *
+        (12.0 / max(0.22, uPhotonThickness)),
+      2.0
+    ));
     vec3 ringColor = mix(
       vec3(1.0, 0.31, 0.045),
       vec3(1.55, 1.22, 0.82),
       photonRing
     );
-    color += ringColor * photonRing * 1.4;
-    color += vec3(0.62, 0.23, 0.055) * lensHalo * 0.18;
+    color += ringColor * photonRing * 1.4 * uPhotonGlow * uShowPhotonRing;
+    color += vec3(0.62, 0.23, 0.055) * lensHalo * 0.18 *
+      uPhotonGlow * uShowPhotonRing;
 
     // Restore the original lensed foreground face of the accretion disk. It is
     // intentionally evaluated in polar coordinates so the gas rotates around
@@ -212,22 +259,72 @@ export const blackHoleFragmentShader = /* glsl */ `
     float screenDiskRadius = length(diskUv);
     float screenDiskAngle = atan(diskUv.y, diskUv.x);
     float screenFlow = screenDiskAngle -
-      uTime * uMotion * (1.28 / pow(max(0.48, screenDiskRadius), 0.72));
+      uTime * uMotion * uRotationSpeed *
+        (1.28 / pow(max(0.48, screenDiskRadius), 0.72));
     float screenNoise = fbm(vec3(
-      cos(screenFlow) * screenDiskRadius * 3.1,
-      sin(screenFlow) * screenDiskRadius * 3.1,
-      uTime * uMotion * 0.09
+      cos(screenFlow) * screenDiskRadius * 3.1 * uCloudScale,
+      sin(screenFlow) * screenDiskRadius * 3.1 * uCloudScale,
+      uTime * uMotion * uNoiseSpeed * 0.09
     ));
     float screenStreaks =
       0.5 + 0.5 * sin(screenFlow * 21.0 + screenDiskRadius * 19.0);
-    float frontBand = exp(-abs(p.y) * 27.0);
-    frontBand *= smoothstep(0.26, 0.4, screenDiskRadius);
-    frontBand *= 1.0 - smoothstep(1.32, 1.72, screenDiskRadius);
-    frontBand *= 0.2 + smoothstep(
+    float originalFrontBand = exp(-abs(p.y) * 27.0);
+    originalFrontBand *= smoothstep(0.26, 0.4, screenDiskRadius);
+    originalFrontBand *= 1.0 - smoothstep(1.32, 1.72, screenDiskRadius);
+    originalFrontBand *= 0.2 + smoothstep(
       0.32,
       0.9,
       screenNoise * 0.72 + screenStreaks * 0.36
     );
+
+    // The development material keeps the established polar flow but replaces
+    // the continuous translucent sheet with broken macro clouds, fine
+    // filaments and bounded noise. The noise coordinates loop instead of
+    // accumulating spatial frequency, so the gas does not comb itself thinner
+    // during long sessions.
+    float loopPhase = uTime * uMotion * uNoiseSpeed * 0.055;
+    float macroCloud = fbm(vec3(
+      cos(screenFlow) * screenDiskRadius * 2.18 * uCloudScale +
+        cos(loopPhase) * 0.42,
+      sin(screenFlow) * screenDiskRadius * 2.18 * uCloudScale +
+        sin(loopPhase) * 0.42,
+      sin(loopPhase * 0.73) * 0.66
+    ));
+    float detailCloud = fbm(vec3(
+      cos(screenFlow * 1.03) * screenDiskRadius * 5.7 *
+        max(0.32, uFineDetail),
+      sin(screenFlow * 1.03) * screenDiskRadius * 5.7 *
+        max(0.32, uFineDetail),
+      cos(loopPhase * 0.81) * 0.74 + 3.7
+    ));
+    float gasWarp = (macroCloud - 0.52) * 0.074 * uForegroundBreakup +
+      sin(screenFlow * 7.0 + screenDiskRadius * 9.0) *
+        0.014 * uForegroundBreakup;
+    float gasEnvelope = exp(
+      -abs(p.y + gasWarp) * (21.0 / max(0.42, uForegroundThickness))
+    );
+    float gasRadial = smoothstep(0.25, 0.42, screenDiskRadius) *
+      (1.0 - smoothstep(1.28, 1.76, screenDiskRadius));
+    float cloudGate = smoothstep(
+      0.3 + uForegroundBreakup * 0.24,
+      0.88,
+      macroCloud * 0.78 + detailCloud * 0.34
+    );
+    float gasFilaments = pow(
+      0.5 + 0.5 * sin(
+        screenFlow * 14.0 + screenDiskRadius * 22.0 +
+          macroCloud * 5.2
+      ),
+      3.0
+    ) * smoothstep(0.31, 0.8, detailCloud);
+    float brokenGas = gasEnvelope * gasRadial *
+      (0.018 + cloudGate * 0.78 + gasFilaments * 0.38 * uFilamentStrength);
+    brokenGas *= mix(
+      1.0,
+      smoothstep(0.28, 0.78, detailCloud + macroCloud * 0.42),
+      uForegroundBreakup
+    );
+    float frontBand = mix(originalFrontBand, brokenGas, uGasDevelopment);
     float frontHeat = 1.0 - smoothstep(0.34, 1.48, screenDiskRadius);
     vec3 frontDiskColor = mix(
       vec3(0.48, 0.075, 0.012),
@@ -241,7 +338,8 @@ export const blackHoleFragmentShader = /* glsl */ `
     );
     float frontDoppler =
       0.72 + 0.46 * smoothstep(-1.0, 1.0, p.x / max(0.01, screenDiskRadius));
-    color += frontDiskColor * frontBand * frontDoppler * 1.28;
+    color += frontDiskColor * frontBand * frontDoppler * 1.28 *
+      uGasDensity * uShowForeground;
 
     float equatorialLine = exp(-abs(p.y + 0.004) * 72.0);
     equatorialLine *= 1.0 - smoothstep(0.74, 1.62, abs(p.x));
@@ -250,12 +348,22 @@ export const blackHoleFragmentShader = /* glsl */ `
       vec3(0.8, 0.16, 0.02),
       vec3(1.6, 1.08, 0.62),
       frontHeat
-    ) * equatorialLine * 0.72;
+    ) * equatorialLine * 0.72 * uEquatorialGlow * uShowEquatorial;
+
+    if (uDebugView > 0.5 && uDebugView < 1.5) {
+      color = vec3(clamp(frontBand, 0.0, 1.0));
+    } else if (uDebugView >= 1.5 && uDebugView < 2.5) {
+      color = vec3(clamp(macroCloud, 0.0, 1.0));
+    } else if (uDebugView >= 2.5 && uDebugView < 3.5) {
+      color = mix(vec3(0.02, 0.04, 0.1), vec3(1.0, 0.18, 0.015), frontHeat);
+    } else if (uDebugView >= 3.5) {
+      color = vec3(horizonMask);
+    }
 
     float vignette =
       1.0 - smoothstep(0.62, 1.45, length((vUv - 0.5) * vec2(1.15, 0.9)));
     color *= 0.76 + vignette * 0.28;
-    color = 1.0 - exp(-color * 1.08);
+    color = 1.0 - exp(-color * 1.08 * uExposure);
     color = pow(max(color, 0.0), vec3(0.88));
 
     gl_FragColor = vec4(color, 1.0);
@@ -328,6 +436,8 @@ export const gravitationalDustVertexShader = /* glsl */ `
 export const gravitationalDustFragmentShader = /* glsl */ `
   precision highp float;
 
+  uniform float uBrightness;
+
   varying float vAlpha;
   varying float vHeat;
 
@@ -341,6 +451,6 @@ export const gravitationalDustFragmentShader = /* glsl */ `
     vec3 hotColor = vec3(1.0, 0.93, 0.72);
     vec3 color = mix(coolColor, warmColor, smoothstep(0.12, 0.72, vHeat));
     color = mix(color, hotColor, smoothstep(0.72, 1.0, vHeat));
-    gl_FragColor = vec4(color, (core + halo) * vAlpha);
+    gl_FragColor = vec4(color * uBrightness, (core + halo) * vAlpha * uBrightness);
   }
 `

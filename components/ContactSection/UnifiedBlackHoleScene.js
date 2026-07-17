@@ -4,6 +4,10 @@ import * as THREE from 'three'
 import {mergeVertices} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import ActiveFrameLoop from '../ActiveFrameLoop'
 import {
+  BLACK_HOLE_LAYER_DEFAULTS,
+  BLACK_HOLE_PRODUCTION_TUNING
+} from './blackHoleLabConfig'
+import {
   blackHoleFragmentShader,
   blackHoleVertexShader,
   gravitationalDustFragmentShader,
@@ -58,6 +62,8 @@ const DIAGNOSTIC_DATA_KEYS = [
   'contactPhase',
   'contactFrame',
   'contactTime',
+  'contactFps',
+  'contactFrameTime',
   'contactCssSize',
   'contactBufferSize',
   'contactTextures',
@@ -85,36 +91,149 @@ const getAnimationDiagnostic = (phase, active) => {
   return active ? 'running' : 'paused'
 }
 
-function RaymarchedBlackHole({active, reducedMotion, pointerRef, settings}) {
+const createRawColor = (hex, fallback) => {
+  if (typeof hex !== 'string' || !/^#[0-9a-f]{6}$/i.test(hex)) {
+    return new THREE.Color(...fallback)
+  }
+  const value = Number.parseInt(hex.slice(1), 16)
+  return new THREE.Color(
+    ((value >> 16) & 255) / 255,
+    ((value >> 8) & 255) / 255,
+    (value & 255) / 255
+  )
+}
+
+function RaymarchedBlackHole({
+  active,
+  reducedMotion,
+  pointerRef,
+  settings,
+  manualTime,
+  resetToken
+}) {
   const materialRef = useRef(null)
   const elapsedRef = useRef(0)
   const smoothedPointerRef = useRef(new THREE.Vector2())
   const {viewport, size, gl} = useThree()
   const drawingBufferRef = useRef(new THREE.Vector2())
+  const tuning = settings.tuning
 
-  const uniforms = useMemo(() => ({
-    uTime: {value: 0},
-    uMotion: {value: reducedMotion ? 0.18 : 1},
-    uQuality: {value: settings.shaderQuality},
-    uScale: {value: settings.scale},
-    uResolution: {value: new THREE.Vector2(1, 1)},
-    uCenter: {value: new THREE.Vector2(...settings.center)},
-    uPointer: {value: new THREE.Vector2()}
-  }), [reducedMotion, settings])
+  const uniformsRef = useRef(null)
+  if (!uniformsRef.current) {
+    uniformsRef.current = {
+      uTime: {value: 0},
+      uMotion: {value: reducedMotion ? 0.18 : tuning.motionSpeed},
+      uQuality: {value: settings.shaderQuality},
+      uScale: {value: settings.scale},
+      uHorizonScale: {value: tuning.horizonScale},
+      uLensingStrength: {value: tuning.lensingStrength},
+      uRotationSpeed: {value: tuning.rotationSpeed},
+      uNoiseSpeed: {value: tuning.noiseSpeed},
+      uGasDensity: {value: tuning.gasDensity},
+      uDiskThickness: {value: tuning.diskThickness},
+      uCloudScale: {value: tuning.cloudScale},
+      uFineDetail: {value: tuning.fineDetail},
+      uFilamentStrength: {value: tuning.filamentStrength},
+      uCloudBreakup: {value: tuning.cloudBreakup},
+      uForegroundThickness: {value: tuning.foregroundThickness},
+      uForegroundBreakup: {value: tuning.foregroundBreakup},
+      uGasDevelopment: {value: tuning.gasDevelopment},
+      uPhotonGlow: {value: tuning.photonGlow},
+      uPhotonThickness: {value: tuning.photonThickness},
+      uEquatorialGlow: {value: tuning.equatorialGlow},
+      uExposure: {value: tuning.exposure},
+      uHotColorBoost: {value: tuning.hotColorBoost},
+      uPointerStrength: {value: tuning.pointerStrength},
+      uShowBackground: {value: settings.layers.background ? 1 : 0},
+      uShowDisk: {value: settings.layers.raymarchedGas ? 1 : 0},
+      uShowForeground: {value: settings.layers.foregroundGas ? 1 : 0},
+      uShowPhotonRing: {value: settings.layers.photonRing ? 1 : 0},
+      uShowEquatorial: {value: settings.layers.equatorialCurrent ? 1 : 0},
+      uShowLensing: {value: settings.layers.lensing ? 1 : 0},
+      uDebugView: {value: settings.debugView || 0},
+      uResolution: {value: new THREE.Vector2(1, 1)},
+      uCenter: {value: new THREE.Vector2(...settings.center)},
+      uPointer: {value: new THREE.Vector2()},
+      uOuterColor: {value: createRawColor(
+        tuning.outerColor,
+        [0.18, 0.045, 0.012]
+      )},
+      uMiddleColor: {value: createRawColor(
+        tuning.middleColor,
+        [1, 0.28, 0.045]
+      )},
+      uHotColor: {value: createRawColor(
+        tuning.hotColor,
+        [1.55, 1.08, 0.66]
+      )}
+    }
+  }
+  const uniforms = uniformsRef.current
 
   useEffect(() => {
-    if (!materialRef.current) return
+    uniforms.uMotion.value = reducedMotion ? 0.18 : tuning.motionSpeed
+    uniforms.uQuality.value = settings.shaderQuality
+    uniforms.uScale.value = settings.scale
+    uniforms.uHorizonScale.value = tuning.horizonScale
+    uniforms.uLensingStrength.value = tuning.lensingStrength
+    uniforms.uRotationSpeed.value = tuning.rotationSpeed
+    uniforms.uNoiseSpeed.value = tuning.noiseSpeed
+    uniforms.uGasDensity.value = tuning.gasDensity
+    uniforms.uDiskThickness.value = tuning.diskThickness
+    uniforms.uCloudScale.value = tuning.cloudScale
+    uniforms.uFineDetail.value = tuning.fineDetail
+    uniforms.uFilamentStrength.value = tuning.filamentStrength
+    uniforms.uCloudBreakup.value = tuning.cloudBreakup
+    uniforms.uForegroundThickness.value = tuning.foregroundThickness
+    uniforms.uForegroundBreakup.value = tuning.foregroundBreakup
+    uniforms.uGasDevelopment.value = tuning.gasDevelopment
+    uniforms.uPhotonGlow.value = tuning.photonGlow
+    uniforms.uPhotonThickness.value = tuning.photonThickness
+    uniforms.uEquatorialGlow.value = tuning.equatorialGlow
+    uniforms.uExposure.value = tuning.exposure
+    uniforms.uHotColorBoost.value = tuning.hotColorBoost
+    uniforms.uPointerStrength.value = tuning.pointerStrength
+    uniforms.uShowBackground.value = settings.layers.background ? 1 : 0
+    uniforms.uShowDisk.value = settings.layers.raymarchedGas ? 1 : 0
+    uniforms.uShowForeground.value = settings.layers.foregroundGas ? 1 : 0
+    uniforms.uShowPhotonRing.value = settings.layers.photonRing ? 1 : 0
+    uniforms.uShowEquatorial.value = settings.layers.equatorialCurrent ? 1 : 0
+    uniforms.uShowLensing.value = settings.layers.lensing ? 1 : 0
+    uniforms.uDebugView.value = settings.debugView || 0
+    uniforms.uCenter.value.set(...settings.center)
+    uniforms.uOuterColor.value.copy(createRawColor(
+      tuning.outerColor,
+      [0.18, 0.045, 0.012]
+    ))
+    uniforms.uMiddleColor.value.copy(createRawColor(
+      tuning.middleColor,
+      [1, 0.28, 0.045]
+    ))
+    uniforms.uHotColor.value.copy(createRawColor(
+      tuning.hotColor,
+      [1.55, 1.08, 0.66]
+    ))
+  }, [reducedMotion, settings, tuning, uniforms])
+
+  useEffect(() => {
+    elapsedRef.current = 0
+    uniforms.uTime.value = 0
+  }, [resetToken, uniforms])
+
+  useEffect(() => {
     const drawingBuffer = gl.getDrawingBufferSize(drawingBufferRef.current)
-    materialRef.current.uniforms.uResolution.value.set(drawingBuffer.x, drawingBuffer.y)
-  }, [gl, size.height, size.width])
+    uniforms.uResolution.value.set(drawingBuffer.x, drawingBuffer.y)
+  }, [gl, size.height, size.width, uniforms])
 
   useFrame((_, delta) => {
     const material = materialRef.current
     if (!material) return
     const safeDelta = Math.min(Math.max(delta, 0), 1 / 30)
-    if (active) elapsedRef.current += safeDelta
-    material.uniforms.uTime.value = elapsedRef.current
-    material.uniforms.uMotion.value = reducedMotion ? 0.18 : 1
+    if (active && !Number.isFinite(manualTime)) elapsedRef.current += safeDelta
+    material.uniforms.uTime.value = Number.isFinite(manualTime)
+      ? manualTime
+      : elapsedRef.current
+    material.uniforms.uMotion.value = reducedMotion ? 0.18 : tuning.motionSpeed
     smoothedPointerRef.current.x = THREE.MathUtils.damp(
       smoothedPointerRef.current.x,
       reducedMotion ? 0 : pointerRef.current.x,
@@ -181,7 +300,14 @@ function createDustGeometry(count) {
   return geometry
 }
 
-function GravitationalDust({active, reducedMotion, settings, position}) {
+function GravitationalDust({
+  active,
+  reducedMotion,
+  settings,
+  position,
+  manualTime,
+  resetToken
+}) {
   const materialRef = useRef(null)
   const elapsedRef = useRef(0)
   const geometry = useMemo(() => createDustGeometry(settings.dust), [settings.dust])
@@ -190,16 +316,23 @@ function GravitationalDust({active, reducedMotion, settings, position}) {
     uMotion: {value: reducedMotion ? 0.18 : 1},
     uPointScale: {value: settings.pointScale},
     uTilt: {value: settings.diskTilt},
-    uRoll: {value: settings.roll}
-  }), [reducedMotion, settings.diskTilt, settings.pointScale, settings.roll])
+    uRoll: {value: settings.roll},
+    uBrightness: {value: settings.tuning.dustBrightness}
+  }), [reducedMotion, settings.diskTilt, settings.pointScale, settings.roll, settings.tuning.dustBrightness])
 
   useEffect(() => () => geometry.dispose(), [geometry])
+  useEffect(() => {
+    elapsedRef.current = 0
+    if (materialRef.current) materialRef.current.uniforms.uTime.value = 0
+  }, [resetToken])
 
   useFrame((_, delta) => {
     if (!materialRef.current) return
     const safeDelta = Math.min(Math.max(delta, 0), 1 / 30)
-    if (active) elapsedRef.current += safeDelta
-    materialRef.current.uniforms.uTime.value = elapsedRef.current
+    if (active && !Number.isFinite(manualTime)) elapsedRef.current += safeDelta
+    materialRef.current.uniforms.uTime.value = Number.isFinite(manualTime)
+      ? manualTime
+      : elapsedRef.current
   })
 
   return (
@@ -669,15 +802,25 @@ function IndependentAsteroidField({active, reducedMotion, blackHolePosition}) {
   ))
 }
 
-function SceneDiagnostics({active, quality, phase, readinessEpochRef, onReady, onStable, onError}) {
+function SceneDiagnostics({
+  active,
+  quality,
+  phase,
+  readinessEpochRef,
+  onReady,
+  onStable,
+  onError,
+  onDiagnostics
+}) {
   const {gl, size} = useThree()
   const frameRef = useRef(0)
   const readyEpochRef = useRef(-1)
   const stableEpochRef = useRef(-1)
   const stableStartRef = useRef(0)
-  const callbacksRef = useRef({onReady, onStable, onError})
+  const callbacksRef = useRef({onReady, onStable, onError, onDiagnostics})
+  const sampleRef = useRef({time: performance.now(), frame: 0})
   const drawingBufferRef = useRef(new THREE.Vector2())
-  callbacksRef.current = {onReady, onStable, onError}
+  callbacksRef.current = {onReady, onStable, onError, onDiagnostics}
 
   useFrame((state) => {
     try {
@@ -702,6 +845,33 @@ function SceneDiagnostics({active, quality, phase, readinessEpochRef, onReady, o
       canvas.dataset.contactContextState = 'ok'
       canvas.dataset.contactReadinessEpoch = String(epoch)
 
+      const now = performance.now()
+      const sample = sampleRef.current
+      if (now - sample.time >= 450) {
+        const elapsed = Math.max(1, now - sample.time)
+        const sampledFrames = frameRef.current - sample.frame
+        const fps = sampledFrames * 1000 / elapsed
+        const frameTime = sampledFrames > 0 ? elapsed / sampledFrames : 0
+        canvas.dataset.contactFps = fps.toFixed(1)
+        canvas.dataset.contactFrameTime = frameTime.toFixed(2)
+        callbacksRef.current.onDiagnostics?.({
+          fps,
+          frameTime,
+          frame: frameRef.current,
+          elapsedTime: state.clock.elapsedTime,
+          cssSize: `${Math.round(size.width)}x${Math.round(size.height)}`,
+          bufferSize: `${Math.round(drawingBuffer.x)}x${Math.round(drawingBuffer.y)}`,
+          textures: gl.info.memory.textures,
+          geometries: gl.info.memory.geometries,
+          programs: gl.info.programs?.length || 0,
+          drawCalls: gl.info.render.calls,
+          triangles: gl.info.render.triangles,
+          context: 'ok',
+          animation: getAnimationDiagnostic(phase, active)
+        })
+        sampleRef.current = {time: now, frame: frameRef.current}
+      }
+
       if (readyEpochRef.current !== epoch) {
         readyEpochRef.current = epoch
         stableStartRef.current = performance.now()
@@ -719,9 +889,40 @@ function SceneDiagnostics({active, quality, phase, readinessEpochRef, onReady, o
   return null
 }
 
-function UnifiedScene({active, reducedMotion, pointerRef, quality, phase, readinessEpochRef, onReady, onStable, onError}) {
-  const settings = CONTACT_QUALITY[quality]
+function UnifiedScene({
+  active,
+  reducedMotion,
+  pointerRef,
+  quality,
+  phase,
+  readinessEpochRef,
+  onReady,
+  onStable,
+  onError,
+  onDiagnostics,
+  labConfig,
+  debugView,
+  manualTime,
+  resetToken
+}) {
+  const baseSettings = CONTACT_QUALITY[quality]
   const {viewport} = useThree()
+  const tuning = labConfig?.tuning || BLACK_HOLE_PRODUCTION_TUNING
+  const layers = labConfig?.layers || BLACK_HOLE_LAYER_DEFAULTS
+  const useExportedLayout = Boolean(labConfig) || quality === 'desktop'
+  const settings = useMemo(() => ({
+    ...baseSettings,
+    shaderQuality: useExportedLayout
+      ? tuning.raymarchQuality
+      : baseSettings.shaderQuality,
+    scale: baseSettings.scale * (useExportedLayout ? tuning.blackHoleScale : 1),
+    center: useExportedLayout
+      ? [tuning.centerX, tuning.centerY]
+      : baseSettings.center,
+    tuning,
+    layers,
+    debugView: debugView || 0
+  }), [baseSettings, debugView, layers, tuning, useExportedLayout])
   const visualSettings = useMemo(() => ({
     ...settings,
     roll: 0,
@@ -741,24 +942,32 @@ function UnifiedScene({active, reducedMotion, pointerRef, quality, phase, readin
         reducedMotion={reducedMotion}
         pointerRef={pointerRef}
         settings={visualSettings}
+        manualTime={manualTime}
+        resetToken={resetToken}
       />
       <ambientLight intensity={0.3} color="#6a8190" />
       <directionalLight position={[3, 5, 6]} intensity={1.5} color="#ffd6a0" />
       <pointLight position={[sceneCenter[0] + 1.2, sceneCenter[1] + 0.3, 3]} intensity={8} distance={7} color="#ff7a21" />
-      <GravitationalDust
-        active={active}
-        reducedMotion={reducedMotion}
-        settings={visualSettings}
-        position={sceneCenter}
-      />
-      <WarpedAsteroids
-        active={active}
-        reducedMotion={reducedMotion}
-        count={settings.asteroids}
-        position={sceneCenter}
-        settings={settings}
-      />
-      {quality === 'desktop' ? (
+      {layers.dust ? (
+        <GravitationalDust
+          active={active}
+          reducedMotion={reducedMotion}
+          settings={visualSettings}
+          position={sceneCenter}
+          manualTime={manualTime}
+          resetToken={resetToken}
+        />
+      ) : null}
+      {layers.boundAsteroids ? (
+        <WarpedAsteroids
+          active={active}
+          reducedMotion={reducedMotion}
+          count={settings.asteroids}
+          position={sceneCenter}
+          settings={settings}
+        />
+      ) : null}
+      {quality === 'desktop' && layers.independentAsteroids ? (
         <>
           <IndependentAsteroidField
             active={active}
@@ -775,6 +984,7 @@ function UnifiedScene({active, reducedMotion, pointerRef, quality, phase, readin
         onReady={onReady}
         onStable={onStable}
         onError={onError}
+        onDiagnostics={onDiagnostics}
       />
     </>
   )
@@ -790,7 +1000,12 @@ export default function UnifiedBlackHoleCanvas({
   onStable,
   onError,
   onContextLost,
-  onContextRestored
+  onContextRestored,
+  onDiagnostics,
+  labConfig = null,
+  debugView = 0,
+  manualTime = null,
+  resetToken = 0
 }) {
   const settings = CONTACT_QUALITY[quality]
   const readinessEpochRef = useRef(0)
@@ -881,6 +1096,11 @@ export default function UnifiedBlackHoleCanvas({
           onReady={onReady}
           onStable={onStable}
           onError={onError}
+          onDiagnostics={onDiagnostics}
+          labConfig={labConfig}
+          debugView={debugView}
+          manualTime={manualTime}
+          resetToken={resetToken}
         />
       </Suspense>
     </Canvas>
