@@ -360,7 +360,7 @@ export const orbitalParticleVertexShader = /* glsl */ `
     vAlpha = 0.58 + 0.34 * sin(theta + aPhase) * sin(theta + aPhase);
     vec4 viewPosition = modelViewMatrix * vec4(orbitPosition, 1.0);
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = aSize * (7.0 / max(1.0, -viewPosition.z));
+    gl_PointSize = max(1.0, aSize * (7.0 / max(1.0, -viewPosition.z)));
   }
 `
 
@@ -433,7 +433,7 @@ export const starVertexShader = /* glsl */ `
     vTwinkle = 0.72 + 0.28 * sin(uTime * uMotion * 0.9 + aPhase);
     vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = aSize * (7.0 / max(1.0, -viewPosition.z));
+    gl_PointSize = max(1.0, aSize * (7.0 / max(1.0, -viewPosition.z)));
   }
 `
 

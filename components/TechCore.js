@@ -1,4 +1,4 @@
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { createTimeline } from 'animejs'
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -169,6 +169,7 @@ function StarField() {
 }
 
 function RotatingTesseract({ hovered, activation, pointer, dragOffset, colorIndex, angry, rageBurst, limitCharge, autonomousAction, navSignal, clickSignal }) {
+  const compact = useThree((state) => state.size.width < 640)
   const groupRef = useRef()
   const innerGroupRef = useRef()
   const outerCubeRef = useRef()
@@ -425,7 +426,7 @@ function RotatingTesseract({ hovered, activation, pointer, dragOffset, colorInde
       if (!ghost) return
 
       const depth = index + 1
-      const opacity = motionBlurStrength * (0.32 / depth)
+      const opacity = motionBlurStrength * ((compact ? 0.15 : 0.32) / depth)
       ghost.visible = opacity > 0.01
       ghost.position.x = Math.sin(actionSeed + depth * 1.7) * motionBlurStrength * 0.04 * depth
       ghost.position.y = -0.42 * depth * (1 + motionBlurStrength * 0.9)
@@ -468,7 +469,7 @@ function RotatingTesseract({ hovered, activation, pointer, dragOffset, colorInde
 
   return (
     <group ref={groupRef}>
-      <group scale={TESSERACT_BASE_SCALE}>
+      <group scale={TESSERACT_BASE_SCALE * (compact ? 1.3 : 1)}>
         {motionBlurGhosts.map((ghostIndex) => (
         <group
           key={`motion-blur-ghost-${ghostIndex}`}
@@ -711,7 +712,9 @@ export default function TechCore({ onHoverChange }) {
   const [limitCharge, setLimitCharge] = useState(0)
   const [autonomousAction, setAutonomousAction] = useState(null)
   const [canvasMounted, setCanvasMounted] = useState(false)
-  const [canvasActive, setCanvasActive] = useState(false)
+  const [canvasInView, setCanvasInView] = useState(false)
+  const [pageVisible, setPageVisible] = useState(true)
+  const [mobileQuality, setMobileQuality] = useState(false)
   const containerRef = useRef()
   const dragStartRef = useRef({ x: 0, y: 0 })
   const dragOriginRef = useRef({ x: 0, y: 0 })
@@ -736,12 +739,29 @@ export default function TechCore({ onHoverChange }) {
     if (!container) return undefined
     const observer = new IntersectionObserver(([entry]) => {
       const active = entry.isIntersecting
-      setCanvasActive(active)
+      setCanvasInView(active)
       if (active) setCanvasMounted(true)
     }, {rootMargin: '35% 0px', threshold: 0.01})
     observer.observe(container)
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    const handleVisibility = () => setPageVisible(document.visibilityState !== 'hidden')
+    handleVisibility()
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 639px)')
+    const handleMobileQuality = () => setMobileQuality(mobileQuery.matches)
+    handleMobileQuality()
+    mobileQuery.addEventListener('change', handleMobileQuality)
+    return () => mobileQuery.removeEventListener('change', handleMobileQuality)
+  }, [])
+
+  const canvasActive = canvasInView && pageVisible
 
   useEffect(() => {
     return () => {
@@ -760,6 +780,11 @@ export default function TechCore({ onHoverChange }) {
   }, [autonomousAction])
 
   useEffect(() => {
+    if (!canvasActive) {
+      setAutonomousAction(null)
+      return undefined
+    }
+
     const actions = ['ascension', 'orbit', 'compression', 'reconfigure']
 
     const scheduleNextAction = () => {
@@ -792,7 +817,7 @@ export default function TechCore({ onHoverChange }) {
       clearTimeout(autonomousTimeoutRef.current)
       clearTimeout(autonomousEndTimeoutRef.current)
     }
-  }, [angry])
+  }, [angry, canvasActive])
 
   const cancelAutonomousAction = () => {
     clearTimeout(autonomousEndTimeoutRef.current)
@@ -836,6 +861,12 @@ export default function TechCore({ onHoverChange }) {
   }
 
   useEffect(() => {
+    if (!canvasActive) {
+      navTimelineRef.current?.revert()
+      resetAnimeSignal(navSignalRef.current)
+      return undefined
+    }
+
     const profile = navModeProfiles[activeSection] || navModeProfiles.home
 
     navTimelineRef.current?.revert()
@@ -871,7 +902,7 @@ export default function TechCore({ onHoverChange }) {
         duration: 1420,
         ease: 'inOutSine'
       })
-  }, [activeSection])
+  }, [activeSection, canvasActive])
 
   const updatePointer = (event) => {
     const bounds = containerRef.current?.getBoundingClientRect()
@@ -1028,7 +1059,7 @@ export default function TechCore({ onHoverChange }) {
       {canvasMounted && <Canvas
         className="!overflow-visible"
         camera={{ position: [0, 0, 8], fov: 45 }}
-        dpr={[1, 1.5]}
+        dpr={mobileQuality ? [1.35, 1.75] : [1, 1.5]}
         frameloop="demand"
         gl={{
           antialias: true,

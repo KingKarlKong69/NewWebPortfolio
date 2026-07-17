@@ -58,16 +58,16 @@ export const CONTACT_QUALITY = {
     position: [1.45, -0.08, 0]
   },
   mobile: {
-    stars: 290,
-    dust: 54,
+    stars: 440,
+    dust: 82,
     ejections: 0,
-    asteroids: 3,
-    dpr: [1, 1],
-    blackHoleScale: 0.9,
-    shaderQuality: 0.42,
-    lensing: 0.32,
-    fboScale: 0.38,
-    bloom: 0,
+    asteroids: 5,
+    dpr: [1.25, 1.5],
+    blackHoleScale: 1.04,
+    shaderQuality: 0.66,
+    lensing: 0.56,
+    fboScale: 0.58,
+    bloom: 0.05,
     position: [0.08, -0.02, 0]
   }
 }
@@ -974,7 +974,7 @@ function createAsteroidBodies(count, compact, center) {
         0.1 + seededValue(index + 8.7) * 0.16,
         (index % 2 ? -1 : 1) * (0.08 + seededValue(index + 11.2) * 0.12)
       ),
-      baseScale: asteroid.scale * (compact ? 0.76 : 1),
+      baseScale: asteroid.scale * (compact ? 0.96 : 1),
       shape: new THREE.Vector3(
         0.84 + seededValue(index + 13.4) * 0.32,
         0.72 + seededValue(index + 17.6) * 0.34,
@@ -1729,7 +1729,7 @@ export default function ContactCanvas({
   if (!rendererOptionsRef.current) {
     rendererOptionsRef.current = {
       alpha: true,
-      antialias: quality !== 'mobile',
+      antialias: true,
       powerPreference: 'high-performance'
     }
   }

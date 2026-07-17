@@ -96,7 +96,7 @@ function RoundedPanel({ size, radius, position, rotation, children }) {
   )
 }
 
-function makeFallbackTexture(project, index) {
+function makeFallbackTexture(project, index, anisotropy = 1) {
   const canvas = document.createElement('canvas')
   canvas.width = 1600
   canvas.height = 900
@@ -170,17 +170,20 @@ function makeFallbackTexture(project, index) {
   texture.colorSpace = THREE.SRGBColorSpace
   texture.minFilter = THREE.LinearMipmapLinearFilter
   texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = anisotropy
   texture.generateMipmaps = true
   texture.userData.resolution = new THREE.Vector2(canvas.width, canvas.height)
   return texture
 }
 
 function useProjectTextures(projects) {
+  const gl = useThree((state) => state.gl)
+  const anisotropy = useMemo(() => Math.min(8, gl.capabilities.getMaxAnisotropy()), [gl])
   const lifecycleRef = useRef(0)
   const [textureVersion, setTextureVersion] = useState(0)
   const textures = useMemo(
-    () => projects.map((project, index) => makeFallbackTexture(project, index)),
-    [projects]
+    () => projects.map((project, index) => makeFallbackTexture(project, index, anisotropy)),
+    [anisotropy, projects]
   )
 
   useEffect(() => {
@@ -200,6 +203,7 @@ function useProjectTextures(projects) {
         texture.colorSpace = THREE.SRGBColorSpace
         texture.minFilter = THREE.LinearMipmapLinearFilter
         texture.magFilter = THREE.LinearFilter
+        texture.anisotropy = anisotropy
         texture.generateMipmaps = true
         texture.userData.resolution = new THREE.Vector2(texture.image.width, texture.image.height)
         textures[index].dispose()
@@ -217,7 +221,7 @@ function useProjectTextures(projects) {
         loadedTextures.forEach((texture) => texture.dispose())
       })
     }
-  }, [projects, textures])
+  }, [anisotropy, projects, textures])
 
   return {textures, textureVersion}
 }
@@ -389,7 +393,7 @@ function CameraRig() {
 
   useFrame((_, delta) => {
     const compact = size.width < 720
-    const target = compact ? new THREE.Vector3(0, 2.05, 11.6) : new THREE.Vector3(0, 2.2, 10.2)
+    const target = compact ? new THREE.Vector3(0, 1.98, 9.25) : new THREE.Vector3(0, 2.2, 10.2)
     camera.position.lerp(target, 1 - Math.exp(-delta * 4))
     camera.lookAt(0, 0.18, 0)
   })
@@ -425,7 +429,7 @@ export default function ProjectLaptopScene(props) {
     <div className={styles.laptopCanvas} aria-hidden="true">
       {props.mounted && <Canvas
         camera={{position: [0, 2.2, 10.2], fov: 40}}
-        dpr={[1, 1.55]}
+        dpr={[1.25, 1.75]}
         frameloop="demand"
         gl={{alpha: true, antialias: true, powerPreference: 'high-performance'}}
         shadows={false}

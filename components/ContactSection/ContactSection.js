@@ -6,7 +6,7 @@ import { useActiveNavSection } from '../navigationState'
 import { CONTACT_COPY, CONTACT_PROFILE } from './contactData'
 import styles from './ContactSection.module.css'
 
-const ContactCanvas = dynamic(() => import('./ContactScene'), {ssr: false})
+const ContactCanvas = dynamic(() => import('./UnifiedBlackHoleScene'), {ssr: false})
 
 const ICONS = {
   email: Mail,
@@ -110,7 +110,6 @@ export default function ContactSection() {
   const sectionRef = useRef(null)
   const interfaceRef = useRef(null)
   const pointerRef = useRef({x: 0, y: 0})
-  const interactionRef = useRef({dragging: false, releaseDrag: null, blockSurgeUntil: 0, cursorOwner: null})
   const frameRequestRef = useRef(null)
   const contextRecoveryTimerRef = useRef(null)
   const finePointerRef = useRef(false)
@@ -255,7 +254,6 @@ export default function ContactSection() {
   }, [])
 
   const handleSceneError = useCallback(() => {
-    interactionRef.current.releaseDrag?.({preserveVelocity: false})
     setScenePhase(SCENE_PHASE.FAILED)
   }, [])
 
@@ -274,7 +272,6 @@ export default function ContactSection() {
   }, [])
 
   const resetPointer = () => {
-    if (interactionRef.current.dragging) return
     pointerRef.current.x = 0
     pointerRef.current.y = 0
 
@@ -288,7 +285,7 @@ export default function ContactSection() {
   }
 
   const handlePointerMove = (event) => {
-    if (interactionRef.current.dragging || reducedMotion || !finePointerRef.current || !isVisible) return
+    if (reducedMotion || !finePointerRef.current || !isVisible) return
     const bounds = sectionRef.current?.getBoundingClientRect()
     if (!bounds) return
 
@@ -386,7 +383,6 @@ export default function ContactSection() {
                     active={canvasActive}
                     reducedMotion={reducedMotion}
                     pointerRef={pointerRef}
-                    interactionRef={interactionRef}
                     quality={quality}
                     phase={scenePhase}
                     onReady={handleSceneReady}
