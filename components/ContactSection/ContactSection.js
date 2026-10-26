@@ -1,12 +1,16 @@
 import dynamic from 'next/dynamic'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowUp, ArrowUpRight, Clock3, Mail, MapPin, Minus, Phone, Plus } from 'lucide-react'
+import { ArrowRight, ArrowUp, Clock3, Mail, MapPin, Phone } from 'lucide-react'
 import { Component, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useActiveNavSection } from '../navigationState'
 import { CONTACT_COPY, CONTACT_PROFILE } from './contactData'
+import useContactEntrance from './useContactEntrance'
+import {sampleContactEntrance,contactEntryVisible} from './contactEntranceMotion'
 import styles from './ContactSection.module.css'
+import {getFooterBlackHoleValues,subscribeFooterBlackHolePreset} from './footerBlackHolePreset'
 
 const ContactCanvas = dynamic(() => import('./UnifiedBlackHoleScene'), {ssr: false})
+const Asteroids=dynamic(()=>import('../HeroAsteroids'),{ssr:false})
 
 const ICONS = {
   email: Mail,
@@ -28,6 +32,13 @@ const SCENE_PHASE = Object.freeze({
 const isReadyPhase = (phase) => (
   phase === SCENE_PHASE.RUNNING || phase === SCENE_PHASE.PAUSED_OFFSCREEN
 )
+
+function GlitchLine({text,accent=false}){
+  return <span className={`${styles.glitchLine} ${accent?styles.headingAccent:''}`}>
+    <span>{text}</span><span className={styles.glitchGhost} aria-hidden="true">{text}</span>
+    <span className={styles.glitchGhostAlt} aria-hidden="true">{text}</span>
+  </span>
+}
 
 class SceneErrorBoundary extends Component {
   constructor(props) {
@@ -52,24 +63,23 @@ function ContactRow({ item, index, visible, reducedMotion }) {
   const Icon = ICONS[item.id]
   const rowContent = (
     <>
+      <span className={styles.anchor} aria-hidden="true" />
       <span className={styles.rowIcon} aria-hidden="true"><Icon size={20} strokeWidth={1.8} /></span>
-      <span className={styles.rowLabel}>{item.label}</span>
-      <span className={`${styles.rowValue} ${item.placeholder ? styles.placeholderValue : ''}`}>
-        {item.status && <span className={styles.statusDot} aria-hidden="true" />}
-        {item.value}
-      </span>
-      <span className={styles.rowAction} aria-hidden="true">
-        {item.href ? <ArrowUpRight size={18} strokeWidth={1.7} /> : <Minus size={16} strokeWidth={1.4} />}
+      <span className={styles.rowText}>
+        <span className={styles.rowLabel}>{item.label}</span>
+        <span className={`${styles.rowValue} ${item.placeholder ? styles.placeholderValue : ''}`}>
+          {item.value}
+          {item.status && <span className={styles.statusDot} aria-hidden="true" />}
+        </span>
+        <span className={styles.rowGhost} aria-hidden="true">{item.value}</span>
       </span>
     </>
   )
 
   return (
-    <motion.div
+    <div
       className={styles.rowMotion}
-      initial={false}
-      animate={visible ? {opacity: 1, y: 0} : {opacity: 0, y: 18}}
-      transition={reducedMotion ? {duration: 0} : {delay: 0.38 + index * 0.075, duration: 0.58, ease: [0.22, 1, 0.36, 1]}}
+      style={{'--glitch-delay':`${.2+index*.075}s`}}
     >
       {item.href ? (
         <a className={styles.contactRow} href={item.href} aria-label={`${item.label}: ${item.value}`}>
@@ -80,7 +90,7 @@ function ContactRow({ item, index, visible, reducedMotion }) {
           {rowContent}
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -92,9 +102,6 @@ function StaticBlackHole({hidden = false}) {
       <span className={styles.fallbackRearArc} />
       <span className={styles.fallbackHorizon} />
       <span className={styles.fallbackFrontFlow} />
-      <span className={styles.fallbackStarOne} />
-      <span className={styles.fallbackStarTwo} />
-      <span className={styles.fallbackStarThree} />
     </div>
   )
 }
@@ -108,11 +115,10 @@ function getQualityTier() {
 export default function ContactSection() {
   const {activeSection} = useActiveNavSection()
   const sectionRef = useRef(null)
-  const interfaceRef = useRef(null)
+  const frameRef=useRef(null)
   const pointerRef = useRef({x: 0, y: 0})
-  const frameRequestRef = useRef(null)
+  const journeyRef = useRef({progress: 0,entrance:sampleContactEntrance(0,false)})
   const contextRecoveryTimerRef = useRef(null)
-  const finePointerRef = useRef(false)
   const reducedMotion = Boolean(useReducedMotion())
   const [isNearViewport, setIsNearViewport] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -124,6 +130,44 @@ export default function ContactSection() {
   const [sceneRetryCount, setSceneRetryCount] = useState(0)
   const [forceReveal, setForceReveal] = useState(false)
   const [quality, setQuality] = useState(null)
+  const [asteroidValues,setAsteroidValues]=useState(getFooterBlackHoleValues)
+  const [blastCooling,setBlastCooling]=useState(false)
+  const blastAt=useRef(-Infinity),blastTimer=useRef(0)
+  useEffect(()=>{
+    const update=()=>setAsteroidValues(getFooterBlackHoleValues())
+    update();const unsubscribe=subscribeFooterBlackHolePreset(update)
+    return()=>{unsubscribe();clearTimeout(blastTimer.current)}
+  },[])
+  const blast=()=>{
+    const now=performance.now()
+    if(now-blastAt.current<2000||journeyRef.current.entrance?.phase!=='settled')return
+    blastAt.current=now;setBlastCooling(true)
+    dispatchEvent(new Event('contact:blast'))
+    clearTimeout(blastTimer.current);blastTimer.current=setTimeout(()=>setBlastCooling(false),2000)
+  }
+
+  useEffect(() => {
+    let frame = null
+    const update = () => {
+      frame = null
+      const bounds = sectionRef.current?.getBoundingClientRect()
+      if (!bounds) return
+      if(contactEntryVisible(frameRef.current?.getBoundingClientRect(),innerHeight))setHasEntered(true)
+      const progress = reducedMotion || window.innerWidth < 761 ? 1 : Math.max(0, Math.min(1, (window.innerHeight * 0.65 - bounds.top) / (window.innerHeight * 0.9)))
+      journeyRef.current.progress = progress
+      sectionRef.current.style.setProperty('--contact-arrival', progress.toFixed(4))
+      sectionRef.current.dataset.contactArrival = progress.toFixed(3)
+    }
+    const schedule = () => { if (!frame) frame = window.requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', schedule, {passive: true})
+    window.addEventListener('resize', schedule)
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+    }
+  }, [reducedMotion])
 
   const contactItems = useMemo(() => [
     {
@@ -146,7 +190,6 @@ export default function ContactSection() {
 
   useEffect(() => {
     setQuality(getQualityTier())
-    finePointerRef.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches
 
     let resizeFrame = null
     const handleResize = () => {
@@ -154,7 +197,6 @@ export default function ContactSection() {
       resizeFrame = window.requestAnimationFrame(() => {
         resizeFrame = null
         setQuality(getQualityTier())
-        finePointerRef.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches
       })
     }
 
@@ -174,7 +216,6 @@ export default function ContactSection() {
     }, {rootMargin: '80% 0px', threshold: 0.01})
     const visibleObserver = new IntersectionObserver(([entry]) => {
       setIsVisible(entry.isIntersecting)
-      if (entry.isIntersecting) setHasEntered(true)
     }, {rootMargin: '0px', threshold: 0.01})
 
     nearObserver.observe(section)
@@ -195,7 +236,6 @@ export default function ContactSection() {
   useEffect(() => {
     if (!quality || hasMountedScene || (!isNearViewport && activeSection !== 'contact')) return
     setHasMountedScene(true)
-    setHasEntered(true)
     setScenePhase(SCENE_PHASE.INITIALIZING)
   }, [activeSection, hasMountedScene, isNearViewport, quality])
 
@@ -207,6 +247,8 @@ export default function ContactSection() {
   )
   const sceneReady = isReadyPhase(scenePhase)
   const sceneFailed = scenePhase === SCENE_PHASE.FAILED
+  useContactEntrance({sectionRef,journeyRef,hasEntered,sceneReady,
+    unavailable:sceneFailed||(forceReveal&&!sceneReady),reducedMotion,pageVisible,isVisible})
 
   useEffect(() => {
     if (!hasMountedScene) return
@@ -217,10 +259,10 @@ export default function ContactSection() {
   }, [hasMountedScene, shouldRunScene])
 
   useEffect(() => {
-    if (!hasEntered || sceneReady || reducedMotion) return undefined
+    if (!hasEntered || sceneReady || reducedMotion || !pageVisible) return undefined
     const timer = window.setTimeout(() => setForceReveal(true), 900)
     return () => window.clearTimeout(timer)
-  }, [hasEntered, reducedMotion, sceneReady])
+  }, [hasEntered, reducedMotion, sceneReady,pageVisible])
 
   useEffect(() => {
     if (
@@ -239,7 +281,6 @@ export default function ContactSection() {
   }, [activeSection, isVisible, pageVisible, scenePhase, sceneRetryCount])
 
   useEffect(() => () => {
-    if (frameRequestRef.current) window.cancelAnimationFrame(frameRequestRef.current)
     if (contextRecoveryTimerRef.current) window.clearTimeout(contextRecoveryTimerRef.current)
   }, [])
 
@@ -271,45 +312,13 @@ export default function ContactSection() {
     setScenePhase(SCENE_PHASE.RESTORING)
   }, [])
 
-  const resetPointer = () => {
-    pointerRef.current.x = 0
-    pointerRef.current.y = 0
-
-    if (frameRequestRef.current) window.cancelAnimationFrame(frameRequestRef.current)
-    frameRequestRef.current = window.requestAnimationFrame(() => {
-      interfaceRef.current?.style.setProperty('--contact-tilt-x', '0deg')
-      interfaceRef.current?.style.setProperty('--contact-tilt-y', '0deg')
-      interfaceRef.current?.style.setProperty('--contact-shift-x', '0px')
-      interfaceRef.current?.style.setProperty('--contact-shift-y', '0px')
-    })
-  }
-
-  const handlePointerMove = (event) => {
-    if (reducedMotion || !finePointerRef.current || !isVisible) return
-    const bounds = sectionRef.current?.getBoundingClientRect()
-    if (!bounds) return
-
-    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2))
-    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2))
-    pointerRef.current.x = x
-    pointerRef.current.y = -y
-
-    if (frameRequestRef.current) window.cancelAnimationFrame(frameRequestRef.current)
-    frameRequestRef.current = window.requestAnimationFrame(() => {
-      interfaceRef.current?.style.setProperty('--contact-tilt-x', `${(-y * 1.25).toFixed(2)}deg`)
-      interfaceRef.current?.style.setProperty('--contact-tilt-y', `${(x * 1.55).toFixed(2)}deg`)
-      interfaceRef.current?.style.setProperty('--contact-shift-x', `${(x * 2.4).toFixed(2)}px`)
-      interfaceRef.current?.style.setProperty('--contact-shift-y', `${(y * 1.8).toFixed(2)}px`)
-    })
-  }
-
   const returnToTop = () => {
     const home = document.getElementById('home')
     home?.scrollIntoView({behavior: reducedMotion ? 'auto' : 'smooth', block: 'start'})
     if (window.location.hash) window.history.pushState(null, '', window.location.pathname)
   }
 
-  const revealContent = hasEntered && (sceneReady || forceReveal || sceneFailed || reducedMotion)
+  const revealContent = hasEntered
   const canvasActive = pageVisible && (
     scenePhase === SCENE_PHASE.INITIALIZING ||
     scenePhase === SCENE_PHASE.RESTORING ||
@@ -325,43 +334,39 @@ export default function ContactSection() {
       data-reduced-motion={reducedMotion ? 'true' : 'false'}
       data-scene-phase={scenePhase}
       data-contact-quality={quality || 'measuring'}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={resetPointer}
+      data-contact-entered={hasEntered?'true':'false'}
+      data-contact-visible={isVisible&&pageVisible?'true':'false'}
     >
-      <motion.div
+      <div
+        ref={frameRef}
+        data-contact-frame
         className={styles.frame}
-        initial={false}
-        animate={hasEntered ? {opacity: 1} : {opacity: 0.35}}
-        transition={reducedMotion ? {duration: 0} : {duration: 0.72, ease: [0.22, 1, 0.36, 1]}}
       >
         <span className={styles.frameGlow} aria-hidden="true" />
-        <span className={styles.frameCornerTop} aria-hidden="true" />
-        <span className={styles.frameCornerBottom} aria-hidden="true" />
+        {isNearViewport&&asteroidValues.asteroidsEnabled>0&&<>
+          <Asteroids footer layer="background" className={styles.footerRocksBack} enabled={isVisible&&pageVisible} sizeScale={asteroidValues.asteroidSize} speedScale={asteroidValues.asteroidSpeed} count={asteroidValues.asteroidCount-Math.round(asteroidValues.asteroidCount*asteroidValues.asteroidNearFraction)}/>
+          <Asteroids footer layer="foreground" className={styles.foregroundAsteroids} enabled={isVisible&&pageVisible} sizeScale={asteroidValues.asteroidSize} speedScale={asteroidValues.asteroidSpeed} count={Math.round(asteroidValues.asteroidCount*asteroidValues.asteroidNearFraction)}/>
+        </>}
+        <button type="button" className={styles.blackHoleBlast} onClick={blast} disabled={!hasEntered||blastCooling} aria-label={blastCooling?'Black-hole blast recharging':'Release a black-hole blast to destroy visible asteroids'} title="Release blast"/>
 
         <div className={styles.contentGrid}>
-          <div className={styles.leadMotion}>
-            <div ref={interfaceRef} className={styles.interfaceTilt}>
+          <div className={styles.leadMotion} inert={hasEntered?undefined:''} aria-hidden={!hasEntered}>
+            <div>
               <motion.div
                 className={styles.eyebrow}
                 initial={false}
                 animate={revealContent ? {opacity: 1, y: 0} : {opacity: 0, y: 12}}
                 transition={reducedMotion ? {duration: 0} : {delay: 0.08, duration: 0.52}}
               >
-                <Plus size={16} strokeWidth={1.7} aria-hidden="true" />
                 <span>{CONTACT_COPY.eyebrow}</span>
               </motion.div>
 
-              <motion.h2
+              <h2
                 id="contact-heading"
                 className={styles.heading}
-                initial={false}
-                animate={revealContent ? {opacity: 1, y: 0} : {opacity: 0, y: 24}}
-                transition={reducedMotion ? {duration: 0} : {delay: 0.14, duration: 0.72, ease: [0.22, 1, 0.36, 1]}}
               >
-                <span>{CONTACT_COPY.heading[0]}</span>
-                <span>{CONTACT_COPY.heading[1]}</span>
-                <span className={styles.headingAccent}>{CONTACT_COPY.heading[2]}</span>
-              </motion.h2>
+                {CONTACT_COPY.heading.map((text,index)=><GlitchLine key={text} text={text} accent={index===2}/>)}
+              </h2>
 
               <motion.p
                 className={styles.description}
@@ -371,11 +376,23 @@ export default function ContactSection() {
               >
                 {CONTACT_COPY.description}
               </motion.p>
+              <details className={styles.composer}>
+              <summary className={styles.conversation}>
+                Start a conversation <ArrowRight size={20} strokeWidth={1.3} aria-hidden="true" />
+                <span aria-hidden="true" />
+              </summary>
+              <div className={styles.composerOptions} aria-label="Choose your email app">
+                <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT_PROFILE.email)}`} target="_blank" rel="noopener noreferrer">Gmail</a>
+                <a href={`https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(CONTACT_PROFILE.email)}`} target="_blank" rel="noopener noreferrer">Outlook</a>
+                <a href={`https://compose.mail.yahoo.com/?to=${encodeURIComponent(CONTACT_PROFILE.email)}`} target="_blank" rel="noopener noreferrer">Yahoo Mail</a>
+                <a href={`mailto:${CONTACT_PROFILE.email}`}>Default email app</a>
+              </div>
+              </details>
             </div>
           </div>
 
-          <div className={styles.sceneWrap} aria-hidden="true">
-            <StaticBlackHole hidden={sceneReady && !sceneFailed} />
+          <div className={styles.sceneWrap} aria-hidden="true" data-contact-sky>
+            <StaticBlackHole hidden={!hasEntered||(!sceneFailed&&(!forceReveal||sceneReady))} />
             {hasMountedScene && quality && !sceneFailed && (
               <SceneErrorBoundary key={sceneGeneration} onError={handleSceneError}>
                 <div className={`${styles.sceneCanvas} ${sceneReady ? styles.sceneCanvasReady : ''}`}>
@@ -383,6 +400,7 @@ export default function ContactSection() {
                     active={canvasActive}
                     reducedMotion={reducedMotion}
                     pointerRef={pointerRef}
+                    journeyRef={journeyRef}
                     quality={quality}
                     phase={scenePhase}
                     onReady={handleSceneReady}
@@ -396,7 +414,8 @@ export default function ContactSection() {
             )}
           </div>
 
-          <div className={styles.contactList} aria-label="Contact details">
+
+          <div className={styles.contactList} aria-label="Contact details" inert={hasEntered?undefined:''} aria-hidden={!hasEntered}>
             {contactItems.map((item, index) => (
               <ContactRow
                 key={item.id}
@@ -410,28 +429,25 @@ export default function ContactSection() {
 
           <footer className={styles.footer}>
             <motion.div
-              className={styles.footerDivider}
-              initial={false}
-              animate={revealContent ? {scaleX: 1, opacity: 1} : {scaleX: 0, opacity: 0}}
-              transition={reducedMotion ? {duration: 0} : {delay: 0.66, duration: 0.85, ease: [0.22, 1, 0.36, 1]}}
-              aria-hidden="true"
-            />
-
-            <motion.div
               className={styles.footerMeta}
               initial={false}
               animate={revealContent ? {opacity: 1, y: 0} : {opacity: 0, y: 10}}
               transition={reducedMotion ? {duration: 0} : {delay: 0.82, duration: 0.58}}
             >
-              <p>&copy; {new Date().getFullYear()} {CONTACT_PROFILE.name}. All rights reserved.</p>
-              <button type="button" className={styles.topControl} onClick={returnToTop} aria-label="Return to top">
+              <p>{CONTACT_PROFILE.name} &copy; {new Date().getFullYear()}</p>
+              <div className={styles.socials}>
+                <a href={CONTACT_PROFILE.github} target="_blank" rel="noreferrer">GitHub</a>
+                <span aria-hidden="true">·</span>
+                <a href={CONTACT_PROFILE.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+              </div>
+              <button type="button" className={styles.topControl} onClick={returnToTop} aria-label="Back to top">
+                Back to top
                 <ArrowUp size={18} strokeWidth={1.8} />
               </button>
-              <p className={styles.closing}>{CONTACT_COPY.closing}<span aria-hidden="true" /></p>
             </motion.div>
           </footer>
         </div>
-      </motion.div>
+      </div>
     </section>
   )
 }

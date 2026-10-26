@@ -53,7 +53,7 @@ export const PROJECTS = [
     eyebrow: 'Featured Project',
     title: 'Silver Thatch',
     shortTitle: 'Silver Thatch',
-    description: 'A personal frontend redesign project that reimagines the Silver Thatch website with a modern, responsive interface. This project focuses solely on the frontend, with no backend functionality.',
+    description: 'A personal frontend redesign project that reimagines the Silver Thatch website with a modern, responsive interface. This project focuses solely on the frontend, with no backend functionality.1',
     role: 'Frontend Web Developer',
     impact: null,
     technologies: ['HTML', 'TailwindCSS', 'JavaScript', 'React.js'],

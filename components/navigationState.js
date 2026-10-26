@@ -13,6 +13,28 @@ export const NAV_EVENT = 'portfolio-nav-change'
 
 const NavigationContext = createContext(null)
 
+const scrollToSectionElement = (element, behavior) => {
+  if (!element) return
+  if(element.id==='home'){window.scrollTo({top:0,behavior});return}
+  if (window.matchMedia('(min-width:1101px) and (prefers-reduced-motion:no-preference)').matches) {
+    const runway = element.id === 'about' ? element.querySelector('[data-about-story]') :
+      element.id === 'projects' ? element.querySelector('[data-projects-story]') : null
+    if (runway) {
+      const top = window.scrollY + runway.getBoundingClientRect().top
+      const distance = runway.offsetHeight-window.innerHeight*(element.id === 'about' ? 2 : 1)
+      const progress = Number(runway.dataset.navProgress || 0)
+      window.scrollTo({top:top+Math.max(0,distance)*progress,behavior})
+      return
+    }
+  }
+  // A direct Services link lands after its overlapping whiteout, with the
+  // opening title still at its initial camera position.
+  const entryHold = Number(element.dataset.projectsEntryHold || element.dataset.servicesEntryHold || 0)
+  if (entryHold > 0) {
+    window.scrollTo({top:window.scrollY + element.getBoundingClientRect().top + entryHold*window.innerHeight/100, behavior})
+  } else element.scrollIntoView({behavior, block:'start'})
+}
+
 const getHashSection = () => {
   if (typeof window === 'undefined') return 'home'
 
@@ -35,7 +57,10 @@ const getSectionInView = () => {
   if (!sections.length) return getHashSection()
 
   const focusY = window.innerHeight * 0.38
-  const active = sections.find(({ element }) => {
+  // A pinned earlier scene can occupy the same viewport as the section now
+  // covering it. The later matching section owns that part of the page.
+  const active = [...sections].reverse().find(({ element }) => {
+    if (element.dataset.projectsEntryHold && element.inert) return false
     const rect = element.getBoundingClientRect()
     return rect.top <= focusY && rect.bottom > focusY
   })
@@ -77,7 +102,7 @@ function useNavigationController() {
         locationFrameId = null
         // `auto` inherits the global smooth-scroll rule and briefly activates every
         // WebGL section crossed by a direct hash load. Force a single-frame jump.
-        document.getElementById(hashAnchorSection)?.scrollIntoView({behavior: 'instant', block: 'start'})
+        scrollToSectionElement(document.getElementById(hashAnchorSection),'instant')
       })
     }
 
@@ -94,6 +119,7 @@ function useNavigationController() {
       setActiveSection(nextSection)
 
       if (!window.location.hash) return
+      window.dispatchEvent(new CustomEvent(NAV_EVENT,{detail:{section:nextSection,shortcut:true}}))
       // Keep the initial hash target anchored while fonts and dynamic sections
       // settle above it. ResizeObserver handles real layout changes without a
       // timeout or synthetic resize event; the first user intent releases it.
@@ -122,6 +148,7 @@ function useNavigationController() {
     window.addEventListener(NAV_EVENT, syncFromEvent)
     window.addEventListener('scroll', syncFromScroll, { passive: true })
     window.addEventListener('resize', syncFromScroll)
+    window.addEventListener('portfolio:layout', scheduleHashAnchor)
     window.addEventListener('wheel', releaseHashAnchor, { passive: true })
     window.addEventListener('touchstart', releaseHashAnchor, { passive: true })
     window.addEventListener('pointerdown', releaseHashAnchor, { passive: true })
@@ -135,6 +162,7 @@ function useNavigationController() {
       window.removeEventListener(NAV_EVENT, syncFromEvent)
       window.removeEventListener('scroll', syncFromScroll)
       window.removeEventListener('resize', syncFromScroll)
+      window.removeEventListener('portfolio:layout', scheduleHashAnchor)
       window.removeEventListener('wheel', releaseHashAnchor)
       window.removeEventListener('touchstart', releaseHashAnchor)
       window.removeEventListener('pointerdown', releaseHashAnchor)
@@ -149,15 +177,14 @@ function useNavigationController() {
 
     const target = document.getElementById(section)
 
+    window.dispatchEvent(new CustomEvent(NAV_EVENT, { detail: { section, shortcut:true } }))
     if (target) {
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+      scrollToSectionElement(target,'instant')
       window.history.pushState(null, '', `#${section}`)
     } else if (window.location.hash !== `#${section}`) {
       window.history.pushState(null, '', `#${section}`)
     }
 
-    window.dispatchEvent(new CustomEvent(NAV_EVENT, { detail: { section } }))
   }, [])
 
   return useMemo(

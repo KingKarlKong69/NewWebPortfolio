@@ -1,257 +1,132 @@
-import {motion, useMotionValue, useReducedMotion, useScroll, useTransform} from 'framer-motion'
-import {Plus, Quote} from 'lucide-react'
-import {Fragment, useEffect, useRef, useState} from 'react'
-import {SERVICES, TESTIMONIALS} from './servicesData'
-import styles from './ServicesSection.module.css'
+import dynamic from 'next/dynamic'
+import {ArrowLeft, ArrowUpRight} from 'lucide-react'
+import {Component, useEffect, useRef, useState} from 'react'
+import {SERVICES} from './servicesData'
+import {sampleServicesStory,sampleServicesJourney,servicePanelView,SERVICE_DESTINATIONS} from './serviceTransitionMotion'
+import ContributionField from './ContributionField'
+import TestimonialDeck from './TestimonialDeck'
+import styles from './ServicesExperience.module.css'
 
-const NODE_RANGES = [
-  [0.12, 0.20],
-  [0.26, 0.34],
-  [0.40, 0.48],
-  [0.54, 0.62],
-  [0.68, 0.76],
-  [0.82, 0.89]
-]
-
-const CONNECTOR_RANGES = [
-  [0.20, 0.26],
-  [0.34, 0.40],
-  [0.48, 0.54],
-  [0.62, 0.68],
-  [0.76, 0.82]
-]
-
-const DESKTOP_CONNECTORS = [
-  'M126 314 L324 252',
-  'M324 252 L528 205',
-  'M528 205 L720 151',
-  'M720 151 L924 112',
-  'M924 112 L1092 110'
-]
-
-const DESTINATIONS = [
-  [324, 252],
-  [528, 205],
-  [720, 151],
-  [924, 112],
-  [1092, 110]
-]
-
-const clampProgress = (value) => Math.max(0, Math.min(1, value))
-
-function usePhase(progress, start, end) {
-  return useTransform(progress, (value) => clampProgress((value - start) / (end - start)))
+const ServicesScene=dynamic(()=>import('./ServicesScene'),{ssr:false})
+class SpaceBoundary extends Component {
+  state={failed:false}
+  static getDerivedStateFromError(){return {failed:true}}
+  componentDidCatch(){this.props.onFailure?.()}
+  render(){return this.state.failed?null:this.props.children}
 }
 
-function ServiceNode({service, index, progress, mobile = false}) {
-  const [start, end] = NODE_RANGES[index]
-  const nodeProgress = usePhase(progress, start, end)
-  const ignitionOpacity = useTransform(nodeProgress, [0, 0.12, 0.45, 1], [0, 1, 0.82, 0.68])
-  const ignitionScale = useTransform(nodeProgress, [0, 0.25, 0.7], [0.35, 1.35, 1])
-  const ringProgress = useTransform(nodeProgress, [0.08, 0.58], [0, 1])
-  const platformOpacity = useTransform(nodeProgress, [0.16, 0.54], [0, 1])
-  const iconOpacity = useTransform(nodeProgress, [0.36, 0.66], [0, 1])
-  const iconScale = useTransform(nodeProgress, [0.36, 0.76], [0.78, 1])
-  const iconY = useTransform(nodeProgress, [0.36, 0.76], [15, 0])
-  const iconBlur = useTransform(nodeProgress, [0.36, 0.7], ['blur(8px)', 'blur(0px)'])
-  const numberOpacity = useTransform(nodeProgress, [0.54, 0.72], [0, 1])
-  const titleOpacity = useTransform(nodeProgress, [0.62, 0.82], [0, 1])
-  const descriptionOpacity = useTransform(nodeProgress, [0.72, 1], [0, 1])
-  const copyY = useTransform(nodeProgress, [0.52, 1], [15, 0])
-  const Icon = service.Icon
-
-  return (
-    <motion.li
-      className={`${styles.serviceNode} ${mobile ? styles.serviceNodeMobile : ''}`}
-      style={mobile ? {'--accent': service.accent, '--glow': service.glow} : {
-        '--accent': service.accent,
-        '--glow': service.glow,
-        left: `${service.x}%`,
-        top: `${service.y}%`
-      }}
-    >
-      <div className={styles.platform} aria-hidden="true">
-        <motion.span className={styles.platformAura} style={{opacity: platformOpacity}} />
-        <svg className={styles.platformRings} viewBox="0 0 140 90">
-          <motion.ellipse cx="70" cy="48" rx="62" ry="29" className={styles.ringOuter} style={{pathLength: ringProgress, opacity: platformOpacity}} />
-          <motion.ellipse cx="70" cy="46" rx="45" ry="20" className={styles.ringInner} style={{pathLength: ringProgress, opacity: platformOpacity}} />
-        </svg>
-        <motion.span className={styles.ignition} style={{opacity: ignitionOpacity, scale: ignitionScale}} />
-        <motion.span className={styles.coreDiamond} style={{opacity: platformOpacity, scale: platformOpacity}} />
-        <motion.div className={styles.hologram} style={{opacity: iconOpacity, scale: iconScale, y: iconY, filter: iconBlur}}>
-          <Icon size={mobile ? 47 : 54} strokeWidth={1.65} />
-          <span className={styles.iconEcho}><Icon size={mobile ? 47 : 54} strokeWidth={1.65} /></span>
-        </motion.div>
-      </div>
-
-      <motion.div className={styles.serviceCopy} style={{y: copyY}}>
-        <motion.span className={styles.serviceNumber} style={{opacity: numberOpacity}}>{service.number}</motion.span>
-        <motion.h3 style={{opacity: titleOpacity}}>{service.title}</motion.h3>
-        <motion.p style={{opacity: descriptionOpacity}}>{service.description}</motion.p>
-      </motion.div>
-    </motion.li>
-  )
-}
-
-function DesktopConnector({path, destination, index, progress}) {
-  const [start, end] = CONNECTOR_RANGES[index]
-  const connectorProgress = usePhase(progress, start, end)
-  const pulseOffset = useTransform(connectorProgress, [0, 1], [0, -1])
-  const destinationOpacity = useTransform(connectorProgress, [0.78, 0.94, 1], [0, 1, 0.45])
-  const destinationScale = useTransform(connectorProgress, [0.78, 0.94, 1], [0.4, 1.8, 1])
-
-  return (
-    <g>
-      <motion.path d={path} className={styles.connectorProgress} style={{pathLength: connectorProgress}} />
-      <motion.path d={path} className={styles.connectorPulse} pathLength="1" strokeDasharray="0.055 0.945" style={{pathOffset: pulseOffset, opacity: connectorProgress}} />
-      <motion.circle cx={destination[0]} cy={destination[1]} r="6" className={styles.receivingFlash} style={{opacity: destinationOpacity, scale: destinationScale, transformOrigin: `${destination[0]}px ${destination[1]}px`}} />
-    </g>
-  )
-}
-
-function MobileConnector({index, progress}) {
-  const [start, end] = CONNECTOR_RANGES[index]
-  const connectorProgress = usePhase(progress, start, end)
-  const pulseY = useTransform(connectorProgress, [0, 1], ['0%', '100%'])
-
-  return (
-    <li className={styles.mobileConnector} aria-hidden="true">
-      <motion.span className={styles.mobileConnectorFill} style={{scaleY: connectorProgress}} />
-      <motion.span className={styles.mobileConnectorPulse} style={{top: pulseY, opacity: connectorProgress}} />
-    </li>
-  )
-}
-
-function TestimonialCard({testimonial, index, progress}) {
-  const cardProgress = usePhase(progress, 0.92 + index * 0.02, 0.975 + index * 0.015)
-  const x = useTransform(cardProgress, [0, 1], [index === 0 ? -28 : 28, 0])
-  const borderProgress = useTransform(cardProgress, [0.05, 0.7], [0, 1])
-
-  return (
-    <motion.blockquote
-      className={`${styles.testimonialCard} ${testimonial.accent === 'violet' ? styles.testimonialViolet : ''}`}
-      style={{opacity: cardProgress, x, '--card-trace': borderProgress}}
-    >
-      <span className={styles.cardTrace} aria-hidden="true" />
-      <Quote className={styles.quoteMark} size={40} strokeWidth={1.25} aria-hidden="true" />
-      <p>{testimonial.quote}</p>
-      <footer>
-        <span className={styles.avatar} aria-hidden="true">{testimonial.initials}</span>
-        <span>
-          <cite>{testimonial.name}</cite>
-          <small>{testimonial.role}</small>
-        </span>
-      </footer>
-      <Quote className={styles.quoteMarkEnd} size={34} strokeWidth={1.25} aria-hidden="true" />
-    </motion.blockquote>
-  )
-}
-
-export default function ServicesSection() {
-  const sectionRef = useRef(null)
-  const reducedMotion = useReducedMotion()
-  const completeProgress = useMotionValue(1)
-  const [isVisible, setIsVisible] = useState(false)
-  const {scrollYProgress} = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end end']
-  })
-  const progress = reducedMotion ? completeProgress : scrollYProgress
-
-  const headerProgress = usePhase(progress, 0.01, 0.09)
-  const headerY = useTransform(headerProgress, [0, 1], [24, 0])
-  const headerSpacing = useTransform(headerProgress, [0, 1], ['0.34em', '0.18em'])
-  const foundationProgress = usePhase(progress, 0.07, 0.14)
-  const testimonialsProgress = usePhase(progress, 0.90, 0.96)
-  const testimonialsY = useTransform(testimonialsProgress, [0, 1], [32, 0])
-  const finalPulse = useTransform(progress, [0.88, 0.91, 0.94], [0, 1, 0.35])
-  const finalPulseOffset = useTransform(finalPulse, [0, 1], [0, -1])
-
-  useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return undefined
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {rootMargin: '12% 0px', threshold: 0.02})
-    observer.observe(section)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <section
-      ref={sectionRef}
-      id="services"
-      aria-labelledby="services-heading"
-      className={`${styles.section} ${isVisible ? styles.sectionActive : ''}`}
-      data-reduced-motion={reducedMotion ? 'true' : 'false'}
-    >
-      <div className={styles.stickyStage}>
-        <motion.div className={styles.circuitAtmosphere} style={{opacity: foundationProgress}} aria-hidden="true">
-          <span /><span /><span /><span /><span /><span />
-        </motion.div>
-
-        <div className={styles.stageInner}>
-          <motion.header className={styles.header} style={{opacity: headerProgress, y: headerY}}>
-            <div className={styles.headerCopy}>
-              <div className={styles.sectionTag}><span>04</span><i>—</i> Services</div>
-              <motion.h2 id="services-heading" style={{letterSpacing: headerSpacing}}>What I Offer</motion.h2>
-              <p>I deliver end-to-end digital solutions with a focus on quality, performance, and exceptional user experience.</p>
-            </div>
-            <div className={styles.impactPanel} aria-hidden="true">
-              <span>Solutions that<br />drive impact</span>
-              <Plus size={17} />
-            </div>
-          </motion.header>
-
-          <div className={styles.desktopPipeline}>
-            <motion.svg className={styles.pipelineSvg} viewBox="0 0 1200 430" preserveAspectRatio="none" style={{opacity: foundationProgress}} aria-hidden="true">
-              <defs>
-                <linearGradient id="services-base-gradient" x1="0" x2="1">
-                  <stop offset="0" stopColor="#ffbd38" />
-                  <stop offset="0.23" stopColor="#22e7ff" />
-                  <stop offset="0.62" stopColor="#9b5cff" />
-                  <stop offset="0.82" stopColor="#22e7ff" />
-                  <stop offset="1" stopColor="#a85eff" />
-                </linearGradient>
-                <filter id="services-path-glow" x="-20%" y="-80%" width="140%" height="260%">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                </filter>
-              </defs>
-              <path d="M126 314 L324 252 L528 205 L720 151 L924 112 L1092 110" className={styles.connectorBase} />
-              {DESKTOP_CONNECTORS.map((path, index) => (
-                <DesktopConnector key={path} path={path} destination={DESTINATIONS[index]} index={index} progress={progress} />
-              ))}
-              <motion.path d="M126 314 L324 252 L528 205 L720 151 L924 112 L1092 110" className={styles.finalPipelinePulse} pathLength="1" strokeDasharray="0.025 0.975" style={{pathOffset: finalPulseOffset, opacity: finalPulse}} />
-            </motion.svg>
-
-            <ol className={styles.desktopServiceList}>
-              {SERVICES.map((service, index) => (
-                <ServiceNode key={service.id} service={service} index={index} progress={progress} />
-              ))}
-            </ol>
-          </div>
-
-          <ol className={styles.mobilePipeline}>
-            {SERVICES.map((service, index) => (
-              <Fragment key={service.id}>
-                <ServiceNode service={service} index={index} progress={progress} mobile />
-                {index < SERVICES.length - 1 && <MobileConnector index={index} progress={progress} />}
-              </Fragment>
-            ))}
-          </ol>
-
-          <motion.section className={styles.testimonials} style={{opacity: testimonialsProgress, y: testimonialsY}} aria-labelledby="testimonials-heading">
-            <div className={styles.testimonialHeading}>
-              <span>05</span><i>—</i><h3 id="testimonials-heading">What People Say</h3>
-            </div>
-            <div className={styles.testimonialGrid}>
-              {TESTIMONIALS.map((testimonial, index) => (
-                <TestimonialCard key={testimonial.id} testimonial={testimonial} index={index} progress={progress} />
-              ))}
-            </div>
-            <div className={styles.pagination} aria-hidden="true"><span /><span /><span /><span /><span /></div>
-          </motion.section>
+function ServiceDeck({deckRef,selected,onSelect,interactive=true,cinematic=false}){
+  const backRef=useRef(null), triggerRefs=useRef([])
+  useEffect(()=>{if(selected!==null)backRef.current?.focus({preventScroll:true})},[selected])
+  function close(){const index=selected;onSelect(null);requestAnimationFrame(()=>triggerRefs.current[index]?.focus({preventScroll:true}))}
+  return <div ref={deckRef} className={styles.deck} data-forming={cinematic&&!interactive?'true':'false'} data-expanded={selected!==null?'true':'false'} aria-hidden={cinematic&&!interactive} aria-label="Explore the five services" onKeyDown={event=>{if(event.key==='Escape'&&selected!==null){event.preventDefault();close()}}}>
+    <div className={styles.columns}>
+      {SERVICES.map((service,index)=><div key={service.id} className={styles.column} data-service-column={index} data-selected={selected===index?'true':'false'} data-other={selected!==null&&selected!==index?'true':'false'}>
+        <img className={styles.artwork} src={service.image} alt="" draggable="false" loading="eager"/><span className={styles.shade}/>
+        <button ref={element=>{triggerRefs.current[index]=element}} type="button" className={styles.columnButton} aria-label={`Explore ${service.title}`} aria-expanded={selected===index} tabIndex={interactive&&selected===null?0:-1} onClick={()=>onSelect(index)} disabled={!interactive||selected!==null}>
+          <span className={styles.number}>{service.number}<small className={styles.serviceLabel}>SERVICE</small></span><span className={styles.columnName}>{service.title}</span><ArrowUpRight className={styles.columnArrow} size={24}/>
+        </button>
+        <div className={styles.serviceDetail} aria-hidden={selected!==index}>
+          {selected===index&&<button ref={backRef} type="button" className={styles.back} onClick={close} aria-label="Back to all five services"><ArrowLeft size={38}/><span>All services</span></button>}
+          <span className={styles.detailNumber}>{service.number}</span><div className={styles.detailCopy}><p>{service.description}</p><h3>{service.title}</h3></div>
         </div>
-      </div>
-    </section>
-  )
+      </div>)}
+    </div>
+    <p className={styles.deckHint}>{selected===null?'Choose a service to explore':'Scroll to continue exploring'}<span>↓</span></p>
+  </div>
+}
+
+export default function ServicesSection(){
+  const sectionRef=useRef(null),storyRef=useRef(null),deckRef=useRef(null),titleRef=useRef(null),progressRef=useRef(null)
+  const activityRef=useRef(null),testimonialsRef=useRef(null),hintRef=useRef(null)
+  const motionRef=useRef({progress:0,pointerX:0,pointerY:0,storyVisible:true,testimonialY:3})
+  const [desktop,setDesktop]=useState(false),[active,setActive]=useState(false),[seen,setSeen]=useState(false),[sceneFailed,setSceneFailed]=useState(false),[selected,setSelected]=useState(null),[interactive,setInteractive]=useState(false)
+  const [gameActive,setGameActive]=useState(false),gameActiveRef=useRef(false)
+  const cinematic=desktop&&!sceneFailed
+  const interactiveRef=useRef(false)
+  const selectedRef=useRef(null)
+  const selectService=index=>{selectedRef.current=index;setSelected(index)}
+  useEffect(()=>{
+    const media=matchMedia('(min-width:1101px) and (prefers-reduced-motion:no-preference)')
+    const configure=()=>setDesktop(media.matches);configure();media.addEventListener('change',configure)
+    return()=>media.removeEventListener('change',configure)
+  },[])
+  useEffect(()=>{
+    const root=sectionRef.current;if(!root)return
+    const observer=new IntersectionObserver(([entry])=>{setActive(entry.isIntersecting);if(entry.isIntersecting)setSeen(true)},{rootMargin:'10% 0px'})
+    observer.observe(root);return()=>observer.disconnect()
+  },[])
+  useEffect(()=>{
+    if(!cinematic){
+      interactiveRef.current=true
+      setInteractive(true)
+      if(deckRef.current){deckRef.current.inert=false;deckRef.current.style.setProperty('--deck-handoff','1')}
+      return
+    }
+    let frame=0,last=0,current=null
+    function update(now){
+      frame=0;if(document.hidden)return
+      const rect=storyRef.current?.getBoundingClientRect(),root=sectionRef.current;if(!rect||!root)return
+      const entryHold=Number(root.dataset.servicesEntryHold||0)*innerHeight/100
+      const target=Math.max(0,Math.min(1,(-rect.top-entryHold)/Math.max(1,rect.height-innerHeight-entryHold)))
+      const dt=Math.min(.05,(now-(last||now))/1000);last=now
+      current=current===null?target:current+(target-current)*(1-Math.exp(-dt/.085))
+      if(Math.abs(current-target)<.00001)current=target
+      const journey=sampleServicesJourney(current),state=sampleServicesStory(journey.storyProgress)
+      motionRef.current.progress=journey.storyProgress;motionRef.current.journeyProgress=current
+      motionRef.current.journey=journey;motionRef.current.storyVisible=rect.bottom>0&&rect.top<innerHeight
+      const projectPanel=(element,destination,enabled,eligible)=>{
+        if(!element)return
+        const view=servicePanelView(destination,journey.camera,innerWidth/innerHeight)
+        element.style.transform=`translate3d(${view.x*50}vw,${view.y*50}svh,0) scale(${view.scale})`
+        const onScreen=eligible&&Math.abs(view.x)<2.8&&Math.abs(view.y)<2.8
+        element.style.visibility=onScreen?'visible':'hidden'
+        element.style.pointerEvents=enabled?'auto':'none';element.inert=!enabled
+        element.setAttribute('aria-hidden',String(!enabled))
+      }
+      projectPanel(activityRef.current,SERVICE_DESTINATIONS.contributions,journey.contributionActive,current>.69&&current<.95)
+      projectPanel(testimonialsRef.current,SERVICE_DESTINATIONS.testimonials,journey.testimonialActive,current>.88)
+      const title=titleRef.current?.getBoundingClientRect()
+      motionRef.current.testimonialY=title?(title.top+title.height/2)/innerHeight:3
+      motionRef.current.testimonialRect=title?{x:(title.left+title.width/2)/innerWidth,y:(title.top+title.height/2)/innerHeight,width:title.width/innerWidth}:null
+      root.dataset.servicesProgress=journey.storyProgress.toFixed(4);root.dataset.servicesPhase=journey.phase==='story'?state.phase:journey.phase
+      root.dataset.servicesJourney=current.toFixed(4)
+      if(progressRef.current)progressRef.current.style.transform=`scaleX(${current})`
+      if(hintRef.current)hintRef.current.style.opacity='1'
+      if(deckRef.current){
+        deckRef.current.style.visibility=journey.storyProgress>.745&&journey.exit<1?'visible':'hidden'
+        deckRef.current.style.transform='none'
+        deckRef.current.style.setProperty('--deck-handoff',String(journey.domDeck))
+        deckRef.current.dataset.forming=journey.deckInteractive?'false':'true'
+        deckRef.current.inert=!journey.deckInteractive
+      }
+      if(!journey.deckInteractive&&selectedRef.current!==null){selectedRef.current=null;setSelected(null)}
+      const enabled=journey.deckInteractive
+      if(enabled!==interactiveRef.current){interactiveRef.current=enabled;setInteractive(enabled)}
+      if(journey.contributionActive!==gameActiveRef.current){gameActiveRef.current=journey.contributionActive;setGameActive(journey.contributionActive)}
+      if(Math.abs(current-target)>.00001)frame=requestAnimationFrame(update)
+    }
+    const wake=()=>{if(!frame)frame=requestAnimationFrame(update)}
+    const pointer=event=>{motionRef.current.pointerX=event.clientX/innerWidth*2-1;motionRef.current.pointerY=event.clientY/innerHeight*2-1}
+    const leave=()=>{motionRef.current.pointerX=0;motionRef.current.pointerY=0}
+    addEventListener('scroll',wake,{passive:true});addEventListener('resize',wake,{passive:true});addEventListener('services:handoff-layout',wake);document.addEventListener('visibilitychange',wake)
+    const root=sectionRef.current;root?.addEventListener('pointermove',pointer,{passive:true});root?.addEventListener('pointerleave',leave);wake()
+    return()=>{cancelAnimationFrame(frame);removeEventListener('scroll',wake);removeEventListener('resize',wake);removeEventListener('services:handoff-layout',wake);document.removeEventListener('visibilitychange',wake);root?.removeEventListener('pointermove',pointer);root?.removeEventListener('pointerleave',leave)}
+  },[cinematic,active])
+  const contributionPanel=<div ref={activityRef} className={styles.activity}><ContributionField active={seen} playActive={!cinematic||gameActive}/></div>
+  const testimonialPanel=<div ref={testimonialsRef} className={styles.testimonials}><div ref={titleRef} className={styles.testimonialTitle}><h2 className={cinematic?styles.accessibleTitle:undefined}>WHAT PEOPLE SAY</h2></div><TestimonialDeck/></div>
+  return <section ref={sectionRef} id="services" className={styles.section} data-cinematic={cinematic?'true':'false'} aria-labelledby="services-heading">
+    <div className={styles.universe} aria-hidden="true">{cinematic&&seen&&<SpaceBoundary onFailure={()=>setSceneFailed(true)}><ServicesScene motionRef={motionRef} active={active} deckRef={deckRef} onFailure={()=>setSceneFailed(true)}/></SpaceBoundary>}</div>
+    <div ref={storyRef} className={styles.story}><div className={styles.stage}>
+      <h2 id="services-heading" className={styles.accessibleTitle}>Services — What I offer</h2>
+      {!cinematic&&<header className={styles.staticHeader}><span>// SERVICES</span><h2>WHAT I OFFER</h2></header>}
+      <ServiceDeck deckRef={deckRef} selected={selected} onSelect={selectService} interactive={interactive} cinematic={cinematic}/>
+      {cinematic&&<div ref={hintRef} className={styles.journeyHint} aria-hidden="true"><span>04 / SERVICES</span><span>SCROLL TO EXPLORE <i>↓</i></span><div><span ref={progressRef}/></div></div>}
+      {cinematic&&contributionPanel}
+      {cinematic&&testimonialPanel}
+    </div></div>
+    {!cinematic&&contributionPanel}
+    {!cinematic&&testimonialPanel}
+    <div className={styles.departure} aria-hidden="true"/>
+  </section>
 }

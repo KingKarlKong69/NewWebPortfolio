@@ -1,553 +1,245 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clipboard,
-  Gauge,
-  Pause,
-  Play,
-  RotateCcw,
-  SlidersHorizontal
-} from 'lucide-react'
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {
-  BLACK_HOLE_LAB_PRESETS,
-  cloneBlackHolePreset
-} from '../components/ContactSection/blackHoleLabConfig'
-import styles from '../styles/BlackHoleLab.module.css'
+import {useCallback,useEffect,useRef,useState} from 'react'
+import {LAB_CATEGORIES,LAB_DEFAULTS,LAB_GROUPS,LAB_PRESETS,LAB_PRESET_VERSION,parseLabPreset,resetLabGroupValues,sanitizeLabValue,sanitizeLabValues} from '../components/ContactSection/blackHoleLabControls'
+import {applyFooterBlackHolePreset,readFooterBlackHolePreset,restoreFooterBlackHoleDefaults,subscribeFooterBlackHolePreset} from '../components/ContactSection/footerBlackHolePreset'
+import {FOOTER_PROJECT_DEFAULT} from '../components/ContactSection/projectFooterBlackHolePreset'
+import styles from '../styles/BlackHoleTuningLab.module.css'
 
-const BlackHoleCanvas = dynamic(
-  () => import('../components/ContactSection/UnifiedBlackHoleScene'),
-  {ssr: false}
-)
+const BlackHoleScene=dynamic(()=>import('../components/ContactSection/IsolatedBlackHoleScene'),{ssr:false})
+const STORAGE_KEY='black-hole-lab-preset-v1'
+const COMPLETE_NUMBER=/^[+-]?(?:\d+|\d*\.\d+)(?:e[+-]?\d+)?$/i
+const displayValue=value=>Number(value.toFixed(5)).toString()
+const importMessage=(text,message)=>{
+  try{
+    const version=JSON.parse(text).version
+    if(version===1)return `${message} Legacy appearance values were retained; 3D disk and universe controls use defaults. Projection spread cannot be converted into physical thickness. Missing new material and arc-shape controls use defaults.`
+    if(version===2)return `${message} Version 2 settings were retained; missing new material and arc-shape controls use defaults.`
+  }catch{}
+  return message
+}
 
-const STORAGE_KEY = 'kl-black-hole-lab-v1'
-
-const CONTROL_GROUPS = [
-  {
-    id: 'scene',
-    title: 'Scene & lensing',
-    controls: [
-      ['blackHoleScale', 'Overall scale', 0.62, 1.38, 0.01],
-      ['raymarchQuality', 'Raymarch quality', 0.25, 1, 0.01],
-      ['centerX', 'Horizontal position', 0.34, 0.74, 0.005],
-      ['centerY', 'Vertical position', 0.36, 0.64, 0.005],
-      ['horizonScale', 'Event horizon', 0.72, 1.28, 0.01],
-      ['lensingStrength', 'Lensing strength', 0, 1.8, 0.01],
-      ['pointerStrength', 'Pointer influence', 0, 2, 0.01]
-    ]
-  },
-  {
-    id: 'motion',
-    title: 'Motion',
-    controls: [
-      ['motionSpeed', 'Master motion', 0.05, 1.8, 0.01],
-      ['rotationSpeed', 'Gas rotation', 0.1, 2.2, 0.01],
-      ['noiseSpeed', 'Cloud evolution', 0.02, 1.5, 0.01]
-    ]
-  },
-  {
-    id: 'material',
-    title: 'Accretion material',
-    controls: [
-      ['gasDensity', 'Gas density', 0.15, 2.1, 0.01],
-      ['diskThickness', 'Volume thickness', 0.45, 2.2, 0.01],
-      ['cloudScale', 'Macro cloud scale', 0.3, 2.1, 0.01],
-      ['fineDetail', 'Fine detail', 0.18, 1.9, 0.01],
-      ['filamentStrength', 'Filaments', 0, 2.5, 0.01],
-      ['cloudBreakup', 'Volume breakup', 0, 0.92, 0.01],
-      ['foregroundThickness', 'Foreground thickness', 0.4, 2.5, 0.01],
-      ['foregroundBreakup', 'Foreground breakup', 0, 1, 0.01],
-      ['gasDevelopment', 'Gas replacement mix', 0, 1, 0.01]
-    ]
-  },
-  {
-    id: 'light',
-    title: 'Light & energy',
-    controls: [
-      ['photonGlow', 'Photon glow', 0, 2.5, 0.01],
-      ['photonThickness', 'Photon thickness', 0.28, 2.2, 0.01],
-      ['equatorialGlow', 'Equatorial current', 0, 2.2, 0.01],
-      ['exposure', 'Exposure', 0.45, 1.8, 0.01],
-      ['dustBrightness', 'Dust brightness', 0, 2.2, 0.01],
-      ['hotColorBoost', 'Inner heat energy', 0.5, 2, 0.01]
-    ]
+function Control({control,value,onChange,syncVersion}){
+  const {key,label,min,max,step,help}=control
+  const [draft,setDraft]=useState(()=>displayValue(value))
+  const editing=useRef(false)
+  const lastSync=useRef(syncVersion)
+  useEffect(()=>{
+    if(!editing.current||lastSync.current!==syncVersion)setDraft(displayValue(value))
+    lastSync.current=syncVersion
+  },[value,syncVersion])
+  const commitDraft=()=>{
+    editing.current=false
+    const raw=draft.trim()
+    const next=COMPLETE_NUMBER.test(raw)?sanitizeLabValue(key,raw,value):value
+    onChange(key,next);setDraft(displayValue(next))
   }
-]
-
-const LAYER_LABELS = {
-  background: 'Background stars',
-  raymarchedGas: 'Raymarched gas',
-  foregroundGas: 'Foreground gas',
-  photonRing: 'Photon ring',
-  equatorialCurrent: 'Equatorial current',
-  dust: 'Fine dust',
-  boundAsteroids: 'Bound asteroids',
-  independentAsteroids: 'Independent asteroids',
-  lensing: 'Space lensing'
-}
-
-const DEBUG_VIEWS = [
-  ['0', 'Final composite'],
-  ['1', 'Foreground density'],
-  ['2', 'Macro noise'],
-  ['3', 'Heat field'],
-  ['4', 'Event-horizon mask']
-]
-
-const formatValue = (value) => (
-  Math.abs(value) >= 10 ? value.toFixed(1) : value.toFixed(2)
-)
-
-const sanitizeConfig = (value) => {
-  const base = cloneBlackHolePreset('gas')
-  if (!value || typeof value !== 'object') return base
-
-  Object.keys(base.tuning).forEach((key) => {
-    const candidate = value.tuning?.[key]
-    if (typeof base.tuning[key] === 'number' && Number.isFinite(candidate)) {
-      base.tuning[key] = candidate
-    } else if (
-      typeof base.tuning[key] === 'string' &&
-      typeof candidate === 'string' &&
-      /^#[0-9a-f]{6}$/i.test(candidate)
-    ) {
-      base.tuning[key] = candidate
-    }
-  })
-  Object.keys(base.layers).forEach((key) => {
-    if (typeof value.layers?.[key] === 'boolean') {
-      base.layers[key] = value.layers[key]
-    }
-  })
-  return base
-}
-
-function RangeControl({control, value, onChange}) {
-  const [key, label, min, max, step] = control
-  return (
-    <label className={styles.rangeControl}>
-      <span className={styles.controlHeading}>
-        <span>{label}</span>
-        <output>{formatValue(value)}</output>
-      </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) => onChange(key, Number(event.target.value))}
-      />
-    </label>
-  )
-}
-
-function DiagnosticItem({label, value, accent = false}) {
-  return (
-    <div className={styles.diagnosticItem}>
+  if(control.kind==='toggle')return <div className={`${styles.control} ${styles.toggleControl}`}>
+    <label className={styles.toggleLabel} htmlFor={`lab-${key}-toggle`}>
       <span>{label}</span>
-      <strong className={accent ? styles.diagnosticAccent : ''}>{value}</strong>
+      <input id={`lab-${key}-toggle`} type="checkbox" checked={value===1}
+        onChange={event=>onChange(key,event.target.checked?1:0)}
+        aria-describedby={help?`lab-${key}-help`:undefined}/>
+    </label>
+    {help&&<p id={`lab-${key}-help`} className={styles.help}>{help}</p>}
+  </div>
+  return <div className={styles.control}>
+    <div className={styles.controlTop}>
+      <label htmlFor={`lab-${key}-range`}>{label}</label>
+      <input id={`lab-${key}-number`} className={styles.number} type="text" inputMode="decimal"
+        role="spinbutton" aria-label={`${label} value`} aria-valuemin={min} aria-valuemax={max}
+        aria-valuenow={value} autoComplete="off" spellCheck={false} value={draft}
+        onFocus={()=>{editing.current=true}}
+        onChange={event=>{
+          const raw=event.target.value
+          if(raw.length>24)return
+          setDraft(raw)
+          if(COMPLETE_NUMBER.test(raw.trim())&&Number.isFinite(Number(raw)))onChange(key,raw)
+        }}
+        onBlur={commitDraft}
+        onKeyDown={event=>{
+          if(event.key==='Enter'){event.preventDefault();event.currentTarget.blur()}
+          if(event.key==='Escape'){setDraft(displayValue(value));event.currentTarget.blur()}
+          if(event.key==='ArrowUp'||event.key==='ArrowDown'){
+            event.preventDefault()
+            const next=sanitizeLabValue(key,value+(event.key==='ArrowUp'?step:-step),value)
+            onChange(key,next);setDraft(displayValue(next))
+          }
+        }}/>
     </div>
-  )
+    <input id={`lab-${key}-range`} className={styles.range} type="range" min={min} max={max}
+      step={step} value={value} onChange={event=>onChange(key,event.target.value)}
+      aria-describedby={help?`lab-${key}-help`:undefined}/>
+    {help&&<p id={`lab-${key}-help`} className={styles.help}>{help}</p>}
+  </div>
 }
 
-function ControlGroup({title, initialOpen = false, children}) {
-  const [open, setOpen] = useState(initialOpen)
-  return (
-    <details
-      className={styles.controlGroup}
-      open={open}
-      onToggle={(event) => setOpen(event.currentTarget.open)}
-    >
-      <summary>{title}</summary>
-      {children}
-    </details>
-  )
+function PreviewStatus({status,paused}){
+  const label=status.state==='ready'?(paused?'Paused':'Rendering'):status.state==='context-lost'?'Graphics context lost':status.state==='error'?'Preview needs recovery':status.state==='recovering'?'Recovering preview':'Starting preview'
+  return <div className={styles.status}>
+    <div className={styles.statusLine}><span className={`${styles.indicator} ${status.state==='error'||status.state==='context-lost'?styles.indicatorError:''}`} aria-hidden="true"/>{label}</div>
+    {status.state==='ready'&&<p className={styles.metrics}>
+      {Number.isFinite(status.fps)&&!paused?`${Math.round(status.fps)} fps · `:''}
+      {Number.isFinite(status.dpr)?`${status.dpr.toFixed(2)}× DPR`:''}
+      {status.width&&status.height?` · ${Math.round(status.width)} × ${Math.round(status.height)}`:''}
+      {status.adaptive?' · adaptive':''}
+    </p>}
+    {status.message&&<p className={styles.statusMessage} role={status.state==='error'?'alert':undefined}>{status.message}</p>}
+  </div>
 }
 
-export default function BlackHoleLab() {
-  const pointerRef = useRef({x: 0, y: 0})
-  const hydratedRef = useRef(false)
-  const noticeTimerRef = useRef(null)
-  const initialPreset = useMemo(() => cloneBlackHolePreset('gas'), [])
-  const [tuning, setTuning] = useState(initialPreset.tuning)
-  const [layers, setLayers] = useState(initialPreset.layers)
-  const [presetKey, setPresetKey] = useState('gas')
-  const [running, setRunning] = useState(true)
-  const [pageVisible, setPageVisible] = useState(true)
-  const [panelOpen, setPanelOpen] = useState(true)
-  const [manualMode, setManualMode] = useState(false)
-  const [manualTime, setManualTime] = useState(0)
-  const [resetToken, setResetToken] = useState(0)
-  const [debugView, setDebugView] = useState(0)
-  const [diagnostics, setDiagnostics] = useState(null)
-  const [sceneStatus, setSceneStatus] = useState('Initializing')
-  const [notice, setNotice] = useState('')
-  const [jsonDraft, setJsonDraft] = useState('')
-
-  const labConfig = useMemo(() => ({tuning, layers}), [layers, tuning])
-  const active = pageVisible && running
-
-  const showNotice = useCallback((message) => {
-    setNotice(message)
-    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current)
-    noticeTimerRef.current = window.setTimeout(() => setNotice(''), 1800)
-  }, [])
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored)
-        const restored = sanitizeConfig(parsed)
-        setTuning(restored.tuning)
-        setLayers(restored.layers)
-        setDebugView(Number.isFinite(parsed.debugView) ? parsed.debugView : 0)
-        setPresetKey('custom')
-      } catch {
-        window.localStorage.removeItem(STORAGE_KEY)
-      }
+export default function BlackHoleLab(){
+  const valuesRef=useRef({...FOOTER_PROJECT_DEFAULT})
+  const [values,setValues]=useState(()=>({...FOOTER_PROJECT_DEFAULT}))
+  const [revision,setRevision]=useState(0)
+  const [syncVersion,setSyncVersion]=useState(0)
+  const [paused,setPaused]=useState(false)
+  const [birthReplay,setBirthReplay]=useState(0)
+  const [panelOpen,setPanelOpen]=useState(true)
+  const [category,setCategory]=useState('blackhole')
+  const [presetText,setPresetText]=useState('')
+  const [notice,setNotice]=useState('')
+  const [status,setStatus]=useState({state:'starting'})
+  const [footerApplied,setFooterApplied]=useState(false)
+  const [footerNotice,setFooterNotice]=useState('')
+  const [savingProject,setSavingProject]=useState(false)
+  const onStatus=useCallback(next=>setStatus(next),[])
+  useEffect(()=>{
+    const refresh=()=>{
+      setFooterApplied(Boolean(readFooterBlackHolePreset()))
+      setFooterNotice('')
     }
-    hydratedRef.current = true
-  }, [])
-
-  useEffect(() => {
-    if (!hydratedRef.current) return
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({tuning, layers, debugView})
-    )
-  }, [debugView, layers, tuning])
-
-  useEffect(() => {
-    const handleVisibility = () => setPageVisible(document.visibilityState !== 'hidden')
-    handleVisibility()
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [])
-
-  useEffect(() => () => {
-    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current)
-  }, [])
-
-  const updateTuning = useCallback((key, value) => {
-    setPresetKey('custom')
-    setTuning((current) => ({...current, [key]: value}))
-  }, [])
-
-  const updateLayer = useCallback((key, value) => {
-    setPresetKey('custom')
-    setLayers((current) => ({...current, [key]: value}))
-  }, [])
-
-  const applyPreset = useCallback((key) => {
-    const next = cloneBlackHolePreset(key)
-    setTuning(next.tuning)
-    setLayers(next.layers)
-    setPresetKey(key)
-    setDebugView(0)
-    setManualMode(false)
-    showNotice(`${BLACK_HOLE_LAB_PRESETS[key].label} loaded`)
-  }, [showNotice])
-
-  const restartSimulation = () => {
-    setManualTime(0)
-    setResetToken((value) => value + 1)
-    showNotice('Shader timeline restarted')
+    refresh()
+    return subscribeFooterBlackHolePreset(refresh)
+  },[])
+  const updateValue=useCallback((key,raw)=>{
+    const previous=valuesRef.current
+    const next=sanitizeLabValue(key,raw,previous[key])
+    if(next===previous[key])return
+    valuesRef.current={...previous,[key]:next}
+    setValues(valuesRef.current);setRevision(value=>value+1)
+  },[])
+  const applyValues=useCallback((incoming,message)=>{
+    const next=sanitizeLabValues(incoming,valuesRef.current)
+    valuesRef.current=next;setValues(next)
+    setRevision(value=>value+1);setSyncVersion(value=>value+1)
+    if(message)setNotice(message)
+  },[])
+  // Fast Refresh can preserve a tuned v2 state while adding v3 controls.
+  // Fill missing fields without replacing the user's current lab settings.
+  useEffect(()=>{applyValues(valuesRef.current)},[applyValues])
+  const resetGroup=group=>{
+    applyValues(resetLabGroupValues(valuesRef.current,group.id),`${group.label} restored.`)
   }
-
-  const exportConfig = useCallback(async () => {
-    const value = JSON.stringify({tuning, layers, debugView}, null, 2)
-    setJsonDraft(value)
-    try {
-      await window.navigator.clipboard.writeText(value)
-      showNotice('Settings copied')
-    } catch {
-      showNotice('Settings shown below')
+  const applyPreset=key=>applyValues({...valuesRef.current,...LAB_PRESETS[key].values},`${LAB_PRESETS[key].label} quality applied.`)
+  const exportPreset=()=>{
+    setPresetText(JSON.stringify({version:LAB_PRESET_VERSION,values:valuesRef.current},null,2))
+    setNotice('Current preset is ready to copy below.')
+  }
+  const importPreset=()=>{
+    try{applyValues(parseLabPreset(presetText,valuesRef.current),importMessage(presetText,'Preset imported.'))}
+    catch(error){setNotice(error.message||'That preset could not be imported.')}
+  }
+  const savePreset=()=>{
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({version:LAB_PRESET_VERSION,values:valuesRef.current}));setNotice('Preset saved in this browser.')}
+    catch{setNotice('This browser could not save the preset. Use Export instead.')}
+  }
+  const loadPreset=()=>{
+    try{
+      const saved=localStorage.getItem(STORAGE_KEY)
+      if(!saved){setNotice('No preset has been saved in this browser yet.');return}
+      applyValues(parseLabPreset(saved,valuesRef.current),importMessage(saved,'Saved preset loaded.'))
+    }catch(error){setNotice(error.message||'The saved preset could not be loaded.')}
+  }
+  const applyToFooter=()=>{
+    try{
+      applyFooterBlackHolePreset(valuesRef.current)
+      setFooterNotice('Applied to Contact and its shared universe in this browser.')
+    }catch{
+      setFooterNotice('Browser storage is unavailable. The footer was not changed.')
     }
-  }, [debugView, layers, showNotice, tuning])
-
-  const importConfig = useCallback(() => {
-    try {
-      const parsed = JSON.parse(jsonDraft)
-      const next = sanitizeConfig(parsed)
-      setTuning(next.tuning)
-      setLayers(next.layers)
-      setDebugView(Number.isFinite(parsed.debugView) ? parsed.debugView : 0)
-      setPresetKey('custom')
-      showNotice('Settings imported')
-    } catch {
-      showNotice('That JSON is not valid')
+  }
+  const restoreFooter=()=>{
+    try{
+      restoreFooterBlackHoleDefaults()
+      setFooterNotice('Using the JSON project default. Your lab settings are kept.')
+    }catch{
+      setFooterNotice('Browser storage is unavailable. Could not restore footer defaults.')
     }
-  }, [jsonDraft, showNotice])
-
-  const handlePointerMove = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    pointerRef.current.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
-    pointerRef.current.y = -(((event.clientY - bounds.top) / bounds.height - 0.5) * 2)
   }
-
-  const resetPointer = () => {
-    pointerRef.current.x = 0
-    pointerRef.current.y = 0
+  const saveProjectDefault=async()=>{
+    if(savingProject)return
+    setSavingProject(true)
+    const snapshot={version:LAB_PRESET_VERSION,values:{...valuesRef.current}}
+    try{
+      const response=await fetch('/api/footer-blackhole-preset',{method:'POST',headers:{'Content-Type':'application/json','X-Black-Hole-Lab':'save-project-default'},body:JSON.stringify(snapshot)})
+      const result=await response.json()
+      if(!response.ok)throw new Error(result.error||'Could not save project default.')
+      try{applyFooterBlackHolePreset(result.values)}catch{}
+      setFooterNotice('Saved to config/footer-blackhole-preset.json. This default survives restarts and ships with your next deployment.')
+    }catch(error){setFooterNotice(error.message||'Could not save project default.')}
+    finally{setSavingProject(false)}
   }
-
-  return (
-    <main
-      className={styles.lab}
-      data-panel-open={panelOpen ? 'true' : 'false'}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={resetPointer}
-    >
-      <Head>
-        <title>Black Hole Lab — Karl Lopez</title>
-        <meta
-          name="description"
-          content="A desktop shader laboratory for refining the portfolio black-hole renderer."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-
-      <div className={styles.canvas}>
-        <BlackHoleCanvas
-          active={active}
-          reducedMotion={false}
-          pointerRef={pointerRef}
-          quality="desktop"
-          phase={active ? 'RUNNING' : 'PAUSED_OFFSCREEN'}
-          labConfig={labConfig}
-          debugView={debugView}
-          manualTime={manualMode ? manualTime : null}
-          resetToken={resetToken}
-          onReady={() => setSceneStatus('Running')}
-          onStable={() => setSceneStatus('Stable')}
-          onError={() => setSceneStatus('Renderer error')}
-          onContextLost={() => setSceneStatus('Context lost')}
-          onContextRestored={() => setSceneStatus('Restoring')}
-          onDiagnostics={setDiagnostics}
-        />
+  return <>
+    <Head><title>Black Hole Lab</title><meta name="robots" content="noindex,nofollow"/></Head>
+    <main className={`${styles.lab} ${!panelOpen?styles.panelHidden:''}`}>
+      <div className={styles.scene}>
+        <BlackHoleScene valuesRef={valuesRef} revision={revision} paused={paused} birthReplay={birthReplay} onStatus={onStatus}/>
       </div>
-
-      <div className={styles.topBar}>
-        <div>
-          <span className={styles.kicker}>KL / VISUAL SYSTEMS</span>
-          <h1>Black Hole Lab</h1>
+      <div className={styles.toolbar}>
+        <span className={styles.labName}>BLACK HOLE / LAB</span>
+        <div className={styles.toolbarActions}>
+          <button type="button" disabled={status.state!=='ready'} onClick={()=>{setPaused(false);setBirthReplay(value=>value+1)}} title="Replay the black-hole opening with the current preset">Play birth</button>
+          <button type="button" onClick={()=>setPaused(value=>!value)} aria-pressed={paused}>{paused?'Resume':'Pause'}</button>
+          <button type="button" onClick={()=>setPanelOpen(value=>!value)} aria-expanded={panelOpen} aria-controls="black-hole-controls">{panelOpen?'Hide controls':'Show controls'}</button>
+          <button type="button" onClick={()=>applyPreset('performance')} title="Reduce rendering cost">Performance fallback</button>
+          <button type="button" onClick={()=>updateValue('universeEnabled',values.universeEnabled?0:1)} aria-pressed={values.universeEnabled===1}>Universe {values.universeEnabled?'on':'off'}</button>
+          <button type="button" onClick={()=>updateValue('curvatureEnabled',values.curvatureEnabled?0:1)} aria-pressed={values.curvatureEnabled===1}>Curvature {values.curvatureEnabled?'on':'off'}</button>
+          <button type="button" onClick={applyToFooter}>Apply to footer</button>
+          {process.env.NODE_ENV==='development'&&<button type="button" onClick={saveProjectDefault} disabled={savingProject}>{savingProject?'Saving…':'Save as project default'}</button>}
+          <button type="button" onClick={restoreFooter} disabled={!footerApplied}>Use project default</button>
         </div>
-        <div className={styles.topActions}>
-          <span className={styles.productionLock}>
-            Contact preset locked
-          </span>
-          <a href="/" className={styles.backLink}>
-            <ChevronLeft size={15} />
-            Portfolio
-          </a>
-        </div>
+        <p className={styles.footerPreview} role="status">
+          {footerNotice||(footerApplied?'A temporary browser preview is active. Save as project default to persist it in the project.':'The footer uses its JSON project default. Apply to footer creates a temporary browser preview.')}
+          {' '}<a href="/#contact" target="_blank" rel="noopener noreferrer">View footer ↗</a>
+        </p>
+        {!panelOpen&&<PreviewStatus status={status} paused={paused}/>}
+        {(status.state==='context-lost'||status.state==='error')&&typeof status.recover==='function'&&<button type="button" className={styles.recover} onClick={status.recover}>Recover preview</button>}
       </div>
-
-      <div className={styles.transport}>
-        <button
-          type="button"
-          onClick={() => setRunning((value) => !value)}
-          aria-label={running ? 'Pause animation' : 'Play animation'}
-        >
-          {running ? <Pause size={16} /> : <Play size={16} />}
-          {running ? 'Pause' : 'Play'}
-        </button>
-        <button type="button" onClick={restartSimulation}>
-          <RotateCcw size={15} />
-          Restart
-        </button>
-        {[0.25, 0.5, 1].map((speed) => (
-          <button
-            key={speed}
-            type="button"
-            className={Math.abs(tuning.motionSpeed - speed) < 0.001 ? styles.activeButton : ''}
-            onClick={() => updateTuning('motionSpeed', speed)}
-          >
-            {speed}×
-          </button>
-        ))}
-        <span className={styles.transportStatus}>
-          <i data-running={active ? 'true' : 'false'} />
-          {manualMode ? `Fixed ${manualTime.toFixed(1)}s` : sceneStatus}
-        </span>
-      </div>
-
-      <button
-        type="button"
-        className={styles.panelToggle}
-        onClick={() => setPanelOpen((value) => !value)}
-        aria-label={panelOpen ? 'Close controls' : 'Open controls'}
-      >
-        {panelOpen ? <ChevronRight size={18} /> : <SlidersHorizontal size={18} />}
-      </button>
-
-      <aside className={styles.panel} aria-label="Black-hole controls">
+      {panelOpen&&<aside id="black-hole-controls" className={styles.panel} aria-label="Black hole and universe controls">
         <header className={styles.panelHeader}>
-          <div>
-            <span>DEBUG CONSOLE</span>
-            <strong>Material workstation</strong>
+          <div className={styles.headingRow}><div><span className={styles.eyebrow}>PROCEDURAL / LIVE</span><h1>Black hole laboratory</h1></div><button type="button" className={styles.resetAll} onClick={()=>applyValues({...LAB_DEFAULTS},'All controls restored to defaults.')}>Reset all</button></div>
+          <PreviewStatus status={status} paused={paused}/>
+          <div className={styles.categoryTabs} aria-label="Control categories">
+            {LAB_CATEGORIES.map(entry=><button type="button" key={entry.id}
+              aria-pressed={category===entry.id} onClick={()=>setCategory(entry.id)}>{entry.label}</button>)}
           </div>
-          <Gauge size={19} />
         </header>
-
-        <section className={styles.presetSection}>
-          <span className={styles.sectionLabel}>Preset</span>
-          <div className={styles.presetGrid}>
-            {Object.entries(BLACK_HOLE_LAB_PRESETS).map(([key, preset]) => (
-              <button
-                type="button"
-                key={key}
-                data-active={presetKey === key ? 'true' : 'false'}
-                onClick={() => applyPreset(key)}
-                title={preset.description}
-              >
-                {preset.label}
-              </button>
-            ))}
-          </div>
-          {presetKey === 'custom' && (
-            <p className={styles.customState}>Custom settings are active and saved locally.</p>
-          )}
-        </section>
-
-        <ControlGroup title="Layer isolation" initialOpen>
-          <div className={styles.layerGrid}>
-            {Object.entries(LAYER_LABELS).map(([key, label]) => (
-              <label key={key}>
-                <input
-                  type="checkbox"
-                  checked={layers[key]}
-                  onChange={(event) => updateLayer(key, event.target.checked)}
-                />
-                <span>{label}</span>
-              </label>
-            ))}
-          </div>
-        </ControlGroup>
-
-        {CONTROL_GROUPS.map((group, index) => (
-          <ControlGroup title={group.title} initialOpen={index < 3} key={group.id}>
-            <div className={styles.controlBody}>
-              {group.controls.map((control) => (
-                <RangeControl
-                  key={control[0]}
-                  control={control}
-                  value={tuning[control[0]]}
-                  onChange={updateTuning}
-                />
-              ))}
+        <div className={styles.panelBody}>
+          <section className={styles.qualityPresets} aria-label="Rendering quality presets">
+            <p className={styles.sectionLabel}>QUALITY PRESET</p>
+            <div className={styles.presetButtons}>{Object.entries(LAB_PRESETS).map(([key,preset])=><button key={key} type="button" onClick={()=>applyPreset(key)} aria-pressed={Object.entries(preset.values).every(([name,value])=>values[name]===value)}>{preset.label}</button>)}</div>
+          </section>
+          {LAB_GROUPS.filter(group=>group.category===category).map((group,index)=><details className={styles.group} key={group.id} open={index<2}>
+            <summary>{group.label}<span className={styles.groupMark} aria-hidden="true">+</span></summary>
+            <div className={styles.groupContent}>
+              <button className={styles.groupReset} type="button" onClick={()=>resetGroup(group)}>Reset {group.label.toLowerCase()}</button>
+              {group.controls.map(control=><Control key={control.key} control={control} value={values[control.key]??LAB_DEFAULTS[control.key]} onChange={updateValue} syncVersion={syncVersion}/>)}
             </div>
-          </ControlGroup>
-        ))}
-
-        <ControlGroup title="Gas color ramp">
-          <div className={styles.colorGrid}>
-            {[
-              ['outerColor', 'Outer gas'],
-              ['middleColor', 'Mid heat'],
-              ['hotColor', 'Inner heat']
-            ].map(([key, label]) => (
-              <label key={key}>
-                <span>{label}</span>
-                <input
-                  type="color"
-                  value={tuning[key]}
-                  onChange={(event) => updateTuning(key, event.target.value)}
-                />
-              </label>
-            ))}
-          </div>
-        </ControlGroup>
-
-        <ControlGroup title="Time inspection" initialOpen>
-          <div className={styles.controlBody}>
-            <label className={styles.inlineToggle}>
-              <input
-                type="checkbox"
-                checked={manualMode}
-                onChange={(event) => setManualMode(event.target.checked)}
-              />
-              <span>Fixed shader time</span>
-            </label>
-            <label className={styles.rangeControl}>
-              <span className={styles.controlHeading}>
-                <span>Timeline</span>
-                <output>{manualTime.toFixed(1)}s</output>
-              </span>
-              <input
-                type="range"
-                min="0"
-                max="120"
-                step="0.1"
-                value={manualTime}
-                disabled={!manualMode}
-                onChange={(event) => setManualTime(Number(event.target.value))}
-              />
-            </label>
-          </div>
-        </ControlGroup>
-
-        <ControlGroup title="Diagnostic view" initialOpen>
-          <div className={styles.controlBody}>
-            <select
-              value={debugView}
-              onChange={(event) => setDebugView(Number(event.target.value))}
-            >
-              {DEBUG_VIEWS.map(([value, label]) => (
-                <option value={value} key={value}>{label}</option>
-              ))}
-            </select>
-          </div>
-        </ControlGroup>
-
-        <ControlGroup title="Performance" initialOpen>
-          <div className={styles.diagnostics}>
-            <DiagnosticItem
-              label="FPS"
-              value={diagnostics ? diagnostics.fps.toFixed(1) : '—'}
-              accent
-            />
-            <DiagnosticItem
-              label="Frame"
-              value={diagnostics ? `${diagnostics.frameTime.toFixed(2)} ms` : '—'}
-            />
-            <DiagnosticItem label="Buffer" value={diagnostics?.bufferSize || '—'} />
-            <DiagnosticItem label="Draw calls" value={diagnostics?.drawCalls ?? '—'} />
-            <DiagnosticItem label="Triangles" value={diagnostics?.triangles ?? '—'} />
-            <DiagnosticItem label="Programs" value={diagnostics?.programs ?? '—'} />
-            <DiagnosticItem label="Textures" value={diagnostics?.textures ?? '—'} />
-            <DiagnosticItem label="Context" value={diagnostics?.context || sceneStatus} />
-          </div>
-        </ControlGroup>
-
-        <ControlGroup title="Import / export">
-          <div className={styles.controlBody}>
-            <textarea
-              value={jsonDraft}
-              onChange={(event) => setJsonDraft(event.target.value)}
-              placeholder="Exported preset JSON appears here."
-              spellCheck="false"
-            />
-            <div className={styles.jsonActions}>
-              <button type="button" onClick={exportConfig}>
-                <Clipboard size={14} />
-                Copy JSON
-              </button>
-              <button type="button" onClick={importConfig}>Import JSON</button>
+          </details>)}
+          <details className={styles.group}>
+            <summary>Save &amp; transfer presets<span className={styles.groupMark} aria-hidden="true">+</span></summary>
+            <div className={styles.presetContent}>
+              <div className={styles.twoButtons}><button type="button" onClick={savePreset}>Save locally</button><button type="button" onClick={loadPreset}>Load saved</button></div>
+              <label className={styles.presetLabel} htmlFor="black-hole-preset">Preset JSON</label>
+              <textarea id="black-hole-preset" value={presetText} maxLength={20000} onChange={event=>setPresetText(event.target.value)} placeholder="Export current values or paste a preset here." spellCheck={false}/>
+              <div className={styles.twoButtons}><button type="button" onClick={exportPreset}>Export current</button><button type="button" onClick={importPreset} disabled={!presetText.trim()}>Import preset</button></div>
+              <p className={styles.help}>Local saving uses this browser. Copy exported JSON to keep a separate preset.</p>
             </div>
-          </div>
-        </ControlGroup>
-      </aside>
-
-      <div className={styles.legend}>
-        <span>Gas-development workspace</span>
-        <strong>{BLACK_HOLE_LAB_PRESETS.gas.description}</strong>
-      </div>
-
-      {notice && <div className={styles.notice} role="status">{notice}</div>}
+          </details>
+          <p className={styles.notice} role="status" aria-live="polite">{notice||'Changes apply live. Numeric fields accept precise values; Enter commits and Escape restores.'}</p>
+        </div>
+      </aside>}
     </main>
-  )
+  </>
 }

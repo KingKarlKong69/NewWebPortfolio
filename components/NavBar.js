@@ -1,15 +1,169 @@
-import { motion, useReducedMotion } from 'framer-motion'
-import { Download } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { ArrowLeft, Download, Menu } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { SIDEBAR_NAV_ITEMS, SOCIAL_ITEMS } from './LeftNav'
+import { PortfolioLogoScene } from './ResponsivePortfolioLogo'
 import { NAV_ITEMS, useActiveNavSection } from './navigationState'
+import styles from './NavBar.module.css'
 
-export default function NavBar(){
+const MOBILE_QUERY = '(max-width: 1100px)'
+const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex="0"]'
+const stopHeroPointer = (event) => event.stopPropagation()
+
+function MobileNavigationDrawer({ activeSection, onClose, onNavigate, toggleRef, reduceMotion }) {
+  const overlayRef = useRef(null)
+  const drawerRef = useRef(null)
+  const backRef = useRef(null)
+
+  useEffect(() => {
+    const overlay = overlayRef.current
+    const drawer = drawerRef.current
+    if (!overlay || !drawer) return
+
+    const bodyOverflow = document.body.style.overflow
+    const rootOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+
+    // Keep keyboard and assistive-technology navigation inside the modal.
+    const background = Array.from(document.body.children)
+      .filter((element) => element !== overlay && !['SCRIPT', 'STYLE'].includes(element.tagName))
+      .map((element) => ({ element, inert: element.inert }))
+    background.forEach(({ element }) => { element.inert = true })
+    const focusFrame = window.requestAnimationFrame(() => backRef.current?.focus({ preventScroll: true }))
+
+    const guardFocus = (event) => {
+      if (!drawer.contains(event.target)) backRef.current?.focus({ preventScroll: true })
+    }
+    const handleKey = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const controls = Array.from(drawer.querySelectorAll(FOCUSABLE))
+      const first = controls[0]
+      const last = controls[controls.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last?.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKey)
+    document.addEventListener('focusin', guardFocus)
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener('focusin', guardFocus)
+      background.forEach(({ element, inert }) => { element.inert = inert })
+      document.body.style.overflow = bodyOverflow
+      document.documentElement.style.overflow = rootOverflow
+      if (window.matchMedia(MOBILE_QUERY).matches) toggleRef.current?.focus({ preventScroll: true })
+    }
+  }, [onClose, toggleRef])
+
+  return (
+    <motion.div
+      ref={overlayRef}
+      className={styles.mobileOverlay}
+      data-navigation-overlay="true"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reduceMotion ? 0 : .26 }}
+      onClick={(event) => {
+        event.stopPropagation()
+        if (event.target === event.currentTarget) onClose()
+      }}
+      onPointerDown={stopHeroPointer}
+      onPointerMove={stopHeroPointer}
+      onPointerUp={stopHeroPointer}
+    >
+      <motion.aside
+        ref={drawerRef}
+        id="mobile-navigation"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+        className={styles.mobileDrawer}
+        initial={{ x: '-100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '-100%' }}
+        transition={reduceMotion ? { duration: 0 } : { duration: .4, ease: [.22, 1, .36, 1] }}
+      >
+        <button ref={backRef} type="button" className={styles.drawerBack} aria-label="Close navigation" onClick={onClose}>
+          <ArrowLeft aria-hidden="true" size={22} strokeWidth={1.6} />
+        </button>
+        <a className={styles.drawerLogo} href="#home" aria-label="Karl Lopez — Home" onClick={(event) => onNavigate(event, 'home')}>
+          <span aria-hidden="true"><PortfolioLogoScene /></span>
+        </a>
+        <nav className={styles.mobileNavigation} aria-label="Mobile navigation">
+          {SIDEBAR_NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={(event) => onNavigate(event, item.id)}
+                aria-current={item.id === activeSection ? 'page' : undefined}
+                className={styles.mobileLink}
+              >
+                <Icon aria-hidden="true" size={19} strokeWidth={1.7} />
+                <span>{item.label}</span>
+                <span aria-hidden="true" className={styles.drawerActiveGlow} />
+              </a>
+            )
+          })}
+        </nav>
+        <div className={styles.drawerFooter}>
+          <div className={styles.drawerSocials}>
+            {SOCIAL_ITEMS.map((item) => {
+              const Icon = item.icon
+              return (
+                <a key={item.label} href={item.href} aria-label={item.label} target="_blank" rel="noopener noreferrer">
+                  <Icon size={20} />
+                </a>
+              )
+            })}
+          </div>
+          <button type="button" className={`${styles.resumeButton} ${styles.drawerResume}`}>
+            Resume <Download aria-hidden="true" strokeWidth={1.8} />
+          </button>
+        </div>
+      </motion.aside>
+    </motion.div>
+  )
+}
+
+export default function NavBar() {
   const { activeSection, navigateToSection } = useActiveNavSection()
-  const navItems = NAV_ITEMS
-  const mobileNavItems = NAV_ITEMS
   const [navVisible, setNavVisible] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navRef = useRef(null)
+  const menuToggleRef = useRef(null)
   const reduceMotion = useReducedMotion()
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), [])
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 1101px)')
+    const closeDesktopMenu = () => {
+      if (desktopQuery.matches) setMobileMenuOpen(false)
+    }
+    desktopQuery.addEventListener('change', closeDesktopMenu)
+    return () => desktopQuery.removeEventListener('change', closeDesktopMenu)
+  }, [])
+
+  const followNavigation = (event, section) => {
+    event.preventDefault()
+    setMobileMenuOpen(false)
+    navigateToSection(section)
+  }
 
   useEffect(() => {
     const nav = navRef.current
@@ -23,7 +177,6 @@ export default function NavBar(){
 
   useEffect(() => {
     let lastScrollY = window.scrollY
-
     const reveal = () => setNavVisible(true)
     const revealNearNav = (event) => {
       if (event.clientY <= 32) reveal()
@@ -31,20 +184,17 @@ export default function NavBar(){
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       const delta = currentScrollY - lastScrollY
-
       if (currentScrollY <= 24 || delta < -8) {
         setNavVisible(true)
-      } else if (delta > 8 && currentScrollY > 72) {
+      } else if (delta > 8 && currentScrollY > 72 && !navRef.current?.contains(document.activeElement)) {
         setNavVisible(false)
       }
-
       lastScrollY = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('pointermove', revealNearNav, { passive: true })
     window.addEventListener('navbar:reveal', reveal)
-
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('pointermove', revealNearNav)
@@ -53,79 +203,76 @@ export default function NavBar(){
   }, [])
 
   return (
+    <>
       <motion.header
         ref={navRef}
-        initial={{opacity:0,y:-28}}
-        animate={{opacity: navVisible ? 1 : 0, y: navVisible ? 0 : '-115%'}}
-        transition={reduceMotion ? {duration:0} : {duration:0.44, ease:[0.22,1,0.36,1]}}
+        initial={{ opacity: 0, y: -28 }}
+        animate={{ opacity: navVisible || mobileMenuOpen ? 1 : 0, y: navVisible || mobileMenuOpen ? 0 : '-115%' }}
+        transition={reduceMotion ? { duration: 0 } : { duration: .44, ease: [.22, 1, .36, 1] }}
         onMouseEnter={() => setNavVisible(true)}
         onFocusCapture={() => setNavVisible(true)}
-        className="fixed left-0 right-0 top-0 z-50 bg-transparent px-4 py-3 md:pl-24 md:pr-8 md:py-5"
+        className={styles.header}
       >
-      <nav
-        aria-label="Mobile navigation"
-        className="fixed right-5 top-9 z-50 flex flex-col items-start gap-8 text-[7px] font-bold uppercase tracking-[0.08em] text-gray-400 md:hidden"
-      >
-        {mobileNavItems.map((item) => {
-          const isActive = item.id === activeSection
-
-          return (
-            <motion.a
-              key={item.id}
-              href={`#${item.id}`}
-              onClick={(event) => {
-                event.preventDefault()
-                navigateToSection(item.id)
-              }}
-              className={`relative cursor-pointer transition-colors ${isActive ? 'text-cyan-200' : 'text-gray-400 hover:text-cyan-200 focus:text-cyan-200'}`}
-              whileHover={{x: -2, color:'#A5F3FC'}}
-              whileFocus={{x: -2, color:'#A5F3FC'}}
+        <div className={styles.row}>
+          <nav aria-label="Main navigation" className={styles.desktopNavigation}>
+            {NAV_ITEMS.map((item) => {
+              const isActive = item.id === activeSection
+              return (
+                <motion.a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(event) => followNavigation(event, item.id)}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`${styles.desktopLink} ${isActive ? styles.activeLink : ''}`}
+                  whileHover={{ color: '#ffffff' }}
+                >
+                  {item.label}
+                  <span aria-hidden="true" className={styles.activeGlow} />
+                </motion.a>
+              )
+            })}
+          </nav>
+          <div className={styles.actions}>
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.04, boxShadow: '0 0 24px rgba(139,92,246,0.35)' }}
+              whileTap={{ scale: .94 }}
+              className={`${styles.resumeButton} ${styles.headerResume}`}
             >
-              {item.label}
-            </motion.a>
-          )
-        })}
-      </nav>
-
-      <div className="mx-auto grid max-w-[1180px] grid-cols-[1fr_auto] items-center gap-8 px-4 py-3 md:px-6 md:py-3">
-        <nav className="hidden md:flex justify-center gap-11 text-[13px] text-gray-300 tracking-wide">
-          {navItems.map((item) => {
-            const isActive = item.id === activeSection
-
-            return (
-              <motion.a
-                key={item.id}
-                href={`#${item.id}`}
-                onClick={(event) => {
-                  event.preventDefault()
-                  navigateToSection(item.id)
-                }}
-                className={`group relative cursor-pointer transition-colors ${isActive ? 'text-white' : 'text-gray-300 hover:text-white'}`}
-                whileHover={{color:'#ffffff'}}
-              >
-                {item.label}
-                <motion.span
-                  className={`absolute -bottom-4 left-1/2 h-px -translate-x-1/2 bg-gradient-to-r from-transparent via-cyan-300 to-transparent transition-all duration-300 ${isActive ? 'w-20 opacity-100' : 'w-0 opacity-0 group-hover:w-16 group-hover:opacity-80'}`}
-                  style={isActive ? {
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(103,232,249,0.28) 28%, rgba(165,243,252,1) 50%, rgba(103,232,249,0.28) 72%, transparent 100%)',
-                    boxShadow: '0 0 8px rgba(0,229,255,0.72), 0 0 18px rgba(0,229,255,0.38), 0 0 34px rgba(0,229,255,0.18)'
-                  } : undefined}
-                />
-              </motion.a>
-            )
-          })}
-        </nav>
-
-        <div className="flex items-center justify-end gap-5">
-          <motion.button
-            whileHover={{scale:1.04,boxShadow: '0 0 24px rgba(139,92,246,0.35)'}}
-            whileTap={{scale:0.94}}
-            className="hidden md:inline-flex items-center gap-3 rounded-md border border-purple-300/35 bg-transparent px-5 py-3 text-xs font-bold text-gray-200"
-          >
-            Resume <Download size={14} strokeWidth={1.8} />
-          </motion.button>
+              Resume <Download aria-hidden="true" strokeWidth={1.8} />
+            </motion.button>
+            <button
+              ref={menuToggleRef}
+              type="button"
+              className={styles.menuToggle}
+              aria-label="Open navigation"
+              aria-controls="mobile-navigation"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => {
+                setNavVisible(true)
+                setMobileMenuOpen(true)
+              }}
+            >
+              <Menu aria-hidden="true" strokeWidth={1.6} />
+            </button>
+          </div>
         </div>
-      </div>
       </motion.header>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <MobileNavigationDrawer
+              key="mobile-navigation"
+              activeSection={activeSection}
+              onClose={closeMobileMenu}
+              onNavigate={followNavigation}
+              toggleRef={menuToggleRef}
+              reduceMotion={reduceMotion}
+            />
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
   )
 }

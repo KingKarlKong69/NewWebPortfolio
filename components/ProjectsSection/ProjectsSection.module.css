@@ -1,3 +1,13 @@
+.storySection {
+  position: relative;
+  pointer-events: none;
+  margin-top: -200svh;
+  z-index: 11;
+  isolation: isolate;
+  background: transparent;
+  scroll-margin-top: 0;
+}
+
 .section {
   position: relative;
   isolation: isolate;

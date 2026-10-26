@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useReducedMotion } from 'framer-motion'
 import { Clock3, ExternalLink, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ProjectDetails from './ProjectDetails'
@@ -7,9 +7,9 @@ import ProjectNavigation from './ProjectNavigation'
 import { PROJECTS } from './projectsData'
 import styles from './ProjectsSection.module.css'
 
-const AUTO_PROJECT_DELAY = 4000
-const MANUAL_PROJECT_DELAY = 8000
 const SCREENSHOT_DELAY = 3000
+
+const ProjectsStory = dynamic(() => import('./ProjectsStory'), { ssr: false })
 
 const ProjectLaptopScene = dynamic(() => import('./ProjectLaptopScene'), {
   ssr: false,
@@ -136,14 +136,26 @@ function ProjectDialog({ project, onClose }) {
 export default function ProjectsSection() {
   const sectionRef = useRef(null)
   const firstProjectRef = useRef(null)
-  const nextProjectDelayRef = useRef(AUTO_PROJECT_DELAY)
   const [activeIndex, setActiveIndex] = useState(0)
   const [isInView, setIsInView] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
-  const [scheduleVersion, setScheduleVersion] = useState(0)
   const [dialogProject, setDialogProject] = useState(null)
+  const [storyMode, setStoryMode] = useState(false)
   const reducedMotion = useReducedMotion()
   const activeProject = PROJECTS[activeIndex]
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1101px)')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const configure = () => setStoryMode(desktop.matches && !reduced.matches)
+    configure()
+    desktop.addEventListener('change', configure)
+    reduced.addEventListener('change', configure)
+    return () => {
+      desktop.removeEventListener('change', configure)
+      reduced.removeEventListener('change', configure)
+    }
+  }, [])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -158,34 +170,18 @@ export default function ProjectsSection() {
 
   const closeDialog = useCallback(() => setDialogProject(null), [])
 
-  useEffect(() => {
-    if (!isInView || dialogProject || PROJECTS.length <= 1) return undefined
-
-    const timeout = window.setTimeout(() => {
-      nextProjectDelayRef.current = AUTO_PROJECT_DELAY
-      setActiveIndex((currentIndex) => (currentIndex + 1) % PROJECTS.length)
-    }, nextProjectDelayRef.current)
-
-    return () => window.clearTimeout(timeout)
-  }, [activeIndex, dialogProject, isInView, scheduleVersion])
-
   const selectProject = useCallback((projectIndex) => {
-    nextProjectDelayRef.current = MANUAL_PROJECT_DELAY
-    setScheduleVersion((version) => version + 1)
     setActiveIndex((currentIndex) => currentIndex === projectIndex ? currentIndex : projectIndex)
   }, [])
 
   return (
-    <motion.section
+    <section
       ref={sectionRef}
       id="projects"
       aria-labelledby="projects-heading"
-      initial={reducedMotion ? false : {opacity: 0, y: 38}}
-      whileInView={{opacity: 1, y: 0}}
-      viewport={{once: false, amount: 0.07}}
-      transition={reducedMotion ? {duration: 0} : {duration: 0.8, ease: [0.22, 1, 0.36, 1]}}
-      className={styles.section}
+      className={storyMode ? styles.storySection : styles.section}
     >
+      {storyMode ? <ProjectsStory projects={PROJECTS} onOpenCaseStudy={setDialogProject} hostRef={sectionRef} /> : <>
       <div className={styles.orbitBackdrop} aria-hidden="true">
         <span /><span /><span />
       </div>
@@ -229,7 +225,9 @@ export default function ProjectsSection() {
         </div>
       </div>
 
+      </>}
+
       <ProjectDialog project={dialogProject} onClose={closeDialog} />
-    </motion.section>
+    </section>
   )
 }

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "values": {
+    "movingSpeed": 0.005,
+    "asteroidCount": 3
+  }
+}

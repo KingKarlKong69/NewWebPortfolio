@@ -1,0 +1,6 @@
+.field { position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#010308; }
+.haze { position:absolute; inset:0; background:radial-gradient(ellipse at 42% 67%,#090b201c,transparent 60%); }
+.field > span { position:absolute; border-radius:50%; background:#d8fcff; opacity:.5; box-shadow:0 0 5px 1px #9af5ff80,0 0 17px 3px #22b5f43b; animation:glimmer 12s ease-in-out infinite alternate; }
+.field > .violet { background:#ddd3ff; box-shadow:0 0 5px 1px #c0a4ff80,0 0 17px 3px #9d5bff3b; }
+@keyframes glimmer { 0%,100% { opacity:.16;transform:translate(-2px,3px) scale(.75); } 45%,60% { opacity:.75;transform:translate(2px,-3px) scale(1.12); } }
+@media (prefers-reduced-motion:reduce) { .field > span {animation:none;} }

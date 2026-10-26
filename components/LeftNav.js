@@ -4,7 +4,7 @@ import { useActiveNavSection } from './navigationState'
 
 const SIDEBAR_BEAM_EDGE_WIDTH = 90
 
-const navItems = [
+export const SIDEBAR_NAV_ITEMS = [
   { icon: Home, label: 'Home', id: 'home' },
   { icon: User, label: 'About', id: 'about' },
   { icon: Briefcase, label: 'Projects', id: 'projects' },
@@ -37,7 +37,7 @@ function FacebookMark({ size = 17, className = '' }) {
   )
 }
 
-const socialItems = [
+export const SOCIAL_ITEMS = [
   { icon: GitHubMark, label: 'GitHub', href: 'https://github.com/KingKarlKong69' },
   { icon: LinkedInMark, label: 'LinkedIn', href: 'https://www.linkedin.com/in/karl-lopez-b3472539a/' },
   { icon: FacebookMark, label: 'Facebook', href: 'https://www.facebook.com/karl.lopez.75491' }
@@ -52,7 +52,7 @@ export default function LeftNav(){
       animate={{opacity:1,x:0}}
       transition={{delay:0.25,duration:0.9}}
       onClick={() => window.dispatchEvent(new Event('navbar:reveal'))}
-      className="hidden lg:flex fixed left-0 top-0 z-[60] h-screen w-[66px] flex-col items-center"
+      className="hidden min-[1101px]:flex fixed left-0 top-0 z-[60] h-screen w-[66px] flex-col items-center"
     >
       <span
         aria-hidden="true"
@@ -63,7 +63,7 @@ export default function LeftNav(){
       <div aria-hidden="true" className="mt-1 h-[172px] shrink-0" />
 
       <nav className="relative mt-3 flex translate-x-[12px] flex-col items-center gap-7">
-        {navItems.map((item, idx) => {
+        {SIDEBAR_NAV_ITEMS.map((item, idx) => {
           const Icon = item.icon
           const isActive = item.id === activeSection
 
@@ -97,7 +97,7 @@ export default function LeftNav(){
       </nav>
 
       <div className="relative mb-9 mt-auto flex translate-x-[12px] flex-col items-center gap-6">
-        {socialItems.map((item) => {
+        {SOCIAL_ITEMS.map((item) => {
           const Icon = item.icon
 
           return (

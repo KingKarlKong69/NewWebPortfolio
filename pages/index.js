@@ -7,6 +7,7 @@ import SkillsSection from '../components/SkillsSection/SkillsSection'
 import ProjectsSection from '../components/ProjectsSection/ProjectsSection'
 import ServicesSection from '../components/ServicesSection/ServicesSection'
 import ContactSection from '../components/ContactSection/ContactSection'
+import SpaceJourney from '../components/ServicesSection/SpaceJourney'
 import ResponsivePortfolioLogo from '../components/ResponsivePortfolioLogo'
 import { NavigationProvider } from '../components/navigationState'
 
@@ -22,12 +23,16 @@ export default function Home(){
         <NavBar />
         <LeftNav />
         <main className="relative min-h-screen w-full" style={{background: 'transparent'}}>
-          <Hero />
-          <AboutSection />
+          <div className="relative">
+            <Hero />
+            <AboutSection />
+          </div>
           <ProjectsSection />
           <SkillsSection />
-          <ServicesSection />
-          <ContactSection />
+          <SpaceJourney>
+            <ServicesSection />
+            <ContactSection />
+          </SpaceJourney>
         </main>
       </div>
     </NavigationProvider>

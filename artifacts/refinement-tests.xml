@@ -1,0 +1,738 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="live projects preserve their destination and expose a separate case study action" time="0.002143" classname="test"/>
+	<testcase name="a project without a live deployment keeps its existing local project details action" time="0.000282" classname="test"/>
+	<testcase name="explicit actions support every requested single and paired arrangement without inventing a URL" time="0.000335" classname="test"/>
+	<testcase name="the dot lattice stays anchored through resize without changing its existing positions" time="0.002890" classname="test"/>
+	<testcase name="hover forms a local pulsating cluster and leaves distant dots unchanged" time="0.001208" classname="test"/>
+	<testcase name="click waves propagate to the farthest corner before fading out" time="0.000215" classname="test"/>
+	<testcase name="a screenshot holds for 4.5 seconds, dissolves for 1.5 seconds, then holds the next image" time="0.001398" classname="test"/>
+	<testcase name="scrolling freezes a fractional dissolve and resuming excludes the paused wall time" time="0.000196" classname="test"/>
+	<testcase name="returning to a prior project restores its own screenshot and remaining hold" time="0.000175" classname="test"/>
+	<testcase name="a delayed dwell wake still begins a visible dissolve and stalled frames cannot skip images" time="0.000107" classname="test"/>
+	<testcase name="empty and single-image projects stay static; a loaded gallery starts with a complete dwell" time="0.000122" classname="test"/>
+	<testcase name="reduced motion pauses autoplay without losing the saved screenshot or blend" time="0.000126" classname="test"/>
+	<testcase name="changing screenshot counts keeps indices in range and retains a surviving incoming image" time="0.000239" classname="test"/>
+	<testcase name="invalid elapsed input cannot advance a paused or playing slideshow" time="0.000173" classname="test"/>
+	<testcase name="sampling handoff textures does not change the active slideshow or resume clock" time="0.000466" classname="test"/>
+	<testcase name="the giant PROJECTS word zooms out before spacing expands, compresses, and drops" time="0.001446" classname="test"/>
+	<testcase name="the closed laptop enters from the right, fills the view, then docks and opens" time="0.000800" classname="test"/>
+	<testcase name="each project reveals its category, title, metadata, actions, and navigation in order" time="0.001671" classname="test"/>
+	<testcase name="project destinations select every real project and the final state stays readable" time="0.000682" classname="test"/>
+	<testcase name="TV transitions keep the matching screen pair through every project boundary in either direction" time="0.003405" classname="test"/>
+	<testcase name="reverse scrolling restores every visual channel exactly and reuses the supplied output" time="0.019862" classname="test"/>
+	<testcase name="laptop, title, visible copy, and screen transitions remain continuous at stage boundaries" time="0.003047" classname="test"/>
+	<testcase name="invalid input stays finite and sampled values stay inside their physical ranges" time="0.020037" classname="test"/>
+	<testcase name="Services overlaps the completed whiteout and becomes visible without a star-only tail" time="0.001357" classname="test" failure="incoming section begins at full white: 8034 versus 7584">
+		<failure type="testCodeFailure" message="incoming section begins at full white: 8034 versus 7584">
+[Error [ERR_TEST_FAILURE]: incoming section begins at full white: 8034 versus 7584] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: incoming section begins at full white: 8034 versus 7584
+      at close (C:\Users\lopez\Documents\ProjectNewPortfolio\components\ProjectsSection\projectsSkillsMotion.test.cjs:10:10)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\ProjectsSection\projectsSkillsMotion.test.cjs:19:3)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="the appended Skills act preserves original project scroll distances and chapter destinations" time="0.000320" classname="test" failure="preserved laptop entry distance: 1550 versus 1100">
+		<failure type="testCodeFailure" message="preserved laptop entry distance: 1550 versus 1100">
+[Error [ERR_TEST_FAILURE]: preserved laptop entry distance: 1550 versus 1100] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: preserved laptop entry distance: 1550 versus 1100
+      at close (C:\Users\lopez\Documents\ProjectNewPortfolio\components\ProjectsSection\projectsSkillsMotion.test.cjs:10:10)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\ProjectsSection\projectsSkillsMotion.test.cjs:37:5)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="the final copy clears, its screen powers off, and the cosmos appears after a dark beat" time="0.002530" classname="test"/>
+	<testcase name="the centered laptop aligns its actual open screen plane before the camera enters" time="0.000315" classname="test"/>
+	<testcase name="portal takeover, landscape formation, and the Skills opening occur in their required order" time="0.006441" classname="test" failure="The expression evaluated to a falsy value:  assert.ok(at(.85).terrainFormation > 0 &amp;&amp; at(.85).terrainFormation &lt; 1)">
+		<failure type="testCodeFailure" message="The expression evaluated to a falsy value:  assert.ok(at(.85).terrainFormation > 0 &amp;&amp; at(.85).terrainFormation &lt; 1)">
+[Error [ERR_TEST_FAILURE]: The expression evaluated to a falsy value:
+
+  assert.ok(at(.85).terrainFormation > 0 &amp;&amp; at(.85).terrainFormation &lt; 1)
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(at(.85).terrainFormation > 0 &amp;&amp; at(.85).terrainFormation &lt; 1)
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\ProjectsSection\projectsSkillsMotion.test.cjs:118:10)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="backward sampling restores every numeric channel exactly, including partial portal and terrain states" time="0.156320" classname="test"/>
+	<testcase name="exit stage boundaries remain continuous and all transition channels stay finite and bounded" time="0.034603" classname="test"/>
+	<testcase name="intensity controls 1/2/3 hit points; destruction does not mutate contribution data" time="0.001236" classname="test"/>
+	<testcase name="swept bullets hit the nearest intact cell, consume one shot and pass destroyed cells" time="0.000315" classname="test"/>
+	<testcase name="horizontal ship bounds stay inside the arena and all supplied sprite paths exist" time="0.001651" classname="test"/>
+	<testcase name="seven fresh gestures hold the fully formed text, then traverse forward automatically and reverse to the exact hold" time="0.003962" classname="test" failure="Expected values to be strictly equal:950 !== 1000">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:950 !== 1000">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+950 !== 1000
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  950 !== 1000
+  
+      at Object.hold (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:17:32)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:23:5)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 950,
+    expected: 1000,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="touchpad momentum counts once; discrete wheel notches count separately" time="0.000493" classname="test"/>
+	<testcase name="the gate waits for the rendered message; up releases earlier Skills and other sections stay native" time="0.000495" classname="test" failure="Expected values to be strictly equal:950 !== 1000">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:950 !== 1000">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+950 !== 1000
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  950 !== 1000
+  
+      at Object.hold (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:17:32)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:48:13)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 950,
+    expected: 1000,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="reverse intent during forward travel returns to the toolset; hiding the tab pauses time and navigation cancels cleanly" time="0.000356" classname="test" failure="Expected values to be strictly equal:950 !== 1000">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:950 !== 1000">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+950 !== 1000
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  950 !== 1000
+  
+      at Object.hold (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:17:32)
+      at Object.forward (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:18:20)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:57:5)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 950,
+    expected: 1000,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="resizing keeps the text hold aligned; the stop samples a fully formed message before the whiteout" time="0.000240" classname="test" failure="Expected values to be strictly equal:950 !== 1000">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:950 !== 1000">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+950 !== 1000
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  950 !== 1000
+  
+      at Object.hold (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:17:32)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsAutoTraverse.test.cjs:72:5)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 950,
+    expected: 1000,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="expedition markers resolve safe local artwork and accessible descriptions" time="0.060255" classname="test" failure="Expected values to be strictly equal:46 !== 42">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:46 !== 42">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+46 !== 42
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  46 !== 42
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsExpeditionData.test.cjs:37:10)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 46,
+    expected: 42,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="five foreground checkpoints precede their chapter mountains without contribution data" time="0.001372" classname="test"/>
+	<testcase name="terrain-anchored marker hit targets remain separately selectable at desktop sizes" time="0.005180" classname="test" failure="office must remain in the interactive viewport at 1366 x 768">
+		<failure type="testCodeFailure" message="office must remain in the interactive viewport at 1366 x 768">
+[Error [ERR_TEST_FAILURE]: office must remain in the interactive viewport at 1366 x 768] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: office must remain in the interactive viewport at 1366 x 768
+      at C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsExpeditionData.test.cjs:79:16
+      at Array.map (&lt;anonymous>)
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsExpeditionData.test.cjs:75:37)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="the laptop entry and project scroll distances survive the longer native Skills runway" time="0.008029" classname="test" failure="The expression evaluated to a falsy value:  assert.ok(Math.abs((layout.transitionEnd-layout.projectsEnd)*distance-1100)&lt;1e-9)">
+		<failure type="testCodeFailure" message="The expression evaluated to a falsy value:  assert.ok(Math.abs((layout.transitionEnd-layout.projectsEnd)*distance-1100)&lt;1e-9)">
+[Error [ERR_TEST_FAILURE]: The expression evaluated to a falsy value:
+
+  assert.ok(Math.abs((layout.transitionEnd-layout.projectsEnd)*distance-1100)&lt;1e-9)
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(Math.abs((layout.transitionEnd-layout.projectsEnd)*distance-1100)&lt;1e-9)
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsExpeditionMotion.test.cjs:23:10)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="travel never pauses or surges between checkpoints and mountain reading windows" time="0.016466" classname="test"/>
+	<testcase name="the introductory copy persists until AI, then leaves only after the AI mountain" time="0.000700" classname="test"/>
+	<testcase name="the world message stays formed and the post-AI ground runs ten times farther before Services" time="0.000695" classname="test"/>
+	<testcase name="arbitrary forward and reverse seeks reconstruct every expedition channel exactly" time="0.048173" classname="test"/>
+	<testcase name="camera velocity is continuous and all narrative channels stay bounded" time="0.017599" classname="test"/>
+	<testcase name="earlier desktop chapters keep native scroll sampling and delegate the toolset closing journey" time="0.002850" classname="test" failure="The input was expected to not match the regular expression /skillsScrollGate|queueInput|preventDefault|addEventListener\(['&amp;quot;](?:wheel|keydown)['&amp;quot;]/. Input:&amp;quot;import dynamic from 'next/dynamic'\r\n&amp;quot; +  &amp;quot;import { ArrowRight } from 'lucide-react'\r\n&amp;quot; +  &amp;quot;import { useEffect, useRef, useState } from 'react'\r\n&amp;quot; +  &amp;quot;import ProjectDotField from './ProjectDotField'\r\n&amp;quot; +  &amp;quot;import ProjectTechnologyMarks from './ProjectTechnologyMarks'\r\n&amp;quot; +  &amp;quot;import { getProjectActions } from './projectActions'\r\n&amp;quot; +  &amp;quot;import {createProjectIdleCycle} from './projectIdleCycle'\r\n&amp;quot; +  &amp;quot;import { projectsSkillsLayout, projectsSkillsStop, sampleProjectsSkillsStory } from './projectStoryMotion'\r\n&amp;quot; +  &amp;quot;import SkillsExpedition from '../SkillsSection/SkillsExpedition'\r\n&amp;quot; +  &amp;quot;import useSkillsAutoTraverse from '../SkillsSection/useSkillsAutoTraverse'\r\n&amp;quot; +  &amp;quot;import styles from './ProjectsStory.module.css'\r\n&amp;quot; +  '\r\n' +  &amp;quot;const Laptop = dynamic(() => import('./ProjectLaptopScene'), { ssr: false })\r\n&amp;quot; +  'const clamp = value => Math.max(0, Math.min(1, value))\r\n' +  '\r\n' +  'function MovingWords({ text, field, className }) {\r\n' +  '  const words = text.split(/\\s+/)\r\n' +  '  return &lt;span className={className} aria-label={text}>\r\n' +  '    {words.map((word, index) => &lt;span key={`${index}-${word}`} className={styles.wordMask} aria-hidden=&amp;quot;true&amp;quot;>\r\n' +  '      &lt;span data-reveal-field={field} data-word-index={index} data-word-count={words.length}>{word}&lt;/span>\r\n' +  '    &lt;/span>)}\r\n' +  '  &lt;/span>\r\n' +  '}\r\n' +  '\r\n' +  'function GlitchLetters({text}) {\r\n' +  `  return &lt;>{text.split('').map((letter,index)=>&lt;span key={index} style={{'--letter':index}} aria-hidden=&amp;quot;true&amp;quot;>{letter === ' ' ? '\\u00a0' : letter}&lt;/span>)}&lt;/>\r\n` +  '}\r\n' +  '\r\n' +  'export default function ProjectsStory({ projects, onOpenCaseStudy, hostRef }) {\r\n' +  '  const runwayRef = useRef(null)\r\n' +  '  const sceneRef = useRef(null)\r\n' +  '  const titleRef = useRef(null)\r\n' +  '  const copyRef = useRef(null)\r\n' +  '  const navigationRef = useRef(null)\r\n' +  '  const skillsRef = useRef(null)\r\n' +  '  const bridgeRef = useRef(null)\r\n' +  '  const wakeRef = useRef(null)\r\n' +  '  const motionRef = useRef({ ...sampleProjectsSkillsStory(0, projects.length), active: false, reducedMotion: false, scrolling: false, lastScrollAt: -Infinity })\r\n' +  '  const [activeIndex, setActiveIndex] = useState(0)\r\n' +  '  const [mounted, setMounted] = useState(false)\r\n' +  '  const [active, setActive] = useState(false)\r\n' +  '  const project = projects[activeIndex]\r\n' +  '  const actions = getProjectActions(project)\r\n' +  '  const layout = projectsSkillsLayout(projects.length)\r\n' +  '  useSkillsAutoTraverse({runwayRef,motionRef,projectCount:projects.length})\r\n' +  '\r\n' +  '  // React must commit the new word spans before the final settled frame\r\n' +  '  // applies their reveal values, including jumps and offscreen navigation.\r\n' +  '  useEffect(() => { wakeRef.current?.() }, [activeIndex])\r\n' +  '\r\n' +  '  useEffect(() => {\r\n' +  '    const runway = runwayRef.current\r\n' +  '    const scene = sceneRef.current\r\n' +  '    if (!runway || !scene) return undefined\r\n' +  '    const motion = motionRef.current\r\n' +  &amp;quot;    if (hostRef?.current) hostRef.current.dataset.projectsEntryHold = '100'\r\n&amp;quot; +  '    // The desktop runway is dynamically mounted after hydration. Let an\r\n' +  '    // initial #skills destination reanchor against its final geometry.\r\n' +  &amp;quot;    window.dispatchEvent(new Event('portfolio:layout'))\r\n&amp;quot; +  '    let disposed = false, raf = 0, previous = 0, current = 0, initialized = false\r\n' +  '    let lastIndex = -1, lastActive = false, warmed = false\r\n' +  '    let idleTimer=0, interacting=false\r\n' +  '    const idleCycle=createProjectIdleCycle(projects.length)\r\n' +  '    const wake = () => { if (!disposed &amp;&amp; !raf &amp;&amp; !document.hidden) raf = requestAnimationFrame(draw) }\r\n' +  '    wakeRef.current = wake\r\n' +  '    const draw = now => {\r\n' +  '      raf = 0\r\n' +  '      if (disposed) return\r\n' +  '      const rect = runway.getBoundingClientRect()\r\n' +  '      const stage = scene.getBoundingClientRect()\r\n' +  '      const distance = Math.max(1, runway.offsetHeight - window.innerHeight)\r\n' +  '      const raw = -rect.top / distance\r\n' +  '      const arrival = clamp(-rect.top / window.innerHeight)\r\n' +  '      const entryOpacity = arrival*arrival*(3-2*arrival)\r\n' +  '      scene.style.opacity = String(entryOpacity)\r\n' +  '      scene.inert = arrival &lt; .99\r\n' +  &amp;quot;      scene.style.pointerEvents = arrival &lt; .99 ? 'none' : ''\r\n&amp;quot; +  '      const target = clamp(raw)\r\n' +  '      const visible = stage.top &lt; window.innerHeight &amp;&amp; stage.bottom > 0 &amp;&amp; rect.top &lt; window.innerHeight &amp;&amp; rect.bottom > 0 &amp;&amp; !document.hidden\r\n' +  '      const near = rect.top &lt; window.innerHeight * 2 &amp;&amp; rect.bottom > -window.innerHeight\r\n' +  '      if (near &amp;&amp; !warmed) { warmed = true; setMounted(true) }\r\n' +  '      const dt = previous ? Math.min(.06, (now - previous) / 1000) : 1 / 60\r\n' +  '      previous = now\r\n' +  '      if (!initialized || !visible || motion.skillsAutoControlled) current = target\r\n' +  '      else {\r\n' +  '        // Earlier chapters retain native scrolling. The toolset hold and\r\n' +  '        // timed closing journey use exact samples through the branch above.\r\n' +  '        const remaining = target-current\r\n' +  '        current = Math.abs(remaining)&lt;.000002 ? target : current+remaining*(1-Math.exp(-18*dt))\r\n' +  '      }\r\n' +  '      initialized = true\r\n' +  '      sampleProjectsSkillsStory(current, projects.length, motion)\r\n' +  '      motion.active = visible\r\n' +  '      motion.reducedMotion = false\r\n' +  '      motion.scrolling = now - motion.lastScrollAt &lt; 260 || Math.abs(target - current) > .000012\r\n' +  '      const idle=idleCycle.sample(now,motion.projectIndex,visible&amp;&amp;!motion.scrolling&amp;&amp;!interacting&amp;&amp;motion.lidOpen>.999&amp;&amp;motion.copyOpacity>.98&amp;&amp;motion.copyExit&lt;.001,motion.lastScrollAt)\r\n' +  '      if(idle?.automatic){\r\n' +  '        motion.projectIndex=idle.index;motion.screenCurrentIndex=idle.from;motion.screenNextIndex=idle.to;motion.screenMix=idle.mix\r\n' +  '        motion.screenTransition=Math.sin(idle.mix*Math.PI)\r\n' +  &amp;quot;        for(const key of ['eyebrowReveal','titleReveal','roleReveal','stackReveal','impactReveal','actionsReveal','navReveal'])motion[key]=1\r\n&amp;quot; +  '      }\r\n' +  '      const laptopActive = visible &amp;&amp; (motion.laptopOpacity > .001 || motion.portalOpacity > .001)\r\n' +  '      if (laptopActive !== lastActive) { lastActive = laptopActive; setActive(laptopActive) }\r\n' +  '      if (motion.projectIndex !== lastIndex) { lastIndex = motion.projectIndex; setActiveIndex(lastIndex) }\r\n' +  '      scene.dataset.storyProgress = current.toFixed(5)\r\n' +  '      scene.dataset.projectIndex = String(motion.projectIndex)\r\n' +  '      scene.dataset.screenMix = motion.screenMix.toFixed(4)\r\n' +  '      scene.dataset.active = String(visible)\r\n' +  '      scene.dataset.skillsProgress = motion.skillsProgress.toFixed(5)\r\n' +  '      scene.dataset.terrainFormation = motion.terrainFormation.toFixed(5)\r\n' +  '      scene.dataset.expeditionProgress = motion.expeditionProgress.toFixed(5)\r\n' +  '      scene.dataset.expeditionTravel = motion.expeditionTravel.toFixed(3)\r\n' +  '      scene.dataset.skillsChapter = String(motion.chapterIndex)\r\n' +  '      scene.dataset.inputControlled = String(Boolean(motion.skillsAutoControlled))\r\n' +  '      scene.dataset.scrollTarget = target.toFixed(5)\r\n' +  &amp;quot;      scene.style.setProperty('--copy-opacity', motion.copyOpacity)\r\n&amp;quot; +  &amp;quot;      scene.style.setProperty('--copy-exit', motion.copyExit)\r\n&amp;quot; +  '      if (skillsRef.current) {\r\n' +  '        const reveal = motion.skillsIntroOpacity\r\n' +  '        const morph = motion.introMorph\r\n' +  '        const aiReveal = reveal*morph\r\n' +  '        const glitch = Math.max(motion.skillsGlitch,Math.sin(morph*Math.PI)**2,\r\n' +  '          Math.sin(motion.introHold*Math.PI)**2*.35)\r\n' +  '        const displacement = Math.sin((morph+reveal)*87)*Math.cos(morph*41)*glitch\r\n' +  &amp;quot;        skillsRef.current.style.setProperty('--skills-reveal', Math.max(reveal,aiReveal))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--tools-opacity', reveal*(1-morph))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--ai-opacity', aiReveal)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--intro-world-x', `${-Math.max(0,motion.expeditionTravel-376)*5}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-x', `${displacement * 9}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-split', `${glitch * 3}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-band', `${Math.round(reveal * 7) % 4 * 20}%`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-opacity', glitch * .8)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.setAttribute('aria-hidden', String(Math.max(reveal,aiReveal) &lt; .1))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.querySelector('[data-intro-tools]')?.setAttribute('aria-hidden',String(reveal*(1-morph)&lt;.1))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.querySelector('[data-intro-ai]')?.setAttribute('aria-hidden',String(aiReveal&lt;.1))\r\n&amp;quot; +  '      }\r\n' +  '      if(bridgeRef.current) {\r\n' +  &amp;quot;        bridgeRef.current.style.setProperty('--whiteout',motion.whiteout)\r\n&amp;quot; +  '        // The real Services scene now supplies the receiving universe/title.\r\n' +  '        // Crossfade the white frame into it instead of holding an empty sky.\r\n' +  '        bridgeRef.current.style.opacity=String(motion.whiteout)\r\n' +  '      }\r\n' +  '      if(hostRef?.current){\r\n' +  '        hostRef.current.style.opacity=String(1-motion.servicesReveal)\r\n' +  '        const covered = arrival &lt; .99 || motion.servicesReveal > .99\r\n' +  &amp;quot;        hostRef.current.style.pointerEvents=covered?'none':'auto'\r\n&amp;quot; +  '        hostRef.current.inert=covered\r\n' +  '      }\r\n' +  &amp;quot;      scene.style.setProperty('--exit-light', motion.exitLight)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-scale', motion.titleScale)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-tracking', `${motion.titleTracking}em`)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-y', `${motion.titleY * 100}vh`)\r\n&amp;quot; +  '      titleRef.current.style.opacity = String(motion.titleOpacity)\r\n' +  &amp;quot;      titleRef.current.setAttribute('aria-hidden', String(motion.titleOpacity &lt; .1))\r\n&amp;quot; +  &amp;quot;      copyRef.current?.querySelectorAll('[data-reveal-field]').forEach(node => {\r\n&amp;quot; +  '        const field = node.dataset.revealField\r\n' +  '        const value = motion[field] || 0\r\n' +  '        const count = Number(node.dataset.wordCount || 1)\r\n' +  '        const index = Number(node.dataset.wordIndex || 0)\r\n' +  '        const spread = count > 1 ? .36 : 0\r\n' +  '        const reveal = clamp((value - index / Math.max(1, count - 1) * spread) / (1 - spread))\r\n' +  &amp;quot;        node.style.setProperty('--reveal', reveal.toFixed(5))\r\n&amp;quot; +  &amp;quot;        node.setAttribute('aria-hidden', String(reveal &lt; .01))\r\n&amp;quot; +  '      })\r\n' +  &amp;quot;      const actions = copyRef.current?.querySelector('[data-project-actions]')\r\n&amp;quot; +  '      if (actions) actions.inert = !visible || motion.actionsReveal &lt; .92 || motion.copyOpacity &lt; .8\r\n' +  '      if (copyRef.current) {\r\n' +  '        copyRe'... 8331 more characters">
+		<failure type="testCodeFailure" message="The input was expected to not match the regular expression /skillsScrollGate|queueInput|preventDefault|addEventListener\(['&amp;quot;](?:wheel|keydown)['&amp;quot;]/. Input:&amp;quot;import dynamic from 'next/dynamic'\r\n&amp;quot; +  &amp;quot;import { ArrowRight } from 'lucide-react'\r\n&amp;quot; +  &amp;quot;import { useEffect, useRef, useState } from 'react'\r\n&amp;quot; +  &amp;quot;import ProjectDotField from './ProjectDotField'\r\n&amp;quot; +  &amp;quot;import ProjectTechnologyMarks from './ProjectTechnologyMarks'\r\n&amp;quot; +  &amp;quot;import { getProjectActions } from './projectActions'\r\n&amp;quot; +  &amp;quot;import {createProjectIdleCycle} from './projectIdleCycle'\r\n&amp;quot; +  &amp;quot;import { projectsSkillsLayout, projectsSkillsStop, sampleProjectsSkillsStory } from './projectStoryMotion'\r\n&amp;quot; +  &amp;quot;import SkillsExpedition from '../SkillsSection/SkillsExpedition'\r\n&amp;quot; +  &amp;quot;import useSkillsAutoTraverse from '../SkillsSection/useSkillsAutoTraverse'\r\n&amp;quot; +  &amp;quot;import styles from './ProjectsStory.module.css'\r\n&amp;quot; +  '\r\n' +  &amp;quot;const Laptop = dynamic(() => import('./ProjectLaptopScene'), { ssr: false })\r\n&amp;quot; +  'const clamp = value => Math.max(0, Math.min(1, value))\r\n' +  '\r\n' +  'function MovingWords({ text, field, className }) {\r\n' +  '  const words = text.split(/\\s+/)\r\n' +  '  return &lt;span className={className} aria-label={text}>\r\n' +  '    {words.map((word, index) => &lt;span key={`${index}-${word}`} className={styles.wordMask} aria-hidden=&amp;quot;true&amp;quot;>\r\n' +  '      &lt;span data-reveal-field={field} data-word-index={index} data-word-count={words.length}>{word}&lt;/span>\r\n' +  '    &lt;/span>)}\r\n' +  '  &lt;/span>\r\n' +  '}\r\n' +  '\r\n' +  'function GlitchLetters({text}) {\r\n' +  `  return &lt;>{text.split('').map((letter,index)=>&lt;span key={index} style={{'--letter':index}} aria-hidden=&amp;quot;true&amp;quot;>{letter === ' ' ? '\\u00a0' : letter}&lt;/span>)}&lt;/>\r\n` +  '}\r\n' +  '\r\n' +  'export default function ProjectsStory({ projects, onOpenCaseStudy, hostRef }) {\r\n' +  '  const runwayRef = useRef(null)\r\n' +  '  const sceneRef = useRef(null)\r\n' +  '  const titleRef = useRef(null)\r\n' +  '  const copyRef = useRef(null)\r\n' +  '  const navigationRef = useRef(null)\r\n' +  '  const skillsRef = useRef(null)\r\n' +  '  const bridgeRef = useRef(null)\r\n' +  '  const wakeRef = useRef(null)\r\n' +  '  const motionRef = useRef({ ...sampleProjectsSkillsStory(0, projects.length), active: false, reducedMotion: false, scrolling: false, lastScrollAt: -Infinity })\r\n' +  '  const [activeIndex, setActiveIndex] = useState(0)\r\n' +  '  const [mounted, setMounted] = useState(false)\r\n' +  '  const [active, setActive] = useState(false)\r\n' +  '  const project = projects[activeIndex]\r\n' +  '  const actions = getProjectActions(project)\r\n' +  '  const layout = projectsSkillsLayout(projects.length)\r\n' +  '  useSkillsAutoTraverse({runwayRef,motionRef,projectCount:projects.length})\r\n' +  '\r\n' +  '  // React must commit the new word spans before the final settled frame\r\n' +  '  // applies their reveal values, including jumps and offscreen navigation.\r\n' +  '  useEffect(() => { wakeRef.current?.() }, [activeIndex])\r\n' +  '\r\n' +  '  useEffect(() => {\r\n' +  '    const runway = runwayRef.current\r\n' +  '    const scene = sceneRef.current\r\n' +  '    if (!runway || !scene) return undefined\r\n' +  '    const motion = motionRef.current\r\n' +  &amp;quot;    if (hostRef?.current) hostRef.current.dataset.projectsEntryHold = '100'\r\n&amp;quot; +  '    // The desktop runway is dynamically mounted after hydration. Let an\r\n' +  '    // initial #skills destination reanchor against its final geometry.\r\n' +  &amp;quot;    window.dispatchEvent(new Event('portfolio:layout'))\r\n&amp;quot; +  '    let disposed = false, raf = 0, previous = 0, current = 0, initialized = false\r\n' +  '    let lastIndex = -1, lastActive = false, warmed = false\r\n' +  '    let idleTimer=0, interacting=false\r\n' +  '    const idleCycle=createProjectIdleCycle(projects.length)\r\n' +  '    const wake = () => { if (!disposed &amp;&amp; !raf &amp;&amp; !document.hidden) raf = requestAnimationFrame(draw) }\r\n' +  '    wakeRef.current = wake\r\n' +  '    const draw = now => {\r\n' +  '      raf = 0\r\n' +  '      if (disposed) return\r\n' +  '      const rect = runway.getBoundingClientRect()\r\n' +  '      const stage = scene.getBoundingClientRect()\r\n' +  '      const distance = Math.max(1, runway.offsetHeight - window.innerHeight)\r\n' +  '      const raw = -rect.top / distance\r\n' +  '      const arrival = clamp(-rect.top / window.innerHeight)\r\n' +  '      const entryOpacity = arrival*arrival*(3-2*arrival)\r\n' +  '      scene.style.opacity = String(entryOpacity)\r\n' +  '      scene.inert = arrival &lt; .99\r\n' +  &amp;quot;      scene.style.pointerEvents = arrival &lt; .99 ? 'none' : ''\r\n&amp;quot; +  '      const target = clamp(raw)\r\n' +  '      const visible = stage.top &lt; window.innerHeight &amp;&amp; stage.bottom > 0 &amp;&amp; rect.top &lt; window.innerHeight &amp;&amp; rect.bottom > 0 &amp;&amp; !document.hidden\r\n' +  '      const near = rect.top &lt; window.innerHeight * 2 &amp;&amp; rect.bottom > -window.innerHeight\r\n' +  '      if (near &amp;&amp; !warmed) { warmed = true; setMounted(true) }\r\n' +  '      const dt = previous ? Math.min(.06, (now - previous) / 1000) : 1 / 60\r\n' +  '      previous = now\r\n' +  '      if (!initialized || !visible || motion.skillsAutoControlled) current = target\r\n' +  '      else {\r\n' +  '        // Earlier chapters retain native scrolling. The toolset hold and\r\n' +  '        // timed closing journey use exact samples through the branch above.\r\n' +  '        const remaining = target-current\r\n' +  '        current = Math.abs(remaining)&lt;.000002 ? target : current+remaining*(1-Math.exp(-18*dt))\r\n' +  '      }\r\n' +  '      initialized = true\r\n' +  '      sampleProjectsSkillsStory(current, projects.length, motion)\r\n' +  '      motion.active = visible\r\n' +  '      motion.reducedMotion = false\r\n' +  '      motion.scrolling = now - motion.lastScrollAt &lt; 260 || Math.abs(target - current) > .000012\r\n' +  '      const idle=idleCycle.sample(now,motion.projectIndex,visible&amp;&amp;!motion.scrolling&amp;&amp;!interacting&amp;&amp;motion.lidOpen>.999&amp;&amp;motion.copyOpacity>.98&amp;&amp;motion.copyExit&lt;.001,motion.lastScrollAt)\r\n' +  '      if(idle?.automatic){\r\n' +  '        motion.projectIndex=idle.index;motion.screenCurrentIndex=idle.from;motion.screenNextIndex=idle.to;motion.screenMix=idle.mix\r\n' +  '        motion.screenTransition=Math.sin(idle.mix*Math.PI)\r\n' +  &amp;quot;        for(const key of ['eyebrowReveal','titleReveal','roleReveal','stackReveal','impactReveal','actionsReveal','navReveal'])motion[key]=1\r\n&amp;quot; +  '      }\r\n' +  '      const laptopActive = visible &amp;&amp; (motion.laptopOpacity > .001 || motion.portalOpacity > .001)\r\n' +  '      if (laptopActive !== lastActive) { lastActive = laptopActive; setActive(laptopActive) }\r\n' +  '      if (motion.projectIndex !== lastIndex) { lastIndex = motion.projectIndex; setActiveIndex(lastIndex) }\r\n' +  '      scene.dataset.storyProgress = current.toFixed(5)\r\n' +  '      scene.dataset.projectIndex = String(motion.projectIndex)\r\n' +  '      scene.dataset.screenMix = motion.screenMix.toFixed(4)\r\n' +  '      scene.dataset.active = String(visible)\r\n' +  '      scene.dataset.skillsProgress = motion.skillsProgress.toFixed(5)\r\n' +  '      scene.dataset.terrainFormation = motion.terrainFormation.toFixed(5)\r\n' +  '      scene.dataset.expeditionProgress = motion.expeditionProgress.toFixed(5)\r\n' +  '      scene.dataset.expeditionTravel = motion.expeditionTravel.toFixed(3)\r\n' +  '      scene.dataset.skillsChapter = String(motion.chapterIndex)\r\n' +  '      scene.dataset.inputControlled = String(Boolean(motion.skillsAutoControlled))\r\n' +  '      scene.dataset.scrollTarget = target.toFixed(5)\r\n' +  &amp;quot;      scene.style.setProperty('--copy-opacity', motion.copyOpacity)\r\n&amp;quot; +  &amp;quot;      scene.style.setProperty('--copy-exit', motion.copyExit)\r\n&amp;quot; +  '      if (skillsRef.current) {\r\n' +  '        const reveal = motion.skillsIntroOpacity\r\n' +  '        const morph = motion.introMorph\r\n' +  '        const aiReveal = reveal*morph\r\n' +  '        const glitch = Math.max(motion.skillsGlitch,Math.sin(morph*Math.PI)**2,\r\n' +  '          Math.sin(motion.introHold*Math.PI)**2*.35)\r\n' +  '        const displacement = Math.sin((morph+reveal)*87)*Math.cos(morph*41)*glitch\r\n' +  &amp;quot;        skillsRef.current.style.setProperty('--skills-reveal', Math.max(reveal,aiReveal))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--tools-opacity', reveal*(1-morph))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--ai-opacity', aiReveal)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--intro-world-x', `${-Math.max(0,motion.expeditionTravel-376)*5}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-x', `${displacement * 9}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-split', `${glitch * 3}px`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-band', `${Math.round(reveal * 7) % 4 * 20}%`)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.style.setProperty('--glitch-opacity', glitch * .8)\r\n&amp;quot; +  &amp;quot;        skillsRef.current.setAttribute('aria-hidden', String(Math.max(reveal,aiReveal) &lt; .1))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.querySelector('[data-intro-tools]')?.setAttribute('aria-hidden',String(reveal*(1-morph)&lt;.1))\r\n&amp;quot; +  &amp;quot;        skillsRef.current.querySelector('[data-intro-ai]')?.setAttribute('aria-hidden',String(aiReveal&lt;.1))\r\n&amp;quot; +  '      }\r\n' +  '      if(bridgeRef.current) {\r\n' +  &amp;quot;        bridgeRef.current.style.setProperty('--whiteout',motion.whiteout)\r\n&amp;quot; +  '        // The real Services scene now supplies the receiving universe/title.\r\n' +  '        // Crossfade the white frame into it instead of holding an empty sky.\r\n' +  '        bridgeRef.current.style.opacity=String(motion.whiteout)\r\n' +  '      }\r\n' +  '      if(hostRef?.current){\r\n' +  '        hostRef.current.style.opacity=String(1-motion.servicesReveal)\r\n' +  '        const covered = arrival &lt; .99 || motion.servicesReveal > .99\r\n' +  &amp;quot;        hostRef.current.style.pointerEvents=covered?'none':'auto'\r\n&amp;quot; +  '        hostRef.current.inert=covered\r\n' +  '      }\r\n' +  &amp;quot;      scene.style.setProperty('--exit-light', motion.exitLight)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-scale', motion.titleScale)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-tracking', `${motion.titleTracking}em`)\r\n&amp;quot; +  &amp;quot;      titleRef.current.style.setProperty('--title-y', `${motion.titleY * 100}vh`)\r\n&amp;quot; +  '      titleRef.current.style.opacity = String(motion.titleOpacity)\r\n' +  &amp;quot;      titleRef.current.setAttribute('aria-hidden', String(motion.titleOpacity &lt; .1))\r\n&amp;quot; +  &amp;quot;      copyRef.current?.querySelectorAll('[data-reveal-field]').forEach(node => {\r\n&amp;quot; +  '        const field = node.dataset.revealField\r\n' +  '        const value = motion[field] || 0\r\n' +  '        const count = Number(node.dataset.wordCount || 1)\r\n' +  '        const index = Number(node.dataset.wordIndex || 0)\r\n' +  '        const spread = count > 1 ? .36 : 0\r\n' +  '        const reveal = clamp((value - index / Math.max(1, count - 1) * spread) / (1 - spread))\r\n' +  &amp;quot;        node.style.setProperty('--reveal', reveal.toFixed(5))\r\n&amp;quot; +  &amp;quot;        node.setAttribute('aria-hidden', String(reveal &lt; .01))\r\n&amp;quot; +  '      })\r\n' +  &amp;quot;      const actions = copyRef.current?.querySelector('[data-project-actions]')\r\n&amp;quot; +  '      if (actions) actions.inert = !visible || motion.actionsReveal &lt; .92 || motion.copyOpacity &lt; .8\r\n' +  '      if (copyRef.current) {\r\n' +  '        copyRe'... 8331 more characters">
+[Error [ERR_TEST_FAILURE]: The input was expected to not match the regular expression /skillsScrollGate|queueInput|preventDefault|addEventListener\(['"](?:wheel|keydown)['"]/. Input:
+
+"import dynamic from 'next/dynamic'\r\n" +
+  "import { ArrowRight } from 'lucide-react'\r\n" +
+  "import { useEffect, useRef, useState } from 'react'\r\n" +
+  "import ProjectDotField from './ProjectDotField'\r\n" +
+  "import ProjectTechnologyMarks from './ProjectTechnologyMarks'\r\n" +
+  "import { getProjectActions } from './projectActions'\r\n" +
+  "import {createProjectIdleCycle} from './projectIdleCycle'\r\n" +
+  "import { projectsSkillsLayout, projectsSkillsStop, sampleProjectsSkillsStory } from './projectStoryMotion'\r\n" +
+  "import SkillsExpedition from '../SkillsSection/SkillsExpedition'\r\n" +
+  "import useSkillsAutoTraverse from '../SkillsSection/useSkillsAutoTraverse'\r\n" +
+  "import styles from './ProjectsStory.module.css'\r\n" +
+  '\r\n' +
+  "const Laptop = dynamic(() => import('./ProjectLaptopScene'), { ssr: false })\r\n" +
+  'const clamp = value => Math.max(0, Math.min(1, value))\r\n' +
+  '\r\n' +
+  'function MovingWords({ text, field, className }) {\r\n' +
+  '  const words = text.split(/\\s+/)\r\n' +
+  '  return &lt;span className={className} aria-label={text}>\r\n' +
+  '    {words.map((word, index) => &lt;span key={`${index}-${word}`} className={styles.wordMask} aria-hidden="true">\r\n' +
+  '      &lt;span data-reveal-field={field} data-word-index={index} data-word-count={words.length}>{word}&lt;/span>\r\n' +
+  '    &lt;/span>)}\r\n' +
+  '  &lt;/span>\r\n' +
+  '}\r\n' +
+  '\r\n' +
+  'function GlitchLetters({text}) {\r\n' +
+  `  return &lt;>{text.split('').map((letter,index)=>&lt;span key={index} style={{'--letter':index}} aria-hidden="true">{letter === ' ' ? '\\u00a0' : letter}&lt;/span>)}&lt;/>\r\n` +
+  '}\r\n' +
+  '\r\n' +
+  'export default function ProjectsStory({ projects, onOpenCaseStudy, hostRef }) {\r\n' +
+  '  const runwayRef = useRef(null)\r\n' +
+  '  const sceneRef = useRef(null)\r\n' +
+  '  const titleRef = useRef(null)\r\n' +
+  '  const copyRef = useRef(null)\r\n' +
+  '  const navigationRef = useRef(null)\r\n' +
+  '  const skillsRef = useRef(null)\r\n' +
+  '  const bridgeRef = useRef(null)\r\n' +
+  '  const wakeRef = useRef(null)\r\n' +
+  '  const motionRef = useRef({ ...sampleProjectsSkillsStory(0, projects.length), active: false, reducedMotion: false, scrolling: false, lastScrollAt: -Infinity })\r\n' +
+  '  const [activeIndex, setActiveIndex] = useState(0)\r\n' +
+  '  const [mounted, setMounted] = useState(false)\r\n' +
+  '  const [active, setActive] = useState(false)\r\n' +
+  '  const project = projects[activeIndex]\r\n' +
+  '  const actions = getProjectActions(project)\r\n' +
+  '  const layout = projectsSkillsLayout(projects.length)\r\n' +
+  '  useSkillsAutoTraverse({runwayRef,motionRef,projectCount:projects.length})\r\n' +
+  '\r\n' +
+  '  // React must commit the new word spans before the final settled frame\r\n' +
+  '  // applies their reveal values, including jumps and offscreen navigation.\r\n' +
+  '  useEffect(() => { wakeRef.current?.() }, [activeIndex])\r\n' +
+  '\r\n' +
+  '  useEffect(() => {\r\n' +
+  '    const runway = runwayRef.current\r\n' +
+  '    const scene = sceneRef.current\r\n' +
+  '    if (!runway || !scene) return undefined\r\n' +
+  '    const motion = motionRef.current\r\n' +
+  "    if (hostRef?.current) hostRef.current.dataset.projectsEntryHold = '100'\r\n" +
+  '    // The desktop runway is dynamically mounted after hydration. Let an\r\n' +
+  '    // initial #skills destination reanchor against its final geometry.\r\n' +
+  "    window.dispatchEvent(new Event('portfolio:layout'))\r\n" +
+  '    let disposed = false, raf = 0, previous = 0, current = 0, initialized = false\r\n' +
+  '    let lastIndex = -1, lastActive = false, warmed = false\r\n' +
+  '    let idleTimer=0, interacting=false\r\n' +
+  '    const idleCycle=createProjectIdleCycle(projects.length)\r\n' +
+  '    const wake = () => { if (!disposed &amp;&amp; !raf &amp;&amp; !document.hidden) raf = requestAnimationFrame(draw) }\r\n' +
+  '    wakeRef.current = wake\r\n' +
+  '    const draw = now => {\r\n' +
+  '      raf = 0\r\n' +
+  '      if (disposed) return\r\n' +
+  '      const rect = runway.getBoundingClientRect()\r\n' +
+  '      const stage = scene.getBoundingClientRect()\r\n' +
+  '      const distance = Math.max(1, runway.offsetHeight - window.innerHeight)\r\n' +
+  '      const raw = -rect.top / distance\r\n' +
+  '      const arrival = clamp(-rect.top / window.innerHeight)\r\n' +
+  '      const entryOpacity = arrival*arrival*(3-2*arrival)\r\n' +
+  '      scene.style.opacity = String(entryOpacity)\r\n' +
+  '      scene.inert = arrival &lt; .99\r\n' +
+  "      scene.style.pointerEvents = arrival &lt; .99 ? 'none' : ''\r\n" +
+  '      const target = clamp(raw)\r\n' +
+  '      const visible = stage.top &lt; window.innerHeight &amp;&amp; stage.bottom > 0 &amp;&amp; rect.top &lt; window.innerHeight &amp;&amp; rect.bottom > 0 &amp;&amp; !document.hidden\r\n' +
+  '      const near = rect.top &lt; window.innerHeight * 2 &amp;&amp; rect.bottom > -window.innerHeight\r\n' +
+  '      if (near &amp;&amp; !warmed) { warmed = true; setMounted(true) }\r\n' +
+  '      const dt = previous ? Math.min(.06, (now - previous) / 1000) : 1 / 60\r\n' +
+  '      previous = now\r\n' +
+  '      if (!initialized || !visible || motion.skillsAutoControlled) current = target\r\n' +
+  '      else {\r\n' +
+  '        // Earlier chapters retain native scrolling. The toolset hold and\r\n' +
+  '        // timed closing journey use exact samples through the branch above.\r\n' +
+  '        const remaining = target-current\r\n' +
+  '        current = Math.abs(remaining)&lt;.000002 ? target : current+remaining*(1-Math.exp(-18*dt))\r\n' +
+  '      }\r\n' +
+  '      initialized = true\r\n' +
+  '      sampleProjectsSkillsStory(current, projects.length, motion)\r\n' +
+  '      motion.active = visible\r\n' +
+  '      motion.reducedMotion = false\r\n' +
+  '      motion.scrolling = now - motion.lastScrollAt &lt; 260 || Math.abs(target - current) > .000012\r\n' +
+  '      const idle=idleCycle.sample(now,motion.projectIndex,visible&amp;&amp;!motion.scrolling&amp;&amp;!interacting&amp;&amp;motion.lidOpen>.999&amp;&amp;motion.copyOpacity>.98&amp;&amp;motion.copyExit&lt;.001,motion.lastScrollAt)\r\n' +
+  '      if(idle?.automatic){\r\n' +
+  '        motion.projectIndex=idle.index;motion.screenCurrentIndex=idle.from;motion.screenNextIndex=idle.to;motion.screenMix=idle.mix\r\n' +
+  '        motion.screenTransition=Math.sin(idle.mix*Math.PI)\r\n' +
+  "        for(const key of ['eyebrowReveal','titleReveal','roleReveal','stackReveal','impactReveal','actionsReveal','navReveal'])motion[key]=1\r\n" +
+  '      }\r\n' +
+  '      const laptopActive = visible &amp;&amp; (motion.laptopOpacity > .001 || motion.portalOpacity > .001)\r\n' +
+  '      if (laptopActive !== lastActive) { lastActive = laptopActive; setActive(laptopActive) }\r\n' +
+  '      if (motion.projectIndex !== lastIndex) { lastIndex = motion.projectIndex; setActiveIndex(lastIndex) }\r\n' +
+  '      scene.dataset.storyProgress = current.toFixed(5)\r\n' +
+  '      scene.dataset.projectIndex = String(motion.projectIndex)\r\n' +
+  '      scene.dataset.screenMix = motion.screenMix.toFixed(4)\r\n' +
+  '      scene.dataset.active = String(visible)\r\n' +
+  '      scene.dataset.skillsProgress = motion.skillsProgress.toFixed(5)\r\n' +
+  '      scene.dataset.terrainFormation = motion.terrainFormation.toFixed(5)\r\n' +
+  '      scene.dataset.expeditionProgress = motion.expeditionProgress.toFixed(5)\r\n' +
+  '      scene.dataset.expeditionTravel = motion.expeditionTravel.toFixed(3)\r\n' +
+  '      scene.dataset.skillsChapter = String(motion.chapterIndex)\r\n' +
+  '      scene.dataset.inputControlled = String(Boolean(motion.skillsAutoControlled))\r\n' +
+  '      scene.dataset.scrollTarget = target.toFixed(5)\r\n' +
+  "      scene.style.setProperty('--copy-opacity', motion.copyOpacity)\r\n" +
+  "      scene.style.setProperty('--copy-exit', motion.copyExit)\r\n" +
+  '      if (skillsRef.current) {\r\n' +
+  '        const reveal = motion.skillsIntroOpacity\r\n' +
+  '        const morph = motion.introMorph\r\n' +
+  '        const aiReveal = reveal*morph\r\n' +
+  '        const glitch = Math.max(motion.skillsGlitch,Math.sin(morph*Math.PI)**2,\r\n' +
+  '          Math.sin(motion.introHold*Math.PI)**2*.35)\r\n' +
+  '        const displacement = Math.sin((morph+reveal)*87)*Math.cos(morph*41)*glitch\r\n' +
+  "        skillsRef.current.style.setProperty('--skills-reveal', Math.max(reveal,aiReveal))\r\n" +
+  "        skillsRef.current.style.setProperty('--tools-opacity', reveal*(1-morph))\r\n" +
+  "        skillsRef.current.style.setProperty('--ai-opacity', aiReveal)\r\n" +
+  "        skillsRef.current.style.setProperty('--intro-world-x', `${-Math.max(0,motion.expeditionTravel-376)*5}px`)\r\n" +
+  "        skillsRef.current.style.setProperty('--glitch-x', `${displacement * 9}px`)\r\n" +
+  "        skillsRef.current.style.setProperty('--glitch-split', `${glitch * 3}px`)\r\n" +
+  "        skillsRef.current.style.setProperty('--glitch-band', `${Math.round(reveal * 7) % 4 * 20}%`)\r\n" +
+  "        skillsRef.current.style.setProperty('--glitch-opacity', glitch * .8)\r\n" +
+  "        skillsRef.current.setAttribute('aria-hidden', String(Math.max(reveal,aiReveal) &lt; .1))\r\n" +
+  "        skillsRef.current.querySelector('[data-intro-tools]')?.setAttribute('aria-hidden',String(reveal*(1-morph)&lt;.1))\r\n" +
+  "        skillsRef.current.querySelector('[data-intro-ai]')?.setAttribute('aria-hidden',String(aiReveal&lt;.1))\r\n" +
+  '      }\r\n' +
+  '      if(bridgeRef.current) {\r\n' +
+  "        bridgeRef.current.style.setProperty('--whiteout',motion.whiteout)\r\n" +
+  '        // The real Services scene now supplies the receiving universe/title.\r\n' +
+  '        // Crossfade the white frame into it instead of holding an empty sky.\r\n' +
+  '        bridgeRef.current.style.opacity=String(motion.whiteout)\r\n' +
+  '      }\r\n' +
+  '      if(hostRef?.current){\r\n' +
+  '        hostRef.current.style.opacity=String(1-motion.servicesReveal)\r\n' +
+  '        const covered = arrival &lt; .99 || motion.servicesReveal > .99\r\n' +
+  "        hostRef.current.style.pointerEvents=covered?'none':'auto'\r\n" +
+  '        hostRef.current.inert=covered\r\n' +
+  '      }\r\n' +
+  "      scene.style.setProperty('--exit-light', motion.exitLight)\r\n" +
+  "      titleRef.current.style.setProperty('--title-scale', motion.titleScale)\r\n" +
+  "      titleRef.current.style.setProperty('--title-tracking', `${motion.titleTracking}em`)\r\n" +
+  "      titleRef.current.style.setProperty('--title-y', `${motion.titleY * 100}vh`)\r\n" +
+  '      titleRef.current.style.opacity = String(motion.titleOpacity)\r\n' +
+  "      titleRef.current.setAttribute('aria-hidden', String(motion.titleOpacity &lt; .1))\r\n" +
+  "      copyRef.current?.querySelectorAll('[data-reveal-field]').forEach(node => {\r\n" +
+  '        const field = node.dataset.revealField\r\n' +
+  '        const value = motion[field] || 0\r\n' +
+  '        const count = Number(node.dataset.wordCount || 1)\r\n' +
+  '        const index = Number(node.dataset.wordIndex || 0)\r\n' +
+  '        const spread = count > 1 ? .36 : 0\r\n' +
+  '        const reveal = clamp((value - index / Math.max(1, count - 1) * spread) / (1 - spread))\r\n' +
+  "        node.style.setProperty('--reveal', reveal.toFixed(5))\r\n" +
+  "        node.setAttribute('aria-hidden', String(reveal &lt; .01))\r\n" +
+  '      })\r\n' +
+  "      const actions = copyRef.current?.querySelector('[data-project-actions]')\r\n" +
+  '      if (actions) actions.inert = !visible || motion.actionsReveal &lt; .92 || motion.copyOpacity &lt; .8\r\n' +
+  '      if (copyRef.current) {\r\n' +
+  '        copyRe'... 8331 more characters
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /skillsScrollGate|queueInput|preventDefault|addEventListener\(['"](?:wheel|keydown)['"]/. Input:
+  
+  "import dynamic from 'next/dynamic'\r\n" +
+    "import { ArrowRight } from 'lucide-react'\r\n" +
+    "import { useEffect, useRef, useState } from 'react'\r\n" +
+    "import ProjectDotField from './ProjectDotField'\r\n" +
+    "import ProjectTechnologyMarks from './ProjectTechnologyMarks'\r\n" +
+    "import { getProjectActions } from './projectActions'\r\n" +
+    "import {createProjectIdleCycle} from './projectIdleCycle'\r\n" +
+    "import { projectsSkillsLayout, projectsSkillsStop, sampleProjectsSkillsStory } from './projectStoryMotion'\r\n" +
+    "import SkillsExpedition from '../SkillsSection/SkillsExpedition'\r\n" +
+    "import useSkillsAutoTraverse from '../SkillsSection/useSkillsAutoTraverse'\r\n" +
+    "import styles from './ProjectsStory.module.css'\r\n" +
+    '\r\n' +
+    "const Laptop = dynamic(() => import('./ProjectLaptopScene'), { ssr: false })\r\n" +
+    'const clamp = value => Math.max(0, Math.min(1, value))\r\n' +
+    '\r\n' +
+    'function MovingWords({ text, field, className }) {\r\n' +
+    '  const words = text.split(/\\s+/)\r\n' +
+    '  return &lt;span className={className} aria-label={text}>\r\n' +
+    '    {words.map((word, index) => &lt;span key={`${index}-${word}`} className={styles.wordMask} aria-hidden="true">\r\n' +
+    '      &lt;span data-reveal-field={field} data-word-index={index} data-word-count={words.length}>{word}&lt;/span>\r\n' +
+    '    &lt;/span>)}\r\n' +
+    '  &lt;/span>\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function GlitchLetters({text}) {\r\n' +
+    `  return &lt;>{text.split('').map((letter,index)=>&lt;span key={index} style={{'--letter':index}} aria-hidden="true">{letter === ' ' ? '\\u00a0' : letter}&lt;/span>)}&lt;/>\r\n` +
+    '}\r\n' +
+    '\r\n' +
+    'export default function ProjectsStory({ projects, onOpenCaseStudy, hostRef }) {\r\n' +
+    '  const runwayRef = useRef(null)\r\n' +
+    '  const sceneRef = useRef(null)\r\n' +
+    '  const titleRef = useRef(null)\r\n' +
+    '  const copyRef = useRef(null)\r\n' +
+    '  const navigationRef = useRef(null)\r\n' +
+    '  const skillsRef = useRef(null)\r\n' +
+    '  const bridgeRef = useRef(null)\r\n' +
+    '  const wakeRef = useRef(null)\r\n' +
+    '  const motionRef = useRef({ ...sampleProjectsSkillsStory(0, projects.length), active: false, reducedMotion: false, scrolling: false, lastScrollAt: -Infinity })\r\n' +
+    '  const [activeIndex, setActiveIndex] = useState(0)\r\n' +
+    '  const [mounted, setMounted] = useState(false)\r\n' +
+    '  const [active, setActive] = useState(false)\r\n' +
+    '  const project = projects[activeIndex]\r\n' +
+    '  const actions = getProjectActions(project)\r\n' +
+    '  const layout = projectsSkillsLayout(projects.length)\r\n' +
+    '  useSkillsAutoTraverse({runwayRef,motionRef,projectCount:projects.length})\r\n' +
+    '\r\n' +
+    '  // React must commit the new word spans before the final settled frame\r\n' +
+    '  // applies their reveal values, including jumps and offscreen navigation.\r\n' +
+    '  useEffect(() => { wakeRef.current?.() }, [activeIndex])\r\n' +
+    '\r\n' +
+    '  useEffect(() => {\r\n' +
+    '    const runway = runwayRef.current\r\n' +
+    '    const scene = sceneRef.current\r\n' +
+    '    if (!runway || !scene) return undefined\r\n' +
+    '    const motion = motionRef.current\r\n' +
+    "    if (hostRef?.current) hostRef.current.dataset.projectsEntryHold = '100'\r\n" +
+    '    // The desktop runway is dynamically mounted after hydration. Let an\r\n' +
+    '    // initial #skills destination reanchor against its final geometry.\r\n' +
+    "    window.dispatchEvent(new Event('portfolio:layout'))\r\n" +
+    '    let disposed = false, raf = 0, previous = 0, current = 0, initialized = false\r\n' +
+    '    let lastIndex = -1, lastActive = false, warmed = false\r\n' +
+    '    let idleTimer=0, interacting=false\r\n' +
+    '    const idleCycle=createProjectIdleCycle(projects.length)\r\n' +
+    '    const wake = () => { if (!disposed &amp;&amp; !raf &amp;&amp; !document.hidden) raf = requestAnimationFrame(draw) }\r\n' +
+    '    wakeRef.current = wake\r\n' +
+    '    const draw = now => {\r\n' +
+    '      raf = 0\r\n' +
+    '      if (disposed) return\r\n' +
+    '      const rect = runway.getBoundingClientRect()\r\n' +
+    '      const stage = scene.getBoundingClientRect()\r\n' +
+    '      const distance = Math.max(1, runway.offsetHeight - window.innerHeight)\r\n' +
+    '      const raw = -rect.top / distance\r\n' +
+    '      const arrival = clamp(-rect.top / window.innerHeight)\r\n' +
+    '      const entryOpacity = arrival*arrival*(3-2*arrival)\r\n' +
+    '      scene.style.opacity = String(entryOpacity)\r\n' +
+    '      scene.inert = arrival &lt; .99\r\n' +
+    "      scene.style.pointerEvents = arrival &lt; .99 ? 'none' : ''\r\n" +
+    '      const target = clamp(raw)\r\n' +
+    '      const visible = stage.top &lt; window.innerHeight &amp;&amp; stage.bottom > 0 &amp;&amp; rect.top &lt; window.innerHeight &amp;&amp; rect.bottom > 0 &amp;&amp; !document.hidden\r\n' +
+    '      const near = rect.top &lt; window.innerHeight * 2 &amp;&amp; rect.bottom > -window.innerHeight\r\n' +
+    '      if (near &amp;&amp; !warmed) { warmed = true; setMounted(true) }\r\n' +
+    '      const dt = previous ? Math.min(.06, (now - previous) / 1000) : 1 / 60\r\n' +
+    '      previous = now\r\n' +
+    '      if (!initialized || !visible || motion.skillsAutoControlled) current = target\r\n' +
+    '      else {\r\n' +
+    '        // Earlier chapters retain native scrolling. The toolset hold and\r\n' +
+    '        // timed closing journey use exact samples through the branch above.\r\n' +
+    '        const remaining = target-current\r\n' +
+    '        current = Math.abs(remaining)&lt;.000002 ? target : current+remaining*(1-Math.exp(-18*dt))\r\n' +
+    '      }\r\n' +
+    '      initialized = true\r\n' +
+    '      sampleProjectsSkillsStory(current, projects.length, motion)\r\n' +
+    '      motion.active = visible\r\n' +
+    '      motion.reducedMotion = false\r\n' +
+    '      motion.scrolling = now - motion.lastScrollAt &lt; 260 || Math.abs(target - current) > .000012\r\n' +
+    '      const idle=idleCycle.sample(now,motion.projectIndex,visible&amp;&amp;!motion.scrolling&amp;&amp;!interacting&amp;&amp;motion.lidOpen>.999&amp;&amp;motion.copyOpacity>.98&amp;&amp;motion.copyExit&lt;.001,motion.lastScrollAt)\r\n' +
+    '      if(idle?.automatic){\r\n' +
+    '        motion.projectIndex=idle.index;motion.screenCurrentIndex=idle.from;motion.screenNextIndex=idle.to;motion.screenMix=idle.mix\r\n' +
+    '        motion.screenTransition=Math.sin(idle.mix*Math.PI)\r\n' +
+    "        for(const key of ['eyebrowReveal','titleReveal','roleReveal','stackReveal','impactReveal','actionsReveal','navReveal'])motion[key]=1\r\n" +
+    '      }\r\n' +
+    '      const laptopActive = visible &amp;&amp; (motion.laptopOpacity > .001 || motion.portalOpacity > .001)\r\n' +
+    '      if (laptopActive !== lastActive) { lastActive = laptopActive; setActive(laptopActive) }\r\n' +
+    '      if (motion.projectIndex !== lastIndex) { lastIndex = motion.projectIndex; setActiveIndex(lastIndex) }\r\n' +
+    '      scene.dataset.storyProgress = current.toFixed(5)\r\n' +
+    '      scene.dataset.projectIndex = String(motion.projectIndex)\r\n' +
+    '      scene.dataset.screenMix = motion.screenMix.toFixed(4)\r\n' +
+    '      scene.dataset.active = String(visible)\r\n' +
+    '      scene.dataset.skillsProgress = motion.skillsProgress.toFixed(5)\r\n' +
+    '      scene.dataset.terrainFormation = motion.terrainFormation.toFixed(5)\r\n' +
+    '      scene.dataset.expeditionProgress = motion.expeditionProgress.toFixed(5)\r\n' +
+    '      scene.dataset.expeditionTravel = motion.expeditionTravel.toFixed(3)\r\n' +
+    '      scene.dataset.skillsChapter = String(motion.chapterIndex)\r\n' +
+    '      scene.dataset.inputControlled = String(Boolean(motion.skillsAutoControlled))\r\n' +
+    '      scene.dataset.scrollTarget = target.toFixed(5)\r\n' +
+    "      scene.style.setProperty('--copy-opacity', motion.copyOpacity)\r\n" +
+    "      scene.style.setProperty('--copy-exit', motion.copyExit)\r\n" +
+    '      if (skillsRef.current) {\r\n' +
+    '        const reveal = motion.skillsIntroOpacity\r\n' +
+    '        const morph = motion.introMorph\r\n' +
+    '        const aiReveal = reveal*morph\r\n' +
+    '        const glitch = Math.max(motion.skillsGlitch,Math.sin(morph*Math.PI)**2,\r\n' +
+    '          Math.sin(motion.introHold*Math.PI)**2*.35)\r\n' +
+    '        const displacement = Math.sin((morph+reveal)*87)*Math.cos(morph*41)*glitch\r\n' +
+    "        skillsRef.current.style.setProperty('--skills-reveal', Math.max(reveal,aiReveal))\r\n" +
+    "        skillsRef.current.style.setProperty('--tools-opacity', reveal*(1-morph))\r\n" +
+    "        skillsRef.current.style.setProperty('--ai-opacity', aiReveal)\r\n" +
+    "        skillsRef.current.style.setProperty('--intro-world-x', `${-Math.max(0,motion.expeditionTravel-376)*5}px`)\r\n" +
+    "        skillsRef.current.style.setProperty('--glitch-x', `${displacement * 9}px`)\r\n" +
+    "        skillsRef.current.style.setProperty('--glitch-split', `${glitch * 3}px`)\r\n" +
+    "        skillsRef.current.style.setProperty('--glitch-band', `${Math.round(reveal * 7) % 4 * 20}%`)\r\n" +
+    "        skillsRef.current.style.setProperty('--glitch-opacity', glitch * .8)\r\n" +
+    "        skillsRef.current.setAttribute('aria-hidden', String(Math.max(reveal,aiReveal) &lt; .1))\r\n" +
+    "        skillsRef.current.querySelector('[data-intro-tools]')?.setAttribute('aria-hidden',String(reveal*(1-morph)&lt;.1))\r\n" +
+    "        skillsRef.current.querySelector('[data-intro-ai]')?.setAttribute('aria-hidden',String(aiReveal&lt;.1))\r\n" +
+    '      }\r\n' +
+    '      if(bridgeRef.current) {\r\n' +
+    "        bridgeRef.current.style.setProperty('--whiteout',motion.whiteout)\r\n" +
+    '        // The real Services scene now supplies the receiving universe/title.\r\n' +
+    '        // Crossfade the white frame into it instead of holding an empty sky.\r\n' +
+    '        bridgeRef.current.style.opacity=String(motion.whiteout)\r\n' +
+    '      }\r\n' +
+    '      if(hostRef?.current){\r\n' +
+    '        hostRef.current.style.opacity=String(1-motion.servicesReveal)\r\n' +
+    '        const covered = arrival &lt; .99 || motion.servicesReveal > .99\r\n' +
+    "        hostRef.current.style.pointerEvents=covered?'none':'auto'\r\n" +
+    '        hostRef.current.inert=covered\r\n' +
+    '      }\r\n' +
+    "      scene.style.setProperty('--exit-light', motion.exitLight)\r\n" +
+    "      titleRef.current.style.setProperty('--title-scale', motion.titleScale)\r\n" +
+    "      titleRef.current.style.setProperty('--title-tracking', `${motion.titleTracking}em`)\r\n" +
+    "      titleRef.current.style.setProperty('--title-y', `${motion.titleY * 100}vh`)\r\n" +
+    '      titleRef.current.style.opacity = String(motion.titleOpacity)\r\n' +
+    "      titleRef.current.setAttribute('aria-hidden', String(motion.titleOpacity &lt; .1))\r\n" +
+    "      copyRef.current?.querySelectorAll('[data-reveal-field]').forEach(node => {\r\n" +
+    '        const field = node.dataset.revealField\r\n' +
+    '        const value = motion[field] || 0\r\n' +
+    '        const count = Number(node.dataset.wordCount || 1)\r\n' +
+    '        const index = Number(node.dataset.wordIndex || 0)\r\n' +
+    '        const spread = count > 1 ? .36 : 0\r\n' +
+    '        const reveal = clamp((value - index / Math.max(1, count - 1) * spread) / (1 - spread))\r\n' +
+    "        node.style.setProperty('--reveal', reveal.toFixed(5))\r\n" +
+    "        node.setAttribute('aria-hidden', String(reveal &lt; .01))\r\n" +
+    '      })\r\n' +
+    "      const actions = copyRef.current?.querySelector('[data-project-actions]')\r\n" +
+    '      if (actions) actions.inert = !visible || motion.actionsReveal &lt; .92 || motion.copyOpacity &lt; .8\r\n' +
+    '      if (copyRef.current) {\r\n' +
+    '        copyRe'... 8331 more characters
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\SkillsSection\skillsExpeditionMotion.test.cjs:117:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1047:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+      at Test.postRun (node:internal/test_runner/test:1173:19)
+      at Test.run (node:internal/test_runner/test:1101:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'import dynamic from \'next/dynamic\'\r\nimport { ArrowRight } from \'lucide-react\'\r\nimport { useEffect, useRef, useState } from \'react\'\r\nimport ProjectDotField from \'./ProjectDotField\'\r\nimport ProjectTechnologyMarks from \'./ProjectTechnologyMarks\'\r\nimport { getProjectActions } from \'./projectActions\'\r\nimport {createProjectIdleCycle} from \'./projectIdleCycle\'\r\nimport { projectsSkillsLayout, projectsSkillsStop, sampleProjectsSkillsStory } from \'./projectStoryMotion\'\r\nimport SkillsExpedition from \'../SkillsSection/SkillsExpedition\'\r\nimport useSkillsAutoTraverse from \'../SkillsSection/useSkillsAutoTraverse\'\r\nimport styles from \'./ProjectsStory.module.css\'\r\n\r\nconst Laptop = dynamic(() => import(\'./ProjectLaptopScene\'), { ssr: false })\r\nconst clamp = value => Math.max(0, Math.min(1, value))\r\n\r\nfunction MovingWords({ text, field, className }) {\r\n  const words = text.split(/\\s+/)\r\n  return &lt;span className={className} aria-label={text}>\r\n    {words.map((word, index) => &lt;span key={`${index}-${word}`} className={styles.wordMask} aria-hidden="true">\r\n      &lt;span data-reveal-field={field} data-word-index={index} data-word-count={words.length}>{word}&lt;/span>\r\n    &lt;/span>)}\r\n  &lt;/span>\r\n}\r\n\r\nfunction GlitchLetters({text}) {\r\n  return &lt;>{text.split(\'\').map((letter,index)=>&lt;span key={index} style={{\'--letter\':index}} aria-hidden="true">{letter === \' \' ? \'\\u00a0\' : letter}&lt;/span>)}&lt;/>\r\n}\r\n\r\nexport default function ProjectsStory({ projects, onOpenCaseStudy, hostRef }) {\r\n  const runwayRef = useRef(null)\r\n  const sceneRef = useRef(null)\r\n  const titleRef = useRef(null)\r\n  const copyRef = useRef(null)\r\n  const navigationRef = useRef(null)\r\n  const skillsRef = useRef(null)\r\n  const bridgeRef = useRef(null)\r\n  const wakeRef = useRef(null)\r\n  const motionRef = useRef({ ...sampleProjectsSkillsStory(0, projects.length), active: false, reducedMotion: false, scrolling: false, lastScrollAt: -Infinity })\r\n  const [activeIndex, setActiveIndex] = useState(0)\r\n  const [mounted, setMounted] = useState(false)\r\n  const [active, setActive] = useState(false)\r\n  const project = projects[activeIndex]\r\n  const actions = getProjectActions(project)\r\n  const layout = projectsSkillsLayout(projects.length)\r\n  useSkillsAutoTraverse({runwayRef,motionRef,projectCount:projects.length})\r\n\r\n  // React must commit the new word spans before the final settled frame\r\n  // applies their reveal values, including jumps and offscreen navigation.\r\n  useEffect(() => { wakeRef.current?.() }, [activeIndex])\r\n\r\n  useEffect(() => {\r\n    const runway = runwayRef.current\r\n    const scene = sceneRef.current\r\n    if (!runway || !scene) return undefined\r\n    const motion = motionRef.current\r\n    if (hostRef?.current) hostRef.current.dataset.projectsEntryHold = \'100\'\r\n    // The desktop runway is dynamically mounted after hydration. Let an\r\n    // initial #skills destination reanchor against its final geometry.\r\n    window.dispatchEvent(new Event(\'portfolio:layout\'))\r\n    let disposed = false, raf = 0, previous = 0, current = 0, initialized = false\r\n    let lastIndex = -1, lastActive = false, warmed = false\r\n    let idleTimer=0, interacting=false\r\n    const idleCycle=createProjectIdleCycle(projects.length)\r\n    const wake = () => { if (!disposed &amp;&amp; !raf &amp;&amp; !document.hidden) raf = requestAnimationFrame(draw) }\r\n    wakeRef.current = wake\r\n    const draw = now => {\r\n      raf = 0\r\n      if (disposed) return\r\n      const rect = runway.getBoundingClientRect()\r\n      const stage = scene.getBoundingClientRect()\r\n      const distance = Math.max(1, runway.offsetHeight - window.innerHeight)\r\n      const raw = -rect.top / distance\r\n      const arrival = clamp(-rect.top / window.innerHeight)\r\n      const entryOpacity = arrival*arrival*(3-2*arrival)\r\n      scene.style.opacity = String(entryOpacity)\r\n      scene.inert = arrival &lt; .99\r\n      scene.style.pointerEvents = arrival &lt; .99 ? \'none\' : \'\'\r\n      const target = clamp(raw)\r\n      const visible = stage.top &lt; window.innerHeight &amp;&amp; stage.bottom > 0 &amp;&amp; rect.top &lt; window.innerHeight &amp;&amp; rect.bottom > 0 &amp;&amp; !document.hidden\r\n      const near = rect.top &lt; window.innerHeight * 2 &amp;&amp; rect.bottom > -window.innerHeight\r\n      if (near &amp;&amp; !warmed) { warmed = true; setMounted(true) }\r\n      const dt = previous ? Math.min(.06, (now - previous) / 1000) : 1 / 60\r\n      previous = now\r\n      if (!initialized || !visible || motion.skillsAutoControlled) current = target\r\n      else {\r\n        // Earlier chapters retain native scrolling. The toolset hold and\r\n        // timed closing journey use exact samples through the branch above.\r\n        const remaining = target-current\r\n        current = Math.abs(remaining)&lt;.000002 ? target : current+remaining*(1-Math.exp(-18*dt))\r\n      }\r\n      initialized = true\r\n      sampleProjectsSkillsStory(current, projects.length, motion)\r\n      motion.active = visible\r\n      motion.reducedMotion = false\r\n      motion.scrolling = now - motion.lastScrollAt &lt; 260 || Math.abs(target - current) > .000012\r\n      const idle=idleCycle.sample(now,motion.projectIndex,visible&amp;&amp;!motion.scrolling&amp;&amp;!interacting&amp;&amp;motion.lidOpen>.999&amp;&amp;motion.copyOpacity>.98&amp;&amp;motion.copyExit&lt;.001,motion.lastScrollAt)\r\n      if(idle?.automatic){\r\n        motion.projectIndex=idle.index;motion.screenCurrentIndex=idle.from;motion.screenNextIndex=idle.to;motion.screenMix=idle.mix\r\n        motion.screenTransition=Math.sin(idle.mix*Math.PI)\r\n        for(const key of [\'eyebrowReveal\',\'titleReveal\',\'roleReveal\',\'stackReveal\',\'impactReveal\',\'actionsReveal\',\'navReveal\'])motion[key]=1\r\n      }\r\n      const laptopActive = visible &amp;&amp; (motion.laptopOpacity > .001 || motion.portalOpacity > .001)\r\n      if (laptopActive !== lastActive) { lastActive = laptopActive; setActive(laptopActive) }\r\n      if (motion.projectIndex !== lastIndex) { lastIndex = motion.projectIndex; setActiveIndex(lastIndex) }\r\n      scene.dataset.storyProgress = current.toFixed(5)\r\n      scene.dataset.projectIndex = String(motion.projectIndex)\r\n      scene.dataset.screenMix = motion.screenMix.toFixed(4)\r\n      scene.dataset.active = String(visible)\r\n      scene.dataset.skillsProgress = motion.skillsProgress.toFixed(5)\r\n      scene.dataset.terrainFormation = motion.terrainFormation.toFixed(5)\r\n      scene.dataset.expeditionProgress = motion.expeditionProgress.toFixed(5)\r\n      scene.dataset.expeditionTravel = motion.expeditionTravel.toFixed(3)\r\n      scene.dataset.skillsChapter = String(motion.chapterIndex)\r\n      scene.dataset.inputControlled = String(Boolean(motion.skillsAutoControlled))\r\n      scene.dataset.scrollTarget = target.toFixed(5)\r\n      scene.style.setProperty(\'--copy-opacity\', motion.copyOpacity)\r\n      scene.style.setProperty(\'--copy-exit\', motion.copyExit)\r\n      if (skillsRef.current) {\r\n        const reveal = motion.skillsIntroOpacity\r\n        const morph = motion.introMorph\r\n        const aiReveal = reveal*morph\r\n        const glitch = Math.max(motion.skillsGlitch,Math.sin(morph*Math.PI)**2,\r\n          Math.sin(motion.introHold*Math.PI)**2*.35)\r\n        const displacement = Math.sin((morph+reveal)*87)*Math.cos(morph*41)*glitch\r\n        skillsRef.current.style.setProperty(\'--skills-reveal\', Math.max(reveal,aiReveal))\r\n        skillsRef.current.style.setProperty(\'--tools-opacity\', reveal*(1-morph))\r\n        skillsRef.current.style.setProperty(\'--ai-opacity\', aiReveal)\r\n        skillsRef.current.style.setProperty(\'--intro-world-x\', `${-Math.max(0,motion.expeditionTravel-376)*5}px`)\r\n        skillsRef.current.style.setProperty(\'--glitch-x\', `${displacement * 9}px`)\r\n        skillsRef.current.style.setProperty(\'--glitch-split\', `${glitch * 3}px`)\r\n        skillsRef.current.style.setProperty(\'--glitch-band\', `${Math.round(reveal * 7) % 4 * 20}%`)\r\n        skillsRef.current.style.setProperty(\'--glitch-opacity\', glitch * .8)\r\n        skillsRef.current.setAttribute(\'aria-hidden\', String(Math.max(reveal,aiReveal) &lt; .1))\r\n        skillsRef.current.querySelector(\'[data-intro-tools]\')?.setAttribute(\'aria-hidden\',String(reveal*(1-morph)&lt;.1))\r\n        skillsRef.current.querySelector(\'[data-intro-ai]\')?.setAttribute(\'aria-hidden\',String(aiReveal&lt;.1))\r\n      }\r\n      if(bridgeRef.current) {\r\n        bridgeRef.current.style.setProperty(\'--whiteout\',motion.whiteout)\r\n        // The real Services scene now supplies the receiving universe/title.\r\n        // Crossfade the white frame into it instead of holding an empty sky.\r\n        bridgeRef.current.style.opacity=String(motion.whiteout)\r\n      }\r\n      if(hostRef?.current){\r\n        hostRef.current.style.opacity=String(1-motion.servicesReveal)\r\n        const covered = arrival &lt; .99 || motion.servicesReveal > .99\r\n        hostRef.current.style.pointerEvents=covered?\'none\':\'auto\'\r\n        hostRef.current.inert=covered\r\n      }\r\n      scene.style.setProperty(\'--exit-light\', motion.exitLight)\r\n      titleRef.current.style.setProperty(\'--title-scale\', motion.titleScale)\r\n      titleRef.current.style.setProperty(\'--title-tracking\', `${motion.titleTracking}em`)\r\n      titleRef.current.style.setProperty(\'--title-y\', `${motion.titleY * 100}vh`)\r\n      titleRef.current.style.opacity = String(motion.titleOpacity)\r\n      titleRef.current.setAttribute(\'aria-hidden\', String(motion.titleOpacity &lt; .1))\r\n      copyRef.current?.querySelectorAll(\'[data-reveal-field]\').forEach(node => {\r\n        const field = node.dataset.revealField\r\n        const value = motion[field] || 0\r\n        const count = Number(node.dataset.wordCount || 1)\r\n        const index = Number(node.dataset.wordIndex || 0)\r\n        const spread = count > 1 ? .36 : 0\r\n        const reveal = clamp((value - index / Math.max(1, count - 1) * spread) / (1 - spread))\r\n        node.style.setProperty(\'--reveal\', reveal.toFixed(5))\r\n        node.setAttribute(\'aria-hidden\', String(reveal &lt; .01))\r\n      })\r\n      const actions = copyRef.current?.querySelector(\'[data-project-actions]\')\r\n      if (actions) actions.inert = !visible || motion.actionsReveal &lt; .92 || motion.copyOpacity &lt; .8\r\n      if (copyRef.current) {\r\n        copyRe'... 8331 more characters,
+    expected: /skillsScrollGate|queueInput|preventDefault|addEventListener\(['"](?:wheel|keydown)['"]/,
+    operator: 'doesNotMatch',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="the terrain bands meet without a sky gap before, during and after mountain discovery" time="0.203645" classname="test"/>
+	<testcase name="entry has no primary mountain and discovered masses remain intact through the final exit" time="0.040823" classname="test"/>
+	<testcase name="the foreground builds by coherent portions rather than revealing every fragment at once" time="0.000516" classname="test"/>
+	<testcase name="ambient travel follows a direction rather than oscillating around a home" time="0.003907" classname="test"/>
+	<testcase name="gentle collisions bounce without crushing or creating debris" time="0.000689" classname="test"/>
+	<testcase name="a fast natural collision crushes without a user-energy flag" time="0.000476" classname="test"/>
+	<testcase name="390px phones allow fast natural impacts while ordinary bumps still rebound" time="0.001009" classname="test"/>
+	<testcase name="speed while separating is not a crushing impact" time="0.000278" classname="test"/>
+	<testcase name="forceful held impact removes the victim permanently; a new offscreen rock arrives after a gap" time="0.003758" classname="test"/>
+	<testcase name="a released hurl can crush and a fast drag cannot tunnel through a tiny rock" time="0.000969" classname="test"/>
+	<testcase name="slow pointer samples do not misread substeps as high-speed impacts" time="0.001009" classname="test"/>
+	<testcase name="offscreen travel exits instead of bouncing and replaces through another edge" time="0.001838" classname="test"/>
+	<testcase name="foreground rocks stay in the lower band and replacements enter below the content" time="0.014401" classname="test"/>
+	<testcase name="released foreground rocks ease down from a dragged position" time="0.000994" classname="test"/>
+	<testcase name="reduced motion freezes ambient travel and rotation while retaining deliberate interaction" time="0.000320" classname="test"/>
+	<testcase name="responsive boundary, deterministic random injection and bounded pools remain stable" time="0.034936" classname="test"/>
+	<testcase name="cancellation discards velocity, invalid deltas do nothing and long resume deltas are bounded" time="0.000354" classname="test"/>
+	<testcase name="first memory stays hidden until an initial charge completes" time="0.003613" classname="test"/>
+	<testcase name="after charging, title then body type without scroll" time="0.002110" classname="test"/>
+	<testcase name="scroll while typing cannot accelerate text or queue charge" time="0.004344" classname="test"/>
+	<testcase name="clockwise idle rotation pauses during drag and resumes after a gentle release" time="0.003191" classname="test"/>
+	<testcase name="only a strong fresh counterclockwise release coasts backward before returning clockwise" time="0.001623" classname="test"/>
+	<testcase name="pointer timestamps measure same-frame throws without treating a slow drag as a throw" time="0.000862" classname="test"/>
+	<testcase name="each memory needs fresh charge; centering finishes before scroll alone drives reversible ascent" time="0.004597" classname="test"/>
+	<testcase name="pinpoint shortcuts form the selected memory and reveal its text before enabling charge" time="0.002728" classname="test"/>
+	<testcase name="upward gestures reconstruct each preceding memory instead of exiting to the introduction" time="0.002207" classname="test" failure="Expected values to be strictly equal:+ actual - expected+ 'erasing'- 'forming'">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:+ actual - expected+ 'erasing'- 'forming'">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
++ actual - expected
+
++ 'erasing'
+- 'forming'
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'erasing'
+  - 'forming'
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\journeyCarouselMotion.test.cjs:176:12)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'erasing',
+    expected: 'forming',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="a continuing upward momentum gesture cannot skip through several reconstructed memories" time="0.001271" classname="test" failure="Expected values to be strictly equal:+ actual - expected+ 'erasing'- 'forming'">
+		<failure type="testCodeFailure" message="Expected values to be strictly equal:+ actual - expected+ 'erasing'- 'forming'">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
++ actual - expected
+
++ 'erasing'
+- 'forming'
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'erasing'
+  - 'forming'
+  
+      at TestContext.&lt;anonymous> (C:\Users\lopez\Documents\ProjectNewPortfolio\components\journeyCarouselMotion.test.cjs:201:10)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'erasing',
+    expected: 'forming',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+		</failure>
+	</testcase>
+	<testcase name="reverse final handoff replays centering and reconstructs the last historical photograph angle" time="0.003080" classname="test"/>
+	<testcase name="clearing charge preserves ready memory and pinpoint selection resets pending reverse input" time="0.001656" classname="test"/>
+	<testcase name="drag cannot disturb absorption; malformed input stays finite" time="0.000453" classname="test"/>
+	<!-- tests 78 -->
+	<!-- suites 0 -->
+	<!-- pass 65 -->
+	<!-- fail 13 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 425.7902 -->
+</testsuites>

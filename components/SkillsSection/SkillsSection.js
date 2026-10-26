@@ -17,6 +17,23 @@ const AUTO_CATEGORY_DELAY = 4000
 const MANUAL_CATEGORY_DELAY = 8000
 
 export default function SkillsSection() {
+  const [desktopStory, setDesktopStory] = useState(false)
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1101px)')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const configure = () => setDesktopStory(desktop.matches && !reduced.matches)
+    configure()
+    desktop.addEventListener('change', configure)
+    reduced.addEventListener('change', configure)
+    return () => {
+      desktop.removeEventListener('change', configure)
+      reduced.removeEventListener('change', configure)
+    }
+  }, [])
+  return desktopStory ? null : <LegacySkillsSection />
+}
+
+function LegacySkillsSection() {
   const sectionRef = useRef(null)
   const nextCategoryDelayRef = useRef(AUTO_CATEGORY_DELAY)
   const [activeCategoryId, setActiveCategoryId] = useState(SKILL_CATEGORIES[0].id)

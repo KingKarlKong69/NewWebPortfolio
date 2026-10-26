@@ -3,6 +3,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import {mergeVertices} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import ActiveFrameLoop from '../ActiveFrameLoop'
+import CinematicFooterWorld from './CinematicFooterWorld'
 import {
   BLACK_HOLE_LAYER_DEFAULTS,
   BLACK_HOLE_PRODUCTION_TUNING
@@ -75,6 +76,8 @@ const DIAGNOSTIC_DATA_KEYS = [
   'contactRenderer',
   'contactComposerCount',
   'contactContextState',
+  'contactArrival',
+  'contactAsteroidModel',
   'independentAsteroids',
   'independentAsteroidInteraction',
   'independentAsteroid0',
@@ -810,7 +813,8 @@ function SceneDiagnostics({
   onReady,
   onStable,
   onError,
-  onDiagnostics
+  onDiagnostics,
+  cinematic = false
 }) {
   const {gl, size} = useThree()
   const frameRef = useRef(0)
@@ -840,7 +844,7 @@ function SceneDiagnostics({
       canvas.dataset.contactPrograms = String(gl.info.programs?.length || 0)
       canvas.dataset.contactDrawCalls = String(gl.info.render.calls)
       canvas.dataset.contactTriangles = String(gl.info.render.triangles)
-      canvas.dataset.contactRenderer = 'unified-raymarch'
+      canvas.dataset.contactRenderer = cinematic ? 'fixed-view-amber-lensing' : 'unified-raymarch'
       canvas.dataset.contactComposerCount = '0'
       canvas.dataset.contactContextState = 'ok'
       canvas.dataset.contactReadinessEpoch = String(epoch)
@@ -903,7 +907,8 @@ function UnifiedScene({
   labConfig,
   debugView,
   manualTime,
-  resetToken
+  resetToken,
+  journeyRef
 }) {
   const baseSettings = CONTACT_QUALITY[quality]
   const {viewport} = useThree()
@@ -933,6 +938,18 @@ function UnifiedScene({
     (settings.center[1] - 0.5) * viewport.height,
     0.14
   ], [settings.center, viewport.height, viewport.width])
+
+  // The standalone diagnostic lab keeps the existing configurable renderer.
+  // Production uses one fixed viewing axis with reused Hero rock models.
+  if (!labConfig) return <>
+    <CinematicFooterWorld active={active} reducedMotion={reducedMotion} journeyRef={journeyRef} quality={quality} />
+    <SceneDiagnostics
+      active={active} quality={quality} phase={phase}
+      readinessEpochRef={readinessEpochRef} onReady={onReady}
+      onStable={onStable} onError={onError} onDiagnostics={onDiagnostics}
+      cinematic
+    />
+  </>
 
   return (
     <>
@@ -994,6 +1011,7 @@ export default function UnifiedBlackHoleCanvas({
   active,
   reducedMotion,
   pointerRef,
+  journeyRef,
   quality,
   phase,
   onReady,
@@ -1010,14 +1028,20 @@ export default function UnifiedBlackHoleCanvas({
   const settings = CONTACT_QUALITY[quality]
   const readinessEpochRef = useRef(0)
   const contextBindingRef = useRef(null)
-  const callbacksRef = useRef({onContextLost, onContextRestored})
-  callbacksRef.current = {onContextLost, onContextRestored}
+  const callbacksRef = useRef({onContextLost, onContextRestored,onError})
+  callbacksRef.current = {onContextLost, onContextRestored,onError}
 
   const handleCreated = useCallback(({gl, invalidate}) => {
-    gl.setClearColor(0x000107, 1)
+    gl.setClearColor(0x010308, 0)
     readinessEpochRef.current += 1
     const canvas = gl.domElement
     let attached = false
+    const previousShaderError=gl.debug.onShaderError
+    const shaderError=(...args)=>{
+      canvas.dataset.contactShaderError='true'
+      callbacksRef.current.onError?.(new Error('Contact shader could not compile'))
+      previousShaderError?.(...args)
+    }
 
     const handleLost = (event) => {
       event.preventDefault()
@@ -1043,12 +1067,14 @@ export default function UnifiedBlackHoleCanvas({
       attach() {
         if (attached) return
         attached = true
+        gl.debug.onShaderError=shaderError
         canvas.addEventListener('webglcontextlost', handleLost, {passive: false})
         canvas.addEventListener('webglcontextrestored', handleRestored)
       },
       detach() {
         if (!attached) return
         attached = false
+        if(gl.debug.onShaderError===shaderError)gl.debug.onShaderError=previousShaderError
         canvas.removeEventListener('webglcontextlost', handleLost)
         canvas.removeEventListener('webglcontextrestored', handleRestored)
       }
@@ -1079,7 +1105,7 @@ export default function UnifiedBlackHoleCanvas({
       camera={{position: [0, 0, 10], fov: quality === 'mobile' ? 44 : 38, near: 0.1, far: 40}}
       dpr={settings.dpr}
       frameloop="demand"
-      gl={{alpha: false, antialias: true, powerPreference: 'high-performance'}}
+      gl={{alpha: true, antialias: true, powerPreference: 'high-performance'}}
       performance={{min: 0.55}}
       flat
       onCreated={handleCreated}
@@ -1090,6 +1116,7 @@ export default function UnifiedBlackHoleCanvas({
           active={active}
           reducedMotion={reducedMotion}
           pointerRef={pointerRef}
+          journeyRef={journeyRef}
           quality={quality}
           phase={phase}
           readinessEpochRef={readinessEpochRef}

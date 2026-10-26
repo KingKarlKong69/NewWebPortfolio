@@ -1,89 +1,13 @@
-import {Code2, Database, FlaskConical, Layers, PenTool, Smartphone} from 'lucide-react'
-
+// Explicit artwork mapping: the supplied files are JPEGs, numbered in order.
 export const SERVICES = [
-  {
-    id: 'ui-ux-design',
-    number: '01',
-    title: 'UI / UX Design',
-    description: 'Designing intuitive and engaging experiences that users love.',
-    Icon: PenTool,
-    accent: '#ffbd38',
-    glow: '255, 189, 56',
-    x: 10.5,
-    y: 73
-  },
-  {
-    id: 'frontend-development',
-    number: '02',
-    title: 'Frontend Development',
-    description: 'Building fast, responsive and accessible web interfaces.',
-    Icon: Code2,
-    accent: '#27e7ff',
-    glow: '39, 231, 255',
-    x: 27,
-    y: 58.5
-  },
-  {
-    id: 'backend-development',
-    number: '03',
-    title: 'Backend Development',
-    description: 'Developing secure, scalable and high-performance server-side applications.',
-    Icon: Database,
-    accent: '#20e5ff',
-    glow: '32, 229, 255',
-    x: 44,
-    y: 47.5
-  },
-  {
-    id: 'full-stack-development',
-    number: '04',
-    title: 'Full Stack Development',
-    description: 'Integrating frontend and backend to build powerful end-to-end solutions.',
-    Icon: Layers,
-    accent: '#a85eff',
-    glow: '168, 94, 255',
-    x: 60,
-    y: 35
-  },
-  {
-    id: 'hybrid-cross-platform',
-    number: '05',
-    title: 'Hybrid / Cross-Platform',
-    description: 'Building high-quality mobile apps for iOS and Android with a single codebase.',
-    Icon: Smartphone,
-    accent: '#27e7ff',
-    glow: '39, 231, 255',
-    x: 77,
-    y: 26
-  },
-  {
-    id: 'research',
-    number: '06',
-    title: 'Research',
-    description: 'Conducting in-depth research to validate ideas and drive data-informed decisions.',
-    Icon: FlaskConical,
-    accent: '#a85eff',
-    glow: '168, 94, 255',
-    x: 91,
-    y: 25.5
-  }
+  {id: 'website-development', number: '01', image: '/services-folder/service-1.jpg', title: 'Website Design & Development', description: 'Business Websites · Landing Pages · Website Redesign · Responsive Design · Web Development'},
+  {id: 'ui-ux-design', number: '02', image: '/services-folder/service-2.jpg', title: 'UI/UX Design & Prototyping', description: 'Wireframing · UI Design · UX Design · Figma Prototypes · Design Systems'},
+  {id: 'business-systems', number: '03', image: '/services-folder/service-3.jpg', title: 'Custom Web Applications & Business Systems', description: 'Inventory Systems · Business Dashboards · Booking Systems · Management Systems · Reporting Tools'},
+  {id: 'application-development', number: '04', image: '/services-folder/service-4.jpg', title: 'Mobile & Desktop Application Development', description: 'Mobile Apps · Desktop Apps · Business Utilities · App Prototypes · MVP Development'},
+  {id: 'website-modernization', number: '05', image: '/services-folder/service-5.jpg', title: 'Website Optimization & Modernization', description: 'Performance Optimization · Technical SEO · Web Accessibility · UI Modernization · Analytics Integration'}
 ]
-
 export const TESTIMONIALS = [
-  {
-    id: 'john-eric-paragas',
-    quote: 'Karl is an exceptional developer. He delivered a high-quality product ahead of schedule and his attention to detail is outstanding.',
-    name: 'John Eric Paragas',
-    role: 'CEO, TechNova Solutions',
-    initials: 'JP',
-    accent: 'cyan'
-  },
-  {
-    id: 'vannah-joy-valencia',
-    quote: 'Working with Karl was a smooth experience. He understood the requirements perfectly and the results exceeded our expectations.',
-    name: 'Vannah Joy Valencia',
-    role: 'Product Manager, VisionUI',
-    initials: 'VV',
-    accent: 'violet'
-  }
+  {id:'capstone-team-leader',name:'Capstone Team Leader',initials:'CT',rating:5,accent:'cyan',quote:'Karl is a highly reliable and talented web developer—he delivered our orphanage management system on time and with great quality.'},
+  {id:'sharmainnes-bakeshop',name:"Sharmainne's Bakeshop",initials:'SB',rating:5,accent:'violet',quote:'Karl and his team did a great job creating our website! They were professional, attentive to our needs, and delivered a design that showcases our products and business beautifully. Thank you for your hard work and dedication!'},
+  {id:'colleague',name:'Colleague',initials:'C',rating:5,accent:'cyan',quote:"Karl is a dedicated and resourceful developer who takes initiative and is always eager to learn new technologies. He's collaborative, creative, and committed to delivering quality work. He's also great at turning ideas into practical solutions and is a reliable partner to work with on projects."}
 ]

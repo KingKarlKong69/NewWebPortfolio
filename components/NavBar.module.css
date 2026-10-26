@@ -1,0 +1,222 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding: 26px 20px 18px;
+  pointer-events: none;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  min-height: 42px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.desktopNavigation {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: clamp(36px, 3.5vw, 56px);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.desktopLink {
+  position: relative;
+  color: #cbd0d7;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .025em;
+  white-space: nowrap;
+  transition: color 160ms ease;
+}
+
+.activeLink { color: #fff; }
+
+.activeGlow {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  width: 80px;
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, #67e8f947 28%, #a5f3fc 50%, #67e8f947 72%, transparent);
+  box-shadow: 0 0 8px #00e5ff80, 0 0 18px #00e5ff40, 0 0 30px #00e5ff1c;
+  transform: translateX(-50%);
+  transition: opacity 180ms ease;
+}
+
+.activeLink .activeGlow { opacity: 1; }
+.desktopLink:hover .activeGlow { opacity: .65; }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  pointer-events: auto;
+}
+
+.resumeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 117px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid #50415f;
+  border-radius: 9px;
+  color: #f9f8fc;
+  background: #050509ba;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.resumeButton svg { width: 16px; height: 16px; }
+.menuToggle, .mobileOverlay { display: none; }
+.desktopLink:focus-visible, .resumeButton:focus-visible, .menuToggle:focus-visible, .mobileLink:focus-visible, .drawerBack:focus-visible, .drawerLogo:focus-visible, .drawerSocials a:focus-visible {
+  outline: 2px solid #66e5ff;
+  outline-offset: 6px;
+}
+
+@media (max-width: 1100px) {
+  .header { inset: 0 auto auto 0; padding: calc(7px + env(safe-area-inset-top, 0px)) 8px 7px; }
+  .row { min-height: 44px; justify-content: flex-start; }
+  .desktopNavigation { display: none; }
+  .headerResume { display: none; }
+  .actions { gap: 0; }
+  .menuToggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: #01030433;
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .menuToggle svg { width: 29px; height: 29px; }
+  .mobileOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: block;
+    height: 100dvh;
+    background: #01050c24;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    touch-action: pan-y;
+    pointer-events: auto;
+  }
+  .mobileDrawer {
+    position: relative;
+    display: flex;
+    width: min(300px, 54vw);
+    min-width: 164px;
+    max-width: calc(100vw - 60px);
+    height: 100%;
+    flex-direction: column;
+    padding: calc(5px + env(safe-area-inset-top, 0px)) clamp(12px, 4vw, 22px) calc(18px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    border-right: 1px solid #d35db72e;
+    background: linear-gradient(105deg, #03080ee0, #04080db8 75%, #140b1aa3);
+    box-shadow: 12px 0 45px #0006, 1px 0 20px #ec4ab313;
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
+  }
+  .drawerBack {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: -7px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    color: #eaf4f9;
+    background: transparent;
+    cursor: pointer;
+  }
+  .drawerLogo {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    height: clamp(90px, 24vw, 132px);
+    margin: -14px -14px 5px;
+    border-radius: 8px;
+  }
+  .drawerLogo > span { position: absolute; inset: 0; pointer-events: none; }
+  .mobileNavigation {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: clamp(4px, 1.5vh, 12px);
+  }
+  .mobileLink {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2.5vw, 15px);
+    min-height: 44px;
+    padding: 9px 8px;
+    border-radius: 7px;
+    color: #c5ccd8;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: clamp(13px, 3.6vw, 16px);
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 160ms ease, background 160ms ease;
+  }
+  .mobileLink > svg { flex: 0 0 auto; color: #7e8c9f; transition: color 160ms ease; }
+  .mobileLink:hover, .mobileLink[aria-current='page'] { color: #fff; background: #15435426; }
+  .mobileLink[aria-current='page'] > svg { color: #70e9ff; filter: drop-shadow(0 0 6px #00cfff88); }
+  .drawerActiveGlow {
+    position: absolute;
+    right: 10%;
+    bottom: 0;
+    left: 10%;
+    height: 1px;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, #4ae5ff99, transparent);
+    box-shadow: 0 3px 9px 1px #09baff70;
+  }
+  .mobileLink[aria-current='page'] .drawerActiveGlow { opacity: 1; }
+  .drawerFooter { display: flex; flex-direction: column; gap: 12px; margin-top: auto; padding-top: 28px; }
+  .drawerSocials { display: flex; align-items: center; justify-content: center; gap: 3px; }
+  .drawerSocials a {
+    display: grid;
+    place-items: center;
+    width: 39px;
+    height: 40px;
+    border-radius: 7px;
+    color: #c2cfdf;
+    transition: color 160ms ease, background 160ms ease;
+  }
+  .drawerSocials a:hover { color: #8feaff; background: #2fcce01a; }
+  .drawerResume {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    gap: 8px;
+    border-color: #64506f;
+    border-radius: 7px;
+    background: #03071099;
+    font-size: 13px;
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopLink, .activeGlow, .mobileLink, .mobileLink > svg, .drawerSocials a { transition: none; }
+}

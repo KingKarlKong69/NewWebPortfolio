@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="every control has one bounded default; quality presets affect only rendering controls" time="0.005658" classname="test"/>
+	<testcase name="numeric drafts preserve last valid value while complete entries clamp and snap" time="0.000355" classname="test"/>
+	<testcase name="new material and shape controls have the specified bounds, defaults and independent groups" time="0.001322" classname="test"/>
+	<testcase name="group resets preserve tuned globals, other local groups and shape controls independently" time="0.003181" classname="test"/>
+	<testcase name="fine noise precision survives sanitizing and all new controls reject invalid preset values" time="0.010773" classname="test"/>
+	<testcase name="universe and curvature switches remain numeric flags and reject fractional preset values" time="0.001788" classname="test"/>
+	<testcase name="sanitizing records preserves fallback values and excludes arrays and unknown keys" time="0.000780" classname="test"/>
+	<testcase name="preset import is atomic, bounded and accepts only supported versions" time="0.001480" classname="test"/>
+	<testcase name="v1 and v2 migration resets every absent new control and retains supplied legacy values" time="0.002616" classname="test"/>
+	<testcase name="v3 snapshots round-trip tuned new values and partial current presets preserve their fallback" time="0.003606" classname="test"/>
+	<testcase name="actual contact click handler enforces the two-second cooldown and ignores an unfinished birth" time="0.001535" classname="test"/>
+	<testcase name="actual entrance hook reuses settled geometry and sends a complete wave for a click blast" time="0.006541" classname="test"/>
+	<testcase name="entry requires a meaningful visible area, including tall mobile frames and direct Contact links" time="0.002344" classname="test"/>
+	<testcase name="the hole emerges continuously to ten percent, charges for exactly 1.5s and settles" time="0.004548" classname="test"/>
+	<testcase name="one elapsed-time clock keeps 30/60/144fps aligned, pauses explicitly and cannot replay after completion" time="0.000556" classname="test"/>
+	<testcase name="birth parameters remain bounded and the charge brightens before its final disappearance" time="0.027864" classname="test"/>
+	<testcase name="the universe tremor alternates quickly between pull and push during charging only" time="0.000721" classname="test"/>
+	<testcase name="the wave reaches the farthest Contact corner before its power fades to zero" time="0.000803" classname="test"/>
+	<testcase name="recession preserves the projected anchor and apparent scale; final transform returns exactly to the tuned one" time="0.000577" classname="test"/>
+	<testcase name="electrical ribbons have valid finite geometry with 12 main bolts and 24 branches" time="0.043381" classname="test"/>
+	<testcase name="electrical and universe shaders have matching varyings and every custom uniform wired" time="0.005270" classname="test"/>
+	<testcase name="local material adapters inherit live globals, isolate regions and never change shape controls" time="0.010286" classname="test"/>
+	<testcase name="fractional local flow stays continuous across forward/reverse wraps, speed edits and pauses" time="0.000366" classname="test"/>
+	<testcase name="neutral local phases remain synchronized over long playback and lag does not produce a leap" time="0.038695" classname="test"/>
+	<testcase name="curved arc sheets have finite bounded attributes, valid triangles and disk junction endpoints" time="0.019301" classname="test"/>
+	<testcase name="front and back disk halves cover opposite sides without increasing triangle count" time="0.015580" classname="test"/>
+	<testcase name="all shader uniforms are wired and fragment varyings match their vertex stage" time="0.001083" classname="test"/>
+	<testcase name="the real lab frame runs idle, advances every birth phase, pauses and replays without a ReferenceError" time="0.016552" classname="test"/>
+	<testcase name="JSON defaults are valid; temporary browser overrides take priority and clearing them restores the project" time="0.009532" classname="test"/>
+	<testcase name="saving replaces the complete JSON atomically; invalid input preserves the previous file" time="0.026750" classname="test"/>
+	<testcase name="the actual endpoint handler allows local development saves and blocks production, foreign origins and invalid requests" time="0.001065" classname="test"/>
+	<testcase name="closed display clears the keyboard legends and its actual solid lid occludes them" time="0.033198" classname="test"/>
+	<testcase name="live projects preserve their destination and expose a separate case study action" time="0.002206" classname="test"/>
+	<testcase name="a project without a live deployment keeps its existing local project details action" time="0.000248" classname="test"/>
+	<testcase name="explicit actions support every requested single and paired arrangement without inventing a URL" time="0.000348" classname="test"/>
+	<testcase name="the dot lattice stays anchored through resize without changing its existing positions" time="0.003370" classname="test"/>
+	<testcase name="hover forms a local pulsating cluster and leaves distant dots unchanged" time="0.001975" classname="test"/>
+	<testcase name="click waves propagate to the farthest corner before fading out" time="0.000460" classname="test"/>
+	<testcase name="idle cycles loop projects without needing a scroll API and input smoothly restores the native selection" time="0.001449" classname="test"/>
+	<testcase name="hover/focus freezes the displayed project and remaining dwell; offscreen and single-project scenes stay safe" time="0.000180" classname="test"/>
+	<testcase name="a screenshot holds for 4.5 seconds, dissolves for 1.5 seconds, then holds the next image" time="0.002536" classname="test"/>
+	<testcase name="scrolling freezes a fractional dissolve and resuming excludes the paused wall time" time="0.000331" classname="test"/>
+	<testcase name="returning to a prior project restores its own screenshot and remaining hold" time="0.000276" classname="test"/>
+	<testcase name="a delayed dwell wake still begins a visible dissolve and stalled frames cannot skip images" time="0.000144" classname="test"/>
+	<testcase name="empty and single-image projects stay static; a loaded gallery starts with a complete dwell" time="0.000145" classname="test"/>
+	<testcase name="reduced motion pauses autoplay without losing the saved screenshot or blend" time="0.000152" classname="test"/>
+	<testcase name="changing screenshot counts keeps indices in range and retains a surviving incoming image" time="0.000297" classname="test"/>
+	<testcase name="invalid elapsed input cannot advance a paused or playing slideshow" time="0.000162" classname="test"/>
+	<testcase name="sampling handoff textures does not change the active slideshow or resume clock" time="0.000430" classname="test"/>
+	<testcase name="the giant PROJECTS word zooms out before spacing expands, compresses, and drops" time="0.002471" classname="test"/>
+	<testcase name="the closed laptop enters from the right, fills the view, then docks and opens" time="0.001520" classname="test"/>
+	<testcase name="each project reveals its category, title, metadata, actions, and navigation in order" time="0.001704" classname="test"/>
+	<testcase name="project destinations select every real project and the final state stays readable" time="0.000481" classname="test"/>
+	<testcase name="TV transitions keep the matching screen pair through every project boundary in either direction" time="0.003442" classname="test"/>
+	<testcase name="reverse scrolling restores every visual channel exactly and reuses the supplied output" time="0.024920" classname="test"/>
+	<testcase name="laptop, title, visible copy, and screen transitions remain continuous at stage boundaries" time="0.000664" classname="test"/>
+	<testcase name="invalid input stays finite and sampled values stay inside their physical ranges" time="0.025517" classname="test"/>
+	<testcase name="Services overlaps the completed whiteout and becomes visible without a star-only tail" time="0.001540" classname="test"/>
+	<testcase name="the appended Skills act preserves original project scroll distances and chapter destinations" time="0.022818" classname="test"/>
+	<testcase name="the final copy clears, its screen powers off, and the cosmos appears after a dark beat" time="0.000486" classname="test"/>
+	<testcase name="the centered laptop aligns its actual open screen plane before the camera enters" time="0.000198" classname="test"/>
+	<testcase name="portal takeover, landscape formation, and the Skills opening occur in their required order" time="0.023512" classname="test"/>
+	<testcase name="backward sampling restores every numeric channel exactly, including partial portal and terrain states" time="0.181560" classname="test"/>
+	<testcase name="exit stage boundaries remain continuous and all transition channels stay finite and bounded" time="0.077835" classname="test"/>
+	<testcase name="calendar counts come from explicit GitHub tooltips and are summed without inferring intensity" time="0.015970" classname="test"/>
+	<testcase name="an absent count or missing date rejects the calendar rather than fabricating activity" time="0.003130" classname="test"/>
+	<testcase name="legacy explicit counts and Sunday-first padded weeks preserve all real dates" time="0.004357" classname="test"/>
+	<testcase name="cells regenerate at 1.2 seconds and restore original durability without modifying data" time="0.001905" classname="test"/>
+	<testcase name="ship upgrade caps at two, collision resets it, and respawn occurs after three active seconds with protection" time="0.000282" classname="test"/>
+	<testcase name="intensity controls 1/2/3 hit points; destruction does not mutate contribution data" time="0.001816" classname="test"/>
+	<testcase name="swept bullets hit the nearest intact cell, consume one shot and pass destroyed cells" time="0.000421" classname="test"/>
+	<testcase name="horizontal ship bounds stay inside the arena and all supplied sprite paths exist" time="0.001289" classname="test"/>
+	<testcase name="refined words retain their framing, finite smooth normals and three batched surface finishes" time="0.871705" classname="test"/>
+	<testcase name="resolution respects native density, the pixel budget, hardware limits and adaptive caps" time="0.000300" classname="test"/>
+	<testcase name="the compact composition uses common row positions and reading-order glyph ranks across both rows" time="0.376844" classname="test"/>
+	<testcase name="scroll stages leave a complete spiral beat, consolidate before handoff, and reverse deterministically" time="0.009056" classname="test"/>
+	<testcase name="particle buffers are stable, balanced, colored, and cover all letters/target regions at reduced counts" time="0.188104" classname="test"/>
+	<testcase name="target frame projects to measured column corners for offset canvases and angled cameras" time="0.001827" classname="test"/>
+	<testcase name="GPU stages have all custom uniforms, attributes and matching varyings wired" time="0.002613" classname="test"/>
+	<testcase name="idle dust keeps moving at fixed scroll, pauses when hidden, and resumes without a time leap" time="0.000921" classname="test"/>
+	<testcase name="the perimeter turns toward the camera and fills every column before smoothing" time="0.002165" classname="test"/>
+	<testcase name="the exit dissolves before curved diagonal travel; destinations settle and reverse exactly" time="0.012012" classname="test"/>
+	<testcase name="DOM panel projection matches the traveling perspective camera for multiple aspect ratios" time="0.001400" classname="test"/>
+	<testcase name="Services camera discovers all world words before disintegration and left-to-right assembly" time="0.002768" classname="test"/>
+	<testcase name="camera and particle reconstruction are deterministic, continuous and exact in reverse" time="0.022352" classname="test"/>
+	<testcase name="six gestures move natively; seventh flies from the current position; reverse releases at toolset" time="0.003358" classname="test"/>
+	<testcase name="touchpad momentum counts once; distinct notches count separately" time="0.000904" classname="test"/>
+	<testcase name="only emerged text arms counting; upward browsing and navigation never seek" time="0.000231" classname="test"/>
+	<testcase name="hidden time pauses travel, reverse interrupts forward, and navigation cancels" time="0.000247" classname="test"/>
+	<testcase name="relayout does not snap native travel; reverse destination is formed before whiteout" time="0.002542" classname="test"/>
+	<testcase name="expedition markers resolve safe local artwork and accessible descriptions" time="0.087821" classname="test"/>
+	<testcase name="five foreground checkpoints precede their chapter mountains without contribution data" time="0.001716" classname="test"/>
+	<testcase name="terrain-anchored marker hit targets remain separately selectable at desktop sizes" time="0.013264" classname="test"/>
+	<testcase name="the laptop entry and project scroll distances survive the longer native Skills runway" time="0.002786" classname="test"/>
+	<testcase name="travel never pauses or surges between checkpoints and mountain reading windows" time="0.029117" classname="test"/>
+	<testcase name="the introductory copy persists until AI, then leaves only after the AI mountain" time="0.001210" classname="test"/>
+	<testcase name="the world message stays formed and the post-AI ground runs ten times farther before Services" time="0.000863" classname="test"/>
+	<testcase name="arbitrary forward and reverse seeks reconstruct every expedition channel exactly" time="0.093467" classname="test"/>
+	<testcase name="camera velocity is continuous and all narrative channels stay bounded" time="0.033925" classname="test"/>
+	<testcase name="earlier desktop chapters keep native scroll sampling and delegate the toolset closing journey" time="0.001518" classname="test"/>
+	<testcase name="the terrain bands meet without a sky gap before, during and after mountain discovery" time="0.327049" classname="test"/>
+	<testcase name="entry has no primary mountain and discovered masses remain intact through the final exit" time="0.047131" classname="test"/>
+	<testcase name="the foreground builds by coherent portions rather than revealing every fragment at once" time="0.000797" classname="test"/>
+	<testcase name="the entry introduces the story before revealing the blurred background title and portrait" time="0.004514" classname="test"/>
+	<testcase name="the large title docks before the heading finishes and the portrait settles to the right" time="0.000482" classname="test"/>
+	<testcase name="all four portrait poses crossfade without blank frames or combined opacity spikes" time="0.008351" classname="test"/>
+	<testcase name="biography paragraphs appear in order, settle for reading, and retain the final paragraph" time="0.000740" classname="test"/>
+	<testcase name="the cyan underline grows monotonically through the specified story milestones" time="0.003534" classname="test"/>
+	<testcase name="scrolling backward produces exactly the same scene states without retained animation state" time="0.004826" classname="test"/>
+	<testcase name="the progress indicator uses stable named stops and reaches the fifth stage at completion" time="0.000466" classname="test"/>
+	<testcase name="invalid and out-of-range progress stays finite and all visual channels remain bounded" time="0.015791" classname="test"/>
+	<testcase name="the scene channels remain continuous across every scroll transition" time="0.001580" classname="test"/>
+	<testcase name="footer rare foreground band is sampled per arrival, while count, size and speed honor presets" time="0.004726" classname="test"/>
+	<testcase name="blast destroys visible rocks once, leaves queued offscreen rocks alone and replaces after a gap" time="0.008582" classname="test"/>
+	<testcase name="ambient travel follows a direction rather than oscillating around a home" time="0.002463" classname="test"/>
+	<testcase name="gentle collisions bounce without crushing or creating debris" time="0.000637" classname="test"/>
+	<testcase name="a fast natural collision crushes without a user-energy flag" time="0.000510" classname="test"/>
+	<testcase name="390px phones allow fast natural impacts while ordinary bumps still rebound" time="0.000650" classname="test"/>
+	<testcase name="speed while separating is not a crushing impact" time="0.000670" classname="test"/>
+	<testcase name="forceful held impact removes the victim permanently; a new offscreen rock arrives after a gap" time="0.004840" classname="test"/>
+	<testcase name="a released hurl can crush and a fast drag cannot tunnel through a tiny rock" time="0.001459" classname="test"/>
+	<testcase name="slow pointer samples do not misread substeps as high-speed impacts" time="0.002305" classname="test"/>
+	<testcase name="offscreen travel exits instead of bouncing and replaces through another edge" time="0.002232" classname="test"/>
+	<testcase name="foreground rocks stay in the lower band and replacements enter below the content" time="0.017887" classname="test"/>
+	<testcase name="released foreground rocks ease down from a dragged position" time="0.001943" classname="test"/>
+	<testcase name="reduced motion freezes ambient travel and rotation while retaining deliberate interaction" time="0.000663" classname="test"/>
+	<testcase name="responsive boundary, deterministic random injection and bounded pools remain stable" time="0.074523" classname="test"/>
+	<testcase name="cancellation discards velocity, invalid deltas do nothing and long resume deltas are bounded" time="0.000514" classname="test"/>
+	<testcase name="responsive visibility uses current bounds after a mobile floor exits and re-enters the viewport" time="0.002296" classname="test"/>
+	<testcase name="idle grid preserves the original vanishing point, rows, and straight lines" time="0.008893" classname="test"/>
+	<testcase name="hover bends only a small local area and leaves the horizon and near edge anchored" time="0.000566" classname="test"/>
+	<testcase name="click wave travels outward and decays without leaving permanent deformation" time="0.000483" classname="test"/>
+	<testcase name="mobile and desktop deformations stay bounded and finite under multiple clicks" time="0.042211" classname="test"/>
+	<testcase name="hold charge preserves taps, grows with duration, and caps after a long press" time="0.000631" classname="test"/>
+	<testcase name="held gravity well pulls inward and sinks progressively while edges stay anchored" time="0.000923" classname="test"/>
+	<testcase name="charged release travels farther, lasts longer, and produces a stronger wave than a tap" time="0.000844" classname="test"/>
+	<testcase name="overlapping fully charged waves remain finite and bounded at mobile and desktop sizes" time="0.057568" classname="test"/>
+	<testcase name="charged well uses a connected local detail mesh without changing idle perspective" time="0.004341" classname="test"/>
+	<testcase name="only a fully charged release detonates and spreads neon outward before its glitch" time="0.000690" classname="test"/>
+	<testcase name="maximum charge glitches for exactly 1.8 seconds then returns to a straight blue idle grid" time="0.000417" classname="test"/>
+	<testcase name="idle pose levitates smoothly through a full cycle with no pointer input" time="0.003681" classname="test"/>
+	<testcase name="all diagonal pointer directions produce a bounded position and matching two-axis twist" time="0.000443" classname="test"/>
+	<testcase name="typewriter types, holds, erases, and leaves a gap before advancing" time="0.001560" classname="test"/>
+	<testcase name="every supplied role appears in order, including both Research Lead entries" time="0.001772" classname="test"/>
+	<testcase name="an interrupted A to B to C to A fade follows the latest front photograph without a jump" time="0.004324" classname="test"/>
+	<testcase name="multiple fading photographs preserve a complete normalized image rather than dimming between sources" time="0.002012" classname="test"/>
+	<testcase name="a new photograph starts immediately after an existing fade and completed fades release obsolete layers" time="0.002160" classname="test"/>
+	<testcase name="first memory stays hidden until an initial charge completes" time="0.006301" classname="test"/>
+	<testcase name="after charging, title then body type without scroll" time="0.002365" classname="test"/>
+	<testcase name="scroll while typing cannot accelerate text or queue charge" time="0.004938" classname="test"/>
+	<testcase name="clockwise idle rotation pauses during drag and resumes after a gentle release" time="0.002824" classname="test"/>
+	<testcase name="only a strong fresh counterclockwise release coasts backward before returning clockwise" time="0.003032" classname="test"/>
+	<testcase name="pointer timestamps measure same-frame throws without treating a slow drag as a throw" time="0.001320" classname="test"/>
+	<testcase name="each memory needs fresh charge; centering finishes before scroll alone drives reversible ascent" time="0.007246" classname="test"/>
+	<testcase name="pinpoint shortcuts form the selected memory and reveal its text before enabling charge" time="0.003280" classname="test"/>
+	<testcase name="upward gestures reconstruct each preceding memory instead of exiting to the introduction" time="0.006954" classname="test"/>
+	<testcase name="a continuing upward momentum gesture cannot skip through several reconstructed memories" time="0.004267" classname="test"/>
+	<testcase name="reverse final handoff replays centering and reconstructs the last historical photograph angle" time="0.000778" classname="test"/>
+	<testcase name="clearing charge preserves ready memory and pinpoint selection resets pending reverse input" time="0.000386" classname="test"/>
+	<testcase name="drag cannot disturb absorption; malformed input stays finite" time="0.000346" classname="test"/>
+	<testcase name="randomized carousel order preserves originals and cannot repeat adjacent images across its cyclic boundary" time="0.003619" classname="test"/>
+	<testcase name="the supplied memory manifest includes every actual photo in natural numerical order" time="0.034040" classname="test"/>
+	<testcase name="the memory titles, descriptions and journey introduction retain the supplied narrative" time="0.000446" classname="test"/>
+	<testcase name="the vortex finishes before the Journey title settles and its introductory typing completes" time="0.000651" classname="test"/>
+	<testcase name="the original core enters from above and settles at the viewport center for its gesture gate" time="0.000177" classname="test"/>
+	<testcase name="the rail has one readable introduction stop and five centered carousel destinations" time="0.000272" classname="test"/>
+	<testcase name="backward scrolling reconstructs exactly the same opening and supports reusable output" time="0.006956" classname="test"/>
+	<testcase name="invalid inputs stay safe and visual opening channels remain finite and bounded" time="0.014148" classname="test"/>
+	<testcase name="the vortex, typography and core move continuously across every opening boundary" time="0.000587" classname="test"/>
+	<testcase name="all supplied photos occupy fixed panels and sparse memories repeat without empty slots" time="0.005089" classname="test"/>
+	<testcase name="dominant rendered panel and background choose the same attached photo while rotating" time="0.058790" classname="test"/>
+	<testcase name="one equal-height row closes through a full revolution with only narrow frame gutters" time="0.000613" classname="test"/>
+	<testcase name="the hollow cylinder surrounds core depth and panels return continuously through the seam" time="0.000312" classname="test"/>
+	<testcase name="tilt and hover offsets stay bounded and preserve the ring center and depth ordering" time="0.001159" classname="test"/>
+	<testcase name="snake formation begins at the core, finishes precisely on each ribbon surface and is reversible" time="0.001043" classname="test"/>
+	<testcase name="cover crops portrait and landscape photographs without letterboxing" time="0.000417" classname="test"/>
+	<testcase name="large scroll and keyboard/scrollbar jumps cannot bypass unfinished memories" time="0.001759" classname="test"/>
+	<testcase name="descent and upward scrolling remain possible before the gate" time="0.000348" classname="test"/>
+	<testcase name="ascent reserves one viewport and releases only after completion" time="0.000391" classname="test"/>
+	<testcase name="explicit navigation and existing deep positions are not pulled into Journey" time="0.001450" classname="test"/>
+	<testcase name="returning from Projects cannot jump over the reverse memories" time="0.000320" classname="test"/>
+	<testcase name="only the restored initial gate or an explicit exit releases upward travel" time="0.000193" classname="test"/>
+	<testcase name="wheel pixel, line and page units normalize to signed travel" time="0.001438" classname="test"/>
+	<testcase name="large wheel bursts are capped and invalid input is inert" time="0.000304" classname="test"/>
+	<testcase name="precision trackpad input retains its continuous magnitude instead of emitting gesture counts" time="0.001204" classname="test"/>
+	<testcase name="navigation lands at explicit composed story milestones and Home always goes to document zero" time="0.001959" classname="test"/>
+	<testcase name="shortcut event releases story gates before changing scroll position" time="0.001440" classname="test"/>
+	<testcase name="the palm charges before the tesseract is visible and emergence settles at its anchor" time="0.001324" classname="test"/>
+	<testcase name="active time freezes during pause and resume never replays emergence or skips an action" time="0.000638" classname="test"/>
+	<testcase name="random selection allows immediate repeats and any jump while waiting for emergence" time="0.005268" classname="test"/>
+	<testcase name="interaction interrupts without resetting emergence and autonomous motion resumes after release" time="0.001037" classname="test"/>
+	<testcase name="reduced motion presents a static finished core and does not replay when preference changes" time="0.000369" classname="test"/>
+	<testcase name="hand constraint bounds even combined autonomous and pointer movement" time="0.000307" classname="test"/>
+	<testcase name="playful orbit shakes for 2.5 seconds, splits into tiny chasing cores and accelerates into reunion" time="0.000788" classname="test"/>
+	<testcase name="drag boundary stays circular in portrait pixels across desktop and mobile" time="0.000670" classname="test"/>
+	<testcase name="three completed anger events reach 10x and return exactly home; fourth grab is refused" time="0.001630" classname="test"/>
+	<testcase name="releasing before full resistance cancels anger and eases home without consuming a strike" time="0.000764" classname="test"/>
+	<testcase name="ascension charges over the palm, becomes fully fire orange, and completes two torso laps" time="0.000532" classname="test"/>
+	<testcase name="subject orbit covers both sides and both depths then rejoins the hand continuously" time="0.001544" classname="test"/>
+	<!-- tests 199 -->
+	<!-- suites 0 -->
+	<!-- pass 199 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 1195.5719 -->
+</testsuites>

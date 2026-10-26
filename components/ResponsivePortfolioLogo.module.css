@@ -1,0 +1,13 @@
+.logo {
+  position: fixed;
+  left: -25px;
+  top: 4px;
+  z-index: 61;
+  width: 224px;
+  height: 172px;
+}
+@media (max-width: 1100px) {
+  .logo { display: none; }
+}
+
+button.logo{padding:0;border:0;background:transparent;cursor:pointer}button.logo:focus-visible{outline:1px solid #6deaff;outline-offset:4px}
