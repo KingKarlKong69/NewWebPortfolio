@@ -23,14 +23,19 @@
 .canvas { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .canvas > div,.canvas canvas { pointer-events: none !important; }
 .canvas canvas { display: block; }
-.memoryBackdrop { position: absolute; z-index: 0; top: 0; bottom: 0; left: 59%; right: 0; opacity: var(--background-presence); mask-image: linear-gradient(90deg,transparent 0%,#000 45%); pointer-events: none; }
+.memoryBackdrop { position: absolute; z-index: 0; top: 0; bottom: 0; left: 59%; right: 0; overflow: hidden; isolation: isolate; opacity: var(--background-presence); mask-image: linear-gradient(90deg,transparent 0%,#000 45%); pointer-events: none; }
 .carouselDrag { display: none; position: absolute; z-index: 3; left: 7%; right: 35%; top: 16%; bottom: 34%; pointer-events: auto; touch-action: none; cursor: grab; user-select: none; }
 .journey[data-phase='reading'][data-journey-active='true'] .carouselDrag,
 .journey[data-phase='ready'][data-journey-active='true'] .carouselDrag { display: block; }
 .carouselDrag[data-dragging='true'] { cursor: grabbing; }
 .carouselDrag:focus-visible { outline: 1px solid #79dff3; outline-offset: 5px; border-radius: 12px; }
 .backdropPhoto { position: absolute; inset: 0; transition: opacity 1.05s cubic-bezier(.22,.61,.36,1); }
-.backdropPhoto img { object-fit: cover; object-position: center; filter: brightness(.63) saturate(.82); }
+.backdropPhoto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.backdropBase { filter: brightness(.63) saturate(.9); }
+.backdropFilters { position: absolute; overflow: hidden; }
+.backdropChannels { position: absolute; inset: 0; overflow: hidden; mix-blend-mode: screen; opacity: 0; }
+.backdropChannels img { position: absolute; inset: 0; mix-blend-mode: screen; }
+.backdropScanlines { position: absolute; inset: 0; opacity: .1; background: repeating-linear-gradient(0deg,#0009 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#ff446622 0 1px,#44eaff22 1px 2px,transparent 2px 3px); }
 .backdropShade { position: absolute; inset: 0; background: linear-gradient(90deg,#000 0%,#0006 36%,#0002 100%); }
 .memoryCopy { position: absolute; z-index: 4; top: 73%; left: 9.2%; width: 61%; opacity: var(--memory-opacity); pointer-events: none; }
 .memoryCopy h3 { margin: 0 0 25px; min-height: 1.15em; white-space: nowrap; font: 300 clamp(26px,var(--heading-size,3.65vw),70px)/1.1 Arial,Helvetica,sans-serif; letter-spacing: -.025em; color: #fcfcff; }
@@ -62,6 +67,40 @@
 
 .memoryCopy h3>span{color:transparent;background:linear-gradient(110deg,#f4cd8e 0%,#f4cd8e 35%,#fff7d5 47%,#fff 50%,#f6d393 55%,#d79f4e 65%,#f4cd8e 100%);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;animation:memoryGold 2s ease-in-out infinite}
 @keyframes memoryGold{0%,45%{background-position:100% 0}85%,100%{background-position:0 0}}
-.backdropPhoto[data-backdrop-active='true'] img{animation:memoryGlitch .55s steps(1,end) both}
-@keyframes memoryGlitch{0%{clip-path:inset(8% 0 18%);transform:translateX(-12px);filter:brightness(.9) saturate(1.3) drop-shadow(7px 0 #66eaff)}15%{clip-path:inset(0);transform:translateX(8px)}28%{clip-path:inset(32% 0 9%);transform:translateX(-5px);filter:brightness(1.1)}42%{clip-path:inset(0);transform:translateX(3px)}60%,100%{clip-path:inset(0);transform:none;filter:brightness(.63) saturate(.82)}}
-@media(prefers-reduced-motion:reduce){.memoryCopy h3>span,.backdropPhoto[data-backdrop-active='true'] img{animation:none}}
+/* The complete photo stays in place. Only short, displaced color bands tear
+   across it, followed by long quiet intervals. No animation-frame JS is used. */
+.backdropPhoto[data-backdrop-active='true'] .backdropChannels { animation: memorySignal 8s steps(1,end) infinite; }
+.backdropPhoto[data-backdrop-active='true'] .backdropRed { animation: memoryRed 8s steps(1,end) infinite; }
+.backdropPhoto[data-backdrop-active='true'] .backdropCyan { animation: memoryCyan 8s steps(1,end) infinite; }
+.backdropPhoto[data-backdrop-active='true'] .backdropMagenta { animation: memoryMagenta 8s steps(1,end) infinite; }
+@keyframes memorySignal {
+  0%,2.6%,60%,63% { opacity: .8; }
+  1.3%,4%,61.5% { opacity: .45; }
+  6%,65%,100% { opacity: 0; }
+}
+@keyframes memoryRed {
+  0%,60% { transform: translateX(13px); clip-path: polygon(0 12%,100% 12%,100% 15%,0 15%,0 42%,100% 42%,100% 47%,0 47%,0 76%,100% 76%,100% 79%,0 79%); }
+  1.3%,61.5% { transform: translateX(-17px); clip-path: inset(28% 0 66%); }
+  2.6%,63% { transform: translateX(9px); clip-path: polygon(0 21%,100% 21%,100% 23%,0 23%,0 57%,100% 57%,100% 64%,0 64%,0 87%,100% 87%,100% 90%,0 90%); }
+  4% { transform: translateX(-6px); clip-path: inset(65% 0 27%); }
+  6%,65%,100% { transform: none; clip-path: inset(0); }
+}
+@keyframes memoryCyan {
+  0%,60% { transform: translateX(-10px); clip-path: polygon(0 13%,100% 13%,100% 16%,0 16%,0 43%,100% 43%,100% 48%,0 48%,0 77%,100% 77%,100% 80%,0 80%); }
+  1.3%,61.5% { transform: translateX(14px); clip-path: inset(29% 0 65%); }
+  2.6%,63% { transform: translateX(-8px); clip-path: polygon(0 20%,100% 20%,100% 24%,0 24%,0 58%,100% 58%,100% 65%,0 65%,0 88%,100% 88%,100% 91%,0 91%); }
+  4% { transform: translateX(5px); clip-path: inset(66% 0 26%); }
+  6%,65%,100% { transform: none; clip-path: inset(0); }
+}
+@keyframes memoryMagenta {
+  0%,60% { transform: translateX(20px); clip-path: inset(62% 0 36%); opacity: .65; }
+  1.3%,61.5% { transform: translateX(-11px); clip-path: inset(8% 0 90%); }
+  2.6%,63% { transform: translateX(15px); clip-path: inset(81% 0 16%); }
+  4% { transform: translateX(-7px); clip-path: inset(35% 0 63%); }
+  6%,65%,100% { transform: none; opacity: 0; }
+}
+@media(prefers-reduced-motion:reduce){
+  .memoryCopy h3>span { animation: none; }
+  .backdropPhoto[data-backdrop-active='true'] .backdropChannels,.backdropPhoto[data-backdrop-active='true'] .backdropChannels img { animation: none; }
+  .backdropChannels,.backdropScanlines { display: none; }
+}

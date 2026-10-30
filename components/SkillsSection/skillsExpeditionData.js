@@ -46,7 +46,7 @@ export const SKILLS_CHAPTERS = [
       technology('react', 'React', 'react', 'Composing interactive views and managing component state.', ['Components', 'State', 'Interfaces'], 125.89, -35, 13),
       technology('next', 'Next.js', 'nextjs-dark', 'Structuring React applications with routing and server rendering.', ['React', 'Routing', 'SSR'], 138.65, -56.2, 23),
       technology('inertia', 'Inertia.js', null, 'Connecting a server-driven application to reactive frontend pages.', ['Server-driven', 'Pages', 'Integration'], 110.04, -7.8, 1.44),
-      technology('threejs', 'Three.js', null, 'Creating interactive 3D scenes, materials, and animation in the browser.', ['WebGL', '3D graphics', 'Animation'], 100, -29, 10),
+      technology('threejs', 'Three.js', 'threejs-dark', 'Creating interactive 3D scenes, materials, and animation in the browser.', ['WebGL', '3D graphics', 'Animation'], 100, -29, 10),
       technology('vite', 'Vite', 'vitejs', 'Keeping frontend development and production builds straightforward.', ['Development', 'Builds', 'Tooling'], 116.49, -67, 13)
     ]
   },
@@ -59,7 +59,7 @@ export const SKILLS_CHAPTERS = [
       technology('node', 'Node.js', 'nodejs', 'Running JavaScript outside the browser for application services and tooling.', ['JavaScript', 'Services', 'Tooling'], 194, -26, 12),
       technology('python', 'Python', 'python', 'Working with the Python application layer used by Django.', ['Python', 'Application logic', 'Django'], 212.94, -47, 3.85),
       technology('django', 'Django', 'django-dark', 'Building Python web applications with structured models and request handling.', ['Python', 'Models', 'Web framework'], 224.7, -59.9, 15.35),
-      technology('postgresql', 'PostgreSQL', null, 'Modeling relational data and querying it with SQL.', ['SQL', 'Relations', 'Queries'], 164, -17, 8),
+      technology('postgresql', 'PostgreSQL', 'postgresql', 'Modeling relational data and querying it with SQL.', ['SQL', 'Relations', 'Queries'], 164, -17, 8),
       technology('mysql', 'MySQL', 'mysql', 'Modeling and querying relational application data.', ['SQL', 'Relations', 'Queries'], 174.13, -6, 1.2),
       technology('mariadb', 'MariaDB', 'mariadb', 'Working with relational data and SQL-based application persistence.', ['SQL', 'Persistence', 'Relational data'], 181.34, -5.1, 1.23),
       technology('sqlite', 'SQLite', 'sqlite', 'Using a lightweight local relational database where it fits the application.', ['Local data', 'SQL', 'Lightweight'], 187.93, -5.9, 1.21),
@@ -70,8 +70,8 @@ export const SKILLS_CHAPTERS = [
     id: 'delivery', title: 'Development & Delivery',
     subtitle: 'Version control · platforms · design · production', x: 264,
     markers: [
-      technology('vercel', 'Vercel', null, 'Deploying web applications with preview builds and production releases.', ['Hosting', 'Previews', 'Deployment'], 279, -32, 12),
-      technology('railway', 'Railway', null, 'Deploying application services and databases for web projects.', ['Services', 'Databases', 'Deployment'], 306, -29, 10),
+      technology('vercel', 'Vercel', 'vercel-dark', 'Deploying web applications with preview builds and production releases.', ['Hosting', 'Previews', 'Deployment'], 279, -32, 12),
+      technology('railway', 'Railway', 'railway-dark', 'Deploying application services and databases for web projects.', ['Services', 'Databases', 'Deployment'], 306, -29, 10),
       technology('git', 'Git', 'git', 'Tracking changes and keeping development work reviewable.', ['Version control', 'Branches', 'History'], 243.38, -54.2, 8.97),
       technology('github', 'GitHub', 'github-dark', 'Sharing repositories and collaborating around code changes.', ['Repositories', 'Collaboration', 'Review'], 259.64, -53, 11.69),
       technology('capacitor', 'Capacitor.js', null, 'Bringing web application interfaces into a native mobile container.', ['Web', 'Mobile', 'Native integration'], 282, -47, 14),

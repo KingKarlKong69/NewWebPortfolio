@@ -10,6 +10,7 @@ import styles from './ProjectsSection.module.css'
 const SCREENSHOT_DELAY = 3000
 
 const ProjectsStory = dynamic(() => import('./ProjectsStory'), { ssr: false })
+const MobileProjectsStory = dynamic(() => import('./MobileProjectsStory'), {ssr:false})
 
 const ProjectLaptopScene = dynamic(() => import('./ProjectLaptopScene'), {
   ssr: false,
@@ -141,13 +142,14 @@ export default function ProjectsSection() {
   const [hasEntered, setHasEntered] = useState(false)
   const [dialogProject, setDialogProject] = useState(null)
   const [storyMode, setStoryMode] = useState(false)
+  const [mobileStory,setMobileStory]=useState(false)
   const reducedMotion = useReducedMotion()
   const activeProject = PROJECTS[activeIndex]
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1101px)')
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const configure = () => setStoryMode(desktop.matches && !reduced.matches)
+    const configure = () => {setStoryMode(desktop.matches && !reduced.matches);setMobileStory(!desktop.matches&&!reduced.matches)}
     configure()
     desktop.addEventListener('change', configure)
     reduced.addEventListener('change', configure)
@@ -179,9 +181,9 @@ export default function ProjectsSection() {
       ref={sectionRef}
       id="projects"
       aria-labelledby="projects-heading"
-      className={storyMode ? styles.storySection : styles.section}
+      className={storyMode ? styles.storySection : mobileStory ? styles.mobileStorySection : styles.section}
     >
-      {storyMode ? <ProjectsStory projects={PROJECTS} onOpenCaseStudy={setDialogProject} hostRef={sectionRef} /> : <>
+      {storyMode ? <ProjectsStory projects={PROJECTS} onOpenCaseStudy={setDialogProject} hostRef={sectionRef} /> : mobileStory ? <MobileProjectsStory projects={PROJECTS} onOpenCaseStudy={setDialogProject}/> : <>
       <div className={styles.orbitBackdrop} aria-hidden="true">
         <span /><span /><span />
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import AboutStory from './AboutStory'
-import LegacyAboutSection from './LegacyAboutSection'
+import MobileAboutStory from './MobileAboutStory'
 import styles from './AboutStory.module.css'
 
 export default function AboutSection() {
@@ -17,7 +17,7 @@ export default function AboutSection() {
   return (
     <section id="about" className={styles.about} aria-label="About Karl Lopez">
       <AboutStory enabled={desktop === true} />
-      <div className={styles.mobile}>{desktop === false && <LegacyAboutSection />}</div>
+      <div className={styles.mobile}>{desktop === false && <MobileAboutStory />}</div>
     </section>
   )
 }

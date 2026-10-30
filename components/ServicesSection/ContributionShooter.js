@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react'
 import {CONTRIBUTION_SPRITES,clampShipX,stepContributionBullets,createShipLife,advanceShipLife,destroyShip,upgradeShip} from './contributionGame'
 import styles from './ContributionField.module.css'
 
-export default function ContributionShooter({arenaRef,active,paused,onHit,revision}){
+export default function ContributionShooter({arenaRef,active,paused,onHit,revision,mobile=false}){
   const shipRef=useRef(null),layerRef=useRef(null),shipX=useRef(.5),drag=useRef(null)
   const inputAt=useRef(0)
   const callbacks=useRef({onHit,paused});callbacks.current={onHit,paused}
@@ -63,7 +63,7 @@ export default function ContributionShooter({arenaRef,active,paused,onHit,revisi
       if(elapsed>=nextHazard){
         nextHazard=elapsed+1.2+Math.random()*1.3
         const node=document.createElement('span');node.className=styles.fallingAsteroid;layer.appendChild(node)
-        rocks.push({node,x:width*(.08+Math.random()*.84),y:-35,r:15+Math.random()*15,speed:90+Math.random()*90,angle:Math.random()*6})
+        rocks.push({node,x:width*(.08+Math.random()*.84),y:-35,r:mobile?7+Math.random()*6:15+Math.random()*15,speed:mobile?55+Math.random()*45:90+Math.random()*90,angle:Math.random()*6})
       }
       rocks=rocks.filter(rock=>{
         rock.y+=rock.speed*dt;rock.angle+=dt
@@ -79,14 +79,14 @@ export default function ContributionShooter({arenaRef,active,paused,onHit,revisi
       cooldown-=dt
       if(cooldown<=0&&!life.deadUntil){
         cooldown=.22
-        for(const offset of life.bullets===2?[-13,13]:[0]){
+        for(const offset of life.bullets===2?(mobile?[-7,7]:[-13,13]):[0]){
         const shot={id:++serial,x:x+offset,y:height-18-ship.offsetHeight+10}
         const node=document.createElement('img');node.src=CONTRIBUTION_SPRITES.bullet;node.alt=''
         node.className=styles.bullet;layer.appendChild(node);nodes.set(shot.id,node);shots.push(shot)
         }
       }
       targets.forEach(target=>{target.destroyed=target.element.dataset.destroyed==='true'})
-      const stepped=stepContributionBullets(shots,targets,dt,Math.max(360,height*.7))
+      const stepped=stepContributionBullets(shots,targets,dt,mobile?Math.max(220,height*.52):Math.max(360,height*.7))
       const alive=new Set(stepped.bullets.map(shot=>shot.id))
       nodes.forEach((node,id)=>{if(!alive.has(id)){node.remove();nodes.delete(id)}})
       shots=stepped.bullets
@@ -108,7 +108,7 @@ export default function ContributionShooter({arenaRef,active,paused,onHit,revisi
     arena.addEventListener('scroll',invalidate,true);addEventListener('resize',invalidate)
     frame=requestAnimationFrame(tick)
     return()=>{cancelAnimationFrame(frame);resize.disconnect();removeEventListener('resize',invalidate);arena.removeEventListener('scroll',invalidate,true);clearShots();bursts.forEach((_,node)=>node.remove());rocks.forEach(rock=>rock.node.remove());ship.style.visibility='';ship.disabled=false}
-  },[engaged,revision,arenaRef])
+  },[engaged,revision,arenaRef,mobile])
 
   const move=clientX=>{
     inputAt.current=performance.now()

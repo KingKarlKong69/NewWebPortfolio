@@ -6,12 +6,13 @@ import { SIDEBAR_NAV_ITEMS, SOCIAL_ITEMS } from './LeftNav'
 import { PortfolioLogoScene } from './ResponsivePortfolioLogo'
 import { NAV_ITEMS, useActiveNavSection } from './navigationState'
 import styles from './NavBar.module.css'
+import ResumePreview from './ResumePreview'
 
 const MOBILE_QUERY = '(max-width: 1100px)'
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex="0"]'
 const stopHeroPointer = (event) => event.stopPropagation()
 
-function MobileNavigationDrawer({ activeSection, onClose, onNavigate, toggleRef, reduceMotion }) {
+function MobileNavigationDrawer({ activeSection, onClose, onNavigate, onResume, onAfterClose, toggleRef, reduceMotion }) {
   const overlayRef = useRef(null)
   const drawerRef = useRef(null)
   const backRef = useRef(null)
@@ -65,8 +66,9 @@ function MobileNavigationDrawer({ activeSection, onClose, onNavigate, toggleRef,
       document.body.style.overflow = bodyOverflow
       document.documentElement.style.overflow = rootOverflow
       if (window.matchMedia(MOBILE_QUERY).matches) toggleRef.current?.focus({ preventScroll: true })
+      onAfterClose?.()
     }
-  }, [onClose, toggleRef])
+  }, [onClose, onAfterClose, toggleRef])
 
   return (
     <motion.div
@@ -132,7 +134,7 @@ function MobileNavigationDrawer({ activeSection, onClose, onNavigate, toggleRef,
               )
             })}
           </div>
-          <button type="button" className={`${styles.resumeButton} ${styles.drawerResume}`}>
+          <button type="button" onClick={onResume} className={`${styles.resumeButton} ${styles.drawerResume}`}>
             Resume <Download aria-hidden="true" strokeWidth={1.8} />
           </button>
         </div>
@@ -144,23 +146,50 @@ function MobileNavigationDrawer({ activeSection, onClose, onNavigate, toggleRef,
 export default function NavBar() {
   const { activeSection, navigateToSection } = useActiveNavSection()
   const [navVisible, setNavVisible] = useState(true)
+  const [mobileViewport, setMobileViewport] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [resumeOpen, setResumeOpen] = useState(false)
   const navRef = useRef(null)
   const menuToggleRef = useRef(null)
+  const resumeButtonRef = useRef(null)
+  const resumeReturnFocusRef = useRef(null)
+  const pendingNavigationRef = useRef(null)
   const reduceMotion = useReducedMotion()
   const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), [])
+  const closeResume = useCallback(() => setResumeOpen(false), [])
+  const finishMobileNavigation = useCallback(() => {
+    const section = pendingNavigationRef.current
+    pendingNavigationRef.current = null
+    if (section) navigateToSection(section)
+  }, [navigateToSection])
+  const openResume = useCallback(() => {
+    pendingNavigationRef.current = null
+    resumeReturnFocusRef.current = window.matchMedia(MOBILE_QUERY).matches ? menuToggleRef.current : resumeButtonRef.current
+    setMobileMenuOpen(false)
+    setNavVisible(true)
+    setResumeOpen(true)
+  }, [])
 
   useEffect(() => {
     const desktopQuery = window.matchMedia('(min-width: 1101px)')
     const closeDesktopMenu = () => {
+      setMobileViewport(!desktopQuery.matches)
       if (desktopQuery.matches) setMobileMenuOpen(false)
     }
+    closeDesktopMenu()
     desktopQuery.addEventListener('change', closeDesktopMenu)
     return () => desktopQuery.removeEventListener('change', closeDesktopMenu)
   }, [])
 
   const followNavigation = (event, section) => {
     event.preventDefault()
+    if (mobileMenuOpen) {
+      // The drawer keeps the page scroll-locked through its exit animation.
+      // Its cleanup completes this navigation only after restoring overflow.
+      pendingNavigationRef.current = section
+      setMobileMenuOpen(false)
+      return
+    }
     setMobileMenuOpen(false)
     navigateToSection(section)
   }
@@ -207,7 +236,7 @@ export default function NavBar() {
       <motion.header
         ref={navRef}
         initial={{ opacity: 0, y: -28 }}
-        animate={{ opacity: navVisible || mobileMenuOpen ? 1 : 0, y: navVisible || mobileMenuOpen ? 0 : '-115%' }}
+        animate={{ opacity: navVisible || mobileViewport || mobileMenuOpen || resumeOpen ? 1 : 0, y: navVisible || mobileViewport || mobileMenuOpen || resumeOpen ? 0 : '-115%' }}
         transition={reduceMotion ? { duration: 0 } : { duration: .44, ease: [.22, 1, .36, 1] }}
         onMouseEnter={() => setNavVisible(true)}
         onFocusCapture={() => setNavVisible(true)}
@@ -234,12 +263,17 @@ export default function NavBar() {
           </nav>
           <div className={styles.actions}>
             <motion.button
+              ref={resumeButtonRef}
               type="button"
+              onClick={openResume}
+              aria-haspopup="dialog"
+              aria-expanded={resumeOpen}
+              aria-controls="resume-preview"
               whileHover={{ scale: 1.04, boxShadow: '0 0 24px rgba(139,92,246,0.35)' }}
               whileTap={{ scale: .94 }}
               className={`${styles.resumeButton} ${styles.headerResume}`}
             >
-              Resume <Download aria-hidden="true" strokeWidth={1.8} />
+              {resumeOpen ? 'Download' : 'Resume'} <Download aria-hidden="true" strokeWidth={1.8} />
             </motion.button>
             <button
               ref={menuToggleRef}
@@ -259,16 +293,21 @@ export default function NavBar() {
         </div>
       </motion.header>
       {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {mobileMenuOpen && (
             <MobileNavigationDrawer
               key="mobile-navigation"
               activeSection={activeSection}
               onClose={closeMobileMenu}
               onNavigate={followNavigation}
+              onResume={openResume}
+              onAfterClose={finishMobileNavigation}
               toggleRef={menuToggleRef}
               reduceMotion={reduceMotion}
             />
+          )}
+          {resumeOpen && !mobileMenuOpen && (
+            <ResumePreview key="resume-preview" onClose={closeResume} returnFocusRef={resumeReturnFocusRef} reduceMotion={reduceMotion} />
           )}
         </AnimatePresence>,
         document.body

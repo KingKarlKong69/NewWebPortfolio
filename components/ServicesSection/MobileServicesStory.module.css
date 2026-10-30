@@ -1,0 +1,19 @@
+.runway{position:relative;background:transparent;color:#edf6ff}
+.stage{position:sticky;top:0;height:100svh;overflow:clip;isolation:isolate}
+.plane{position:absolute;inset:0;will-change:transform}
+.panel{position:absolute;width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 6% 35px;box-sizing:border-box;background:radial-gradient(ellipse at center,#071a2733,transparent 70%)}
+.title{margin:0;text-align:center;font:800 clamp(36px,11.5vw,100px)/1.05 Montserrat,Arial,sans-serif;letter-spacing:-.045em;text-shadow:0 5px 0 #58718c30,0 12px 26px #0009}
+.hint{position:absolute;bottom:8%;display:flex;align-items:center;gap:15px;font:9px Arial,sans-serif;letter-spacing:.15em;color:#8daabd}
+.service{position:absolute;inset:0;isolation:isolate;background:#02060a}
+.service>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
+.serviceShade{position:absolute;inset:0;background:linear-gradient(0deg,#000e,transparent 90%),linear-gradient(90deg,#0005,transparent)}
+.serviceCopy{position:absolute;left:7%;right:7%;bottom:12%;font-family:Arial,sans-serif}
+.serviceCopy>span{font-size:clamp(64px,20vw,150px);font-weight:700;line-height:1;color:transparent;-webkit-text-stroke:1px #d2e6fa}
+.serviceCopy h3{font:800 clamp(28px,8vw,54px)/1.08 Montserrat,Arial,sans-serif;letter-spacing:-.03em;margin:18px 0}
+.serviceCopy>p{font-size:13px;line-height:1.7;color:#c3d8ea;max-width:540px}
+.continue{display:flex;align-items:center;gap:12px;font-size:9px;letter-spacing:.1em;color:#9bc5d8;margin-top:30px}
+.contributions{justify-content:flex-start;padding:70px 6% 25px}
+.testimonials{justify-content:center;padding:65px 6% 30px}
+.testimonialTitle{align-self:flex-start;font:800 clamp(29px,9vw,65px)/1.05 Montserrat,Arial,sans-serif;letter-spacing:-.035em;margin:0 0 25px;color:#f1f8ff}
+.testimonials>section{width:100%;max-width:540px}
+@media(max-height:700px){.panel{padding-top:60px}.serviceCopy{bottom:10%}.serviceCopy>span{font-size:58px}.serviceCopy h3{font-size:26px;margin:12px 0}.serviceCopy>p{font-size:12px}.continue{margin-top:18px}.testimonials{padding:60px 6% 20px}.testimonialTitle{font-size:29px;margin-bottom:16px}.testimonials>section>div{height:360px;grid-template-rows:52px minmax(0,1fr) 42px;gap:16px;padding:22px 20px}}

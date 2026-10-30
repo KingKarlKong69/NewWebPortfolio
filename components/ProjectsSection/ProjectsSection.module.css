@@ -7,6 +7,7 @@
   background: transparent;
   scroll-margin-top: 0;
 }
+.mobileStorySection {position:relative;isolation:isolate;background:transparent;scroll-margin-top:0;margin-top:-100svh;z-index:11;}
 
 .section {
   position: relative;
@@ -330,6 +331,26 @@
   width: 100% !important;
   height: 100% !important;
   touch-action: pan-y;
+}
+
+.laptopAccent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 88%;
+  max-width: 1120px;
+  aspect-ratio: 1.12;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  /* End the fade at the side midpoints, not the rectangle's corners.
+     A farthest-corner gradient still has color at each straight edge. */
+  background: radial-gradient(ellipse closest-side at center, rgba(103, 77, 190, .58) 0%, rgba(91, 65, 171, .46) 28%, rgba(76, 51, 147, .29) 47%, rgba(59, 38, 116, .12) 65%, rgba(42, 27, 82, .035) 79%, transparent 100%);
+  transition: opacity 550ms cubic-bezier(.22, 1, .36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .laptopAccent { transition: none; }
 }
 
 .laptopLoading {

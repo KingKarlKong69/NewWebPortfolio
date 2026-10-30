@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import {
   advanceBackdropTransition,
   backdropLayerOpacities,
@@ -25,6 +25,7 @@ function decodePhoto(url) {
 }
 
 export default function JourneyMemoryBackdrop({ source }) {
+  const filterId = `memory-channels-${useId().replace(/:/g, '')}`
   const transitionRef = useRef(createBackdropTransition())
   const decodedRef = useRef(new Map())
   const nodesRef = useRef(new Map())
@@ -100,6 +101,15 @@ export default function JourneyMemoryBackdrop({ source }) {
   }, [layers])
 
   return <div className={styles.memoryBackdrop} aria-hidden="true" data-memory-backdrop data-backdrop-requested={source} data-backdrop-current={displayed || ''}>
+    <svg className={styles.backdropFilters} width="0" height="0" focusable="false" aria-hidden="true">
+      <defs>
+        {/* Separate actual image channels: a shadow around an opaque photograph
+            cannot produce the colored tearing inside its silhouette. */}
+        <filter id={`${filterId}-red`} colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" /></filter>
+        <filter id={`${filterId}-cyan`} colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" /></filter>
+        <filter id={`${filterId}-magenta`} colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" /></filter>
+      </defs>
+    </svg>
     {layers.map(layer => <div
       key={layer.source}
       ref={node => { if (node) nodesRef.current.set(layer.source, node); else nodesRef.current.delete(layer.source) }}
@@ -108,8 +118,14 @@ export default function JourneyMemoryBackdrop({ source }) {
       data-backdrop-active={String(layer.source === displayed)}
       style={{ opacity: 0, transition: 'none' }}
     >
-      <img src={layer.url} alt="" draggable={false} decoding="async" style={{ width: '100%', height: '100%', display: 'block' }} />
+      <img className={styles.backdropBase} src={layer.url} alt="" draggable={false} decoding="async" />
+      <div className={styles.backdropChannels}>
+        <img className={styles.backdropRed} src={layer.url} alt="" draggable={false} decoding="async" style={{ filter: `url(#${filterId}-red)` }} />
+        <img className={styles.backdropCyan} src={layer.url} alt="" draggable={false} decoding="async" style={{ filter: `url(#${filterId}-cyan)` }} />
+        <img className={styles.backdropMagenta} src={layer.url} alt="" draggable={false} decoding="async" style={{ filter: `url(#${filterId}-magenta)` }} />
+      </div>
     </div>)}
+    <div className={styles.backdropScanlines} />
     <div className={styles.backdropShade} />
   </div>
 }

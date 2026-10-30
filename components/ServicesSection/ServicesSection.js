@@ -8,6 +8,7 @@ import TestimonialDeck from './TestimonialDeck'
 import styles from './ServicesExperience.module.css'
 
 const ServicesScene=dynamic(()=>import('./ServicesScene'),{ssr:false})
+const MobileServicesStory=dynamic(()=>import('./MobileServicesStory'),{ssr:false})
 class SpaceBoundary extends Component {
   state={failed:false}
   static getDerivedStateFromError(){return {failed:true}}
@@ -24,7 +25,7 @@ function ServiceDeck({deckRef,selected,onSelect,interactive=true,cinematic=false
       {SERVICES.map((service,index)=><div key={service.id} className={styles.column} data-service-column={index} data-selected={selected===index?'true':'false'} data-other={selected!==null&&selected!==index?'true':'false'}>
         <img className={styles.artwork} src={service.image} alt="" draggable="false" loading="eager"/><span className={styles.shade}/>
         <button ref={element=>{triggerRefs.current[index]=element}} type="button" className={styles.columnButton} aria-label={`Explore ${service.title}`} aria-expanded={selected===index} tabIndex={interactive&&selected===null?0:-1} onClick={()=>onSelect(index)} disabled={!interactive||selected!==null}>
-          <span className={styles.number}>{service.number}<small className={styles.serviceLabel}>SERVICE</small></span><span className={styles.columnName}>{service.title}</span><ArrowUpRight className={styles.columnArrow} size={24}/>
+          <span className={styles.number}><span>{service.number}</span><small className={styles.serviceLabel} aria-hidden="true">{[...'SERVICE'].map((letter,index)=><span key={index}>{letter}</span>)}</small></span><span className={styles.columnName}>{service.title}</span><ArrowUpRight className={styles.columnArrow} size={24}/>
         </button>
         <div className={styles.serviceDetail} aria-hidden={selected!==index}>
           {selected===index&&<button ref={backRef} type="button" className={styles.back} onClick={close} aria-label="Back to all five services"><ArrowLeft size={38}/><span>All services</span></button>}
@@ -42,20 +43,41 @@ export default function ServicesSection(){
   const motionRef=useRef({progress:0,pointerX:0,pointerY:0,storyVisible:true,testimonialY:3})
   const [desktop,setDesktop]=useState(false),[active,setActive]=useState(false),[seen,setSeen]=useState(false),[sceneFailed,setSceneFailed]=useState(false),[selected,setSelected]=useState(null),[interactive,setInteractive]=useState(false)
   const [gameActive,setGameActive]=useState(false),gameActiveRef=useRef(false)
+  const [mobileStory,setMobileStory]=useState(false)
   const cinematic=desktop&&!sceneFailed
   const interactiveRef=useRef(false)
   const selectedRef=useRef(null)
   const selectService=index=>{selectedRef.current=index;setSelected(index)}
   useEffect(()=>{
     const media=matchMedia('(min-width:1101px) and (prefers-reduced-motion:no-preference)')
-    const configure=()=>setDesktop(media.matches);configure();media.addEventListener('change',configure)
-    return()=>media.removeEventListener('change',configure)
+    const mobile=matchMedia('(max-width:1100px) and (prefers-reduced-motion:no-preference)')
+    const configure=()=>{setDesktop(media.matches);setMobileStory(mobile.matches)};configure();media.addEventListener('change',configure);mobile.addEventListener('change',configure)
+    return()=>{media.removeEventListener('change',configure);mobile.removeEventListener('change',configure)}
   },[])
   useEffect(()=>{
     const root=sectionRef.current;if(!root)return
     const observer=new IntersectionObserver(([entry])=>{setActive(entry.isIntersecting);if(entry.isIntersecting)setSeen(true)},{rootMargin:'10% 0px'})
     observer.observe(root);return()=>observer.disconnect()
   },[])
+  useEffect(()=>{
+    if(!cinematic)return
+    let idle=0
+    const hide=()=>{if(hintRef.current)hintRef.current.dataset.scrolling='false'}
+    const scroll=()=>{
+      clearTimeout(idle)
+      const rect=storyRef.current?.getBoundingClientRect()
+      // The hint belongs to the pinned Services viewport, including its final
+      // testimonial stop. Do not leave it visible during entry or departure.
+      const inside=rect&&rect.top<=1&&rect.bottom>innerHeight+1
+      if(hintRef.current)hintRef.current.dataset.scrolling=inside?'true':'false'
+      if(inside)idle=setTimeout(hide,900)
+    }
+    const visibility=()=>{if(document.hidden){clearTimeout(idle);hide()}}
+    addEventListener('scroll',scroll,{passive:true})
+    document.addEventListener('visibilitychange',visibility)
+    hide()
+    return()=>{clearTimeout(idle);removeEventListener('scroll',scroll);document.removeEventListener('visibilitychange',visibility);hide()}
+  },[cinematic])
   useEffect(()=>{
     if(!cinematic){
       interactiveRef.current=true
@@ -92,7 +114,6 @@ export default function ServicesSection(){
       root.dataset.servicesProgress=journey.storyProgress.toFixed(4);root.dataset.servicesPhase=journey.phase==='story'?state.phase:journey.phase
       root.dataset.servicesJourney=current.toFixed(4)
       if(progressRef.current)progressRef.current.style.transform=`scaleX(${current})`
-      if(hintRef.current)hintRef.current.style.opacity='1'
       if(deckRef.current){
         deckRef.current.style.visibility=journey.storyProgress>.745&&journey.exit<1?'visible':'hidden'
         deckRef.current.style.transform='none'
@@ -116,6 +137,7 @@ export default function ServicesSection(){
   const contributionPanel=<div ref={activityRef} className={styles.activity}><ContributionField active={seen} playActive={!cinematic||gameActive}/></div>
   const testimonialPanel=<div ref={testimonialsRef} className={styles.testimonials}><div ref={titleRef} className={styles.testimonialTitle}><h2 className={cinematic?styles.accessibleTitle:undefined}>WHAT PEOPLE SAY</h2></div><TestimonialDeck/></div>
   return <section ref={sectionRef} id="services" className={styles.section} data-cinematic={cinematic?'true':'false'} aria-labelledby="services-heading">
+    {mobileStory?<MobileServicesStory/>:<>
     <div className={styles.universe} aria-hidden="true">{cinematic&&seen&&<SpaceBoundary onFailure={()=>setSceneFailed(true)}><ServicesScene motionRef={motionRef} active={active} deckRef={deckRef} onFailure={()=>setSceneFailed(true)}/></SpaceBoundary>}</div>
     <div ref={storyRef} className={styles.story}><div className={styles.stage}>
       <h2 id="services-heading" className={styles.accessibleTitle}>Services — What I offer</h2>
@@ -128,5 +150,6 @@ export default function ServicesSection(){
     {!cinematic&&contributionPanel}
     {!cinematic&&testimonialPanel}
     <div className={styles.departure} aria-hidden="true"/>
+    </>}
   </section>
 }

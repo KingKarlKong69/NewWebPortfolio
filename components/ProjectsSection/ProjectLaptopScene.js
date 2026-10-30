@@ -745,7 +745,7 @@ function SidePorts() {
   )
 }
 
-function ProceduralLaptop({ projects, activeIndex, active, reducedMotion, story, motionRef, screenRef, worldTextureRef, portalViewRef }) {
+function ProceduralLaptop({ projects, activeIndex, active, reducedMotion, story, motionRef, screenRef, worldTextureRef, portalViewRef, glowRef }) {
   const rootRef = useRef(null)
   const geometryRef = useRef(null)
   const lidRef = useRef(null)
@@ -787,6 +787,15 @@ function ProceduralLaptop({ projects, activeIndex, active, reducedMotion, story,
         return
       }
       const opacity = THREE.MathUtils.clamp(motion.laptopOpacity ?? 1, 0, 1)
+      if (glowRef.current) {
+        // These coordinates already describe the projected model center.
+        // Keep the accent behind the chassis through the scroll choreography.
+        glowRef.current.style.left = `${motion.laptopX * 100}%`
+        glowRef.current.style.top = `${motion.laptopY * 100}%`
+        // Leave a narrow visible halo outside the opaque screen silhouette.
+        glowRef.current.style.width = `${Math.min(motion.mobile?120:78, motion.laptopWidth * 145)}%`
+        glowRef.current.style.opacity = String((motion.lidOpen || 0) * opacity * (1 - (motion.portalDolly || 0)))
+      }
       rootRef.current.visible = opacity > 0.001
       state.gl.domElement.dataset.laptopVisible = String(rootRef.current.visible)
       state.gl.domElement.dataset.laptopOpacity = String(opacity)
@@ -870,6 +879,10 @@ function ProceduralLaptop({ projects, activeIndex, active, reducedMotion, story,
     rootRef.current.rotation.y = THREE.MathUtils.lerp(rootRef.current.rotation.y, pointerX, motionSpeed)
     rootRef.current.rotation.x = THREE.MathUtils.lerp(rootRef.current.rotation.x, -pointerY, motionSpeed)
     lidRef.current.rotation.x = THREE.MathUtils.lerp(lidRef.current.rotation.x, targetLid, motionSpeed)
+    if (glowRef.current) {
+      const opening = THREE.MathUtils.clamp((Math.PI / 2 - lidRef.current.rotation.x) / (Math.PI / 2 + .09), 0, 1)
+      glowRef.current.style.opacity = String(opening)
+    }
   }, -5)
 
   return (
@@ -996,7 +1009,7 @@ function UniversePortal({ motionRef, textureRef, viewRef }) {
   </mesh>
 }
 
-function LaptopScene({ projects, activeIndex, active, reducedMotion, story, motionRef }) {
+function LaptopScene({ projects, activeIndex, active, reducedMotion, story, motionRef, glowRef }) {
   const screenRef = useRef(null)
   const worldTextureRef = useRef(null)
   const portalViewRef = useRef({x: 0, y: 0, width: 1, height: 1})
@@ -1019,6 +1032,7 @@ function LaptopScene({ projects, activeIndex, active, reducedMotion, story, moti
         screenRef={screenRef}
         worldTextureRef={worldTextureRef}
         portalViewRef={portalViewRef}
+        glowRef={glowRef}
       />
       {story && <UniversePortal motionRef={motionRef} textureRef={worldTextureRef} viewRef={portalViewRef} />}
       {!story && <mesh position={[0, -1.11, -0.1]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -1029,21 +1043,21 @@ function LaptopScene({ projects, activeIndex, active, reducedMotion, story, moti
   )
 }
 
-function ScrollFrameLoop({ active }) {
+function ScrollFrameLoop({ active, mobile=false }) {
   const invalidate = useThree(state => state.invalidate)
   const setDpr = useThree(state => state.setDpr)
   const size = useThree(state => state.size)
   useFrame(state => {
     // Canvas can reapply its device DPR after a native viewport resize. Keep
     // the actual drawing buffer within the same desktop pixel budget.
-    const bounded = Math.min(1.75, window.devicePixelRatio || 1, 2560 / Math.max(1,state.size.width,state.size.height))
+    const bounded = Math.min(mobile?1.3:1.75, window.devicePixelRatio || 1, 2560 / Math.max(1,state.size.width,state.size.height))
     if(Math.abs(state.gl.getPixelRatio()-bounded)>.01)setDpr(bounded)
   },-30)
   useEffect(() => {
     // Bound the procedural world's pixel workload on large desktop displays.
     // It renders directly after entry, so the canvas shares the target budget.
-    setDpr(Math.min(1.75, window.devicePixelRatio || 1, 2560 / Math.max(1, size.width, size.height)))
-  }, [setDpr, size.width, size.height])
+    setDpr(Math.min(mobile?1.3:1.75, window.devicePixelRatio || 1, 2560 / Math.max(1, size.width, size.height)))
+  }, [setDpr, size.width, size.height,mobile])
   useEffect(() => {
     const update = () => { if (active) invalidate() }
     window.addEventListener('projects:motion', update)
@@ -1062,17 +1076,23 @@ export default function ProjectLaptopScene(props) {
     return () => document.removeEventListener('visibilitychange', updateVisibility)
   }, [])
   const active = props.active && pageVisible
+  const glowRef = useRef(null)
+  useEffect(() => {
+    if (!active && glowRef.current) glowRef.current.style.opacity = '0'
+  }, [active])
   return (
     <div className={styles.laptopCanvas} aria-hidden="true">
+      <div ref={glowRef} className={styles.laptopAccent} data-laptop-accent />
       {props.mounted && <Canvas
+        style={{ position: 'relative', zIndex: 1 }}
         camera={{position: [0, 2.2, 10.2], fov: 40}}
-        dpr={[1, 1.75]}
+        dpr={[1, props.motionRef?.current?.mobile ? 1.3 : 1.75]}
         frameloop="demand"
         gl={{alpha: true, antialias: true, powerPreference: 'high-performance'}}
         shadows={false}
       >
-        {props.story ? <ScrollFrameLoop active={active} /> : <ActiveFrameLoop active={active} />}
-        <LaptopScene {...props} active={active} />
+        {props.story ? <ScrollFrameLoop active={active} mobile={Boolean(props.motionRef?.current?.mobile)} /> : <ActiveFrameLoop active={active} />}
+        <LaptopScene {...props} active={active} glowRef={glowRef} />
       </Canvas>}
     </div>
   )

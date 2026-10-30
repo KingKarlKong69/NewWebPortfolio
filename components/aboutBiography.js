@@ -1,0 +1,5 @@
+export const BIOGRAPHY = [
+  "I'm Karl Lopez, a full-stack developer who enjoys bringing ideas to life through the web. What started as a college subject in my third year became something I genuinely loved, and my internship as a Full Stack Web Developer Intern at PRAXXYS Solutions Inc. made that interest grow even further. Working on real projects showed me how much I enjoy the process of turning ideas into functional products, solving problems, and seeing what I build take shape.",
+  "I'm particularly interested in AI-assisted development, or what many call vibe coding, using AI tools to explore ideas, speed up development, and build things I might not have attempted otherwise. I'm also drawn to interactive 3D and immersive web experiences that make websites feel less like static pages and more like something you can explore.",
+  'A BSIT graduate from Bulacan State University – Bustos Campus. Resourceful by nature, curious by default, and always learning and building toward becoming the kind of developer who can bring an idea to life.'
+]

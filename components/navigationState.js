@@ -26,6 +26,20 @@ const scrollToSectionElement = (element, behavior) => {
       window.scrollTo({top:top+Math.max(0,distance)*progress,behavior})
       return
     }
+  } else {
+    // Mobile stories use one pinned viewport and native scroll throughout.
+    // Read their own runway geometry after hydration so direct hash links and
+    // menu navigation share the same destination, including after resizing.
+    const runway = element.id === 'about' ? element.querySelector?.('[data-mobile-about-story]') :
+      element.id === 'projects' ? element.querySelector?.('[data-mobile-projects-story]') : null
+    if (runway) {
+      const top = window.scrollY + runway.getBoundingClientRect().top
+      const distance = Math.max(0, runway.offsetHeight - window.innerHeight)
+      const requested = Number(runway.dataset.navProgress || 0)
+      const progress = Number.isFinite(requested) ? Math.max(0, Math.min(1, requested)) : 0
+      window.scrollTo({top: top + distance * progress, behavior})
+      return
+    }
   }
   // A direct Services link lands after its overlapping whiteout, with the
   // opening title still at its initial camera position.
@@ -111,6 +125,10 @@ function useNavigationController() {
       hashAnchorSection = section
       hashAnchorObserver = new ResizeObserver(scheduleHashAnchor)
       hashAnchorObserver.observe(document.body)
+      // Body has a fixed 100% height; mobile runways change the main content's
+      // height as their dynamic modules mount, without resizing the body box.
+      const content = document.querySelector('main')
+      if (content) hashAnchorObserver.observe(content)
       scheduleHashAnchor()
     }
 

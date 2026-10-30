@@ -16,7 +16,7 @@
 .shade{position:absolute;inset:0;background:linear-gradient(0deg,#0009,transparent 42%);pointer-events:none;}
 .columnButton{position:absolute;inset:0;width:100%;cursor:pointer;border:0;background:transparent;text-align:left;color:#fff;outline-offset:-6px;}
 .columnButton:focus-visible{outline:2px solid #8cf0ff;}
-.number{position:absolute;bottom:3%;left:7%;font-family:Montserrat,Arial,sans-serif;font-weight:800;font-size:clamp(62px,7.4vw,160px);line-height:1;color:transparent;-webkit-text-stroke:1px #97a5b36b;transition:-webkit-text-stroke-color .5s,filter .5s;}
+.number{position:absolute;bottom:3%;left:7%;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:clamp(62px,7.4vw,160px);line-height:.76;color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:1px #97a5b36b;transition:-webkit-text-stroke-color .5s,filter .5s;}
 .columnName{position:absolute;top:5%;left:9%;right:20%;font-size:clamp(12px,1.1vw,21px);line-height:1.3;font-weight:500;opacity:0;transform:translateY(7px);transition:opacity .5s,transform .5s;}
 .columnArrow{position:absolute;right:10%;top:5%;opacity:0;transition:opacity .5s;}
 .column:hover .artwork,.column:focus-within .artwork{filter:brightness(.83) blur(0) saturate(1);transform:scale(1.012);}
@@ -36,7 +36,8 @@
 .back{position:absolute;bottom:29%;left:3%;display:flex;align-items:center;gap:12px;color:#fff;background:none;border:0;cursor:pointer;pointer-events:auto;font-size:12px;letter-spacing:.1em;text-transform:uppercase;}
 .back svg{width:70px;transition:transform .3s;}.back:hover svg{transform:translateX(-8px);}.back:focus-visible{outline:1px solid #8cf0ff;outline-offset:8px;}
 .deckHint{position:absolute;bottom:22px;left:104px;right:3%;display:flex;justify-content:space-between;color:#a9c3d7;font-size:11px;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;}
-.journeyHint{position:absolute;left:4%;right:4%;bottom:3%;display:flex;align-items:center;gap:25px;font-size:10px;letter-spacing:.16em;color:#7f99b0;pointer-events:none;}
+.journeyHint{position:absolute;left:4%;right:4%;bottom:3%;display:flex;align-items:center;gap:25px;font-size:10px;letter-spacing:.16em;color:#7f99b0;pointer-events:none;opacity:0;transform:translateY(9px);transition:opacity .45s ease,transform .55s cubic-bezier(.22,1,.36,1);}
+.journeyHint[data-scrolling='true']{opacity:1;transform:translateY(0);transition-duration:.28s,.4s;}
 .journeyHint i{font-style:normal;color:#a3e8f9;padding-left:10px;}.journeyHint>div{height:1px;flex:1;background:#6fcbe51c;}.journeyHint>div>span{display:block;height:100%;background:#9dd8e9;transform:scaleX(0);transform-origin:left;}
 .activity{position:relative;min-height:115svh;display:flex;align-items:center;padding:12vh 7vw 12vh calc(80px + 5vw);}
 .activity>div,.activity>section{width:100%;}
@@ -49,7 +50,7 @@
 .section[data-cinematic='true'] .testimonials{padding:11svh 5vw 5svh calc(80px + 4vw);display:flex;flex-direction:column;justify-content:center;}
 .section[data-cinematic='true'] .testimonialTitle{height:17svh;flex:none;margin-bottom:3svh;}
 .section[data-cinematic='true'] .testimonials>section:last-child{width:100%;max-width:1300px;margin:0 auto;}
-.section[data-cinematic='true'] .number{bottom:7%;}
+.section[data-cinematic='true'] .number{bottom:11%;}
 .section[data-cinematic='true'] .column:first-child .number{left:calc(80px + 4%);}
 .section[data-cinematic='true'] .column:first-child .columnName{left:calc(80px + 4%);}
 .section[data-cinematic='true'] .detailNumber{left:calc(80px + 2%);}
@@ -75,14 +76,16 @@
 
 /* One sidebar-safe content inset shared by scene controls and details. */
 .section{--scene-inset:calc(80px + clamp(20px,3vw,64px))}
-.serviceLabel{position:absolute;left:calc(100% + 9px);bottom:3px;writing-mode:vertical-rl;text-orientation:upright;font:500 9px/1.15 Arial,sans-serif;letter-spacing:.12em;color:#d3e1ed;-webkit-text-stroke:0}
-.column:hover .number,.column:focus-within .number{color:#f3f8ff}
+.serviceLabel{position:absolute;left:calc(100% + 9px);top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;font:500 9px/1 Arial,sans-serif;letter-spacing:.12em;color:#d3e1ed;-webkit-text-fill-color:#d3e1ed;-webkit-text-stroke:0;opacity:0;clip-path:inset(0 100% 0 0);transform:translateX(-15px);transition:opacity .25s ease,clip-path .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
+.column:hover .serviceLabel,.column:focus-within .serviceLabel{opacity:1;clip-path:inset(0);transform:translateX(0)}
 .journeyHint{left:var(--scene-inset);right:4%;bottom:18px;z-index:20;min-height:22px;padding:5px 10px;background:#02070db3;text-shadow:0 1px 5px #000}
 .deckHint{bottom:55px;left:var(--scene-inset)}
-.serviceDetail{display:grid;grid-template-columns:clamp(130px,15vw,270px) minmax(0,1fr);gap:clamp(22px,3vw,60px);align-content:end;padding:0 4vw 14svh var(--scene-inset)}
-.detailNumber,.section[data-cinematic='true'] .detailNumber{position:static;align-self:end;font-size:clamp(80px,10vw,190px);line-height:.9}
-.detailCopy{position:static;min-width:0;align-self:end}
+.serviceDetail{display:grid;grid-template-columns:clamp(150px,15vw,270px) minmax(0,1fr);column-gap:clamp(22px,3vw,60px);row-gap:24px;align-content:end;padding:0 4vw 14svh var(--scene-inset)}
+.detailNumber,.section[data-cinematic='true'] .detailNumber{position:static;grid-column:1;grid-row:2;align-self:end;font-size:clamp(80px,10vw,190px);line-height:.9}
+.detailCopy{position:static;grid-column:2;grid-row:2;min-width:0;align-self:end}
 .detailCopy h3{font-size:clamp(28px,4vw,78px);margin:0;overflow-wrap:break-word}
 .detailCopy p{font-size:clamp(12px,1vw,19px)}
-.back{left:var(--scene-inset);top:17%;bottom:auto}
-@media(max-width:1100px){.section{--scene-inset:24px}.serviceDetail{padding:0 24px 35px;grid-template-columns:65px minmax(0,1fr);gap:20px}.detailNumber,.section[data-cinematic='true'] .detailNumber{font-size:55px}.detailCopy h3{font-size:clamp(22px,4vw,42px)}.back{top:24px}.serviceLabel{font-size:7px;left:calc(100% + 4px)}}
+.back{position:static;grid-column:1 / -1;grid-row:1;justify-self:start;align-self:end;padding:0;gap:10px;font-size:11px;line-height:1.4}
+.back svg{width:clamp(45px,4vw,70px);height:32px}
+@media(max-width:1100px){.section{--scene-inset:24px}.serviceDetail{padding:0 24px 35px;grid-template-columns:65px minmax(0,1fr);gap:20px}.detailNumber,.section[data-cinematic='true'] .detailNumber{font-size:55px}.detailCopy h3{font-size:clamp(22px,4vw,42px)}.serviceLabel{font-size:7px;left:calc(100% + 4px)}}
+@media(prefers-reduced-motion:reduce){.journeyHint,.serviceLabel{transition:none}}

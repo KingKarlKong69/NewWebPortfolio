@@ -21,7 +21,7 @@ export default function SkillsSection() {
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1101px)')
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const configure = () => setDesktopStory(desktop.matches && !reduced.matches)
+    const configure = () => setDesktopStory(!reduced.matches)
     configure()
     desktop.addEventListener('change', configure)
     reduced.addEventListener('change', configure)

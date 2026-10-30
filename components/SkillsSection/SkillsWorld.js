@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { SKILLS_CHAPTERS, SKILLS_CHECKPOINTS } from './skillsExpeditionData'
+import {mobileSkillFace,mobileFaceIconLayout} from './mobileSkillFaces'
 import { clamp01, smooth, skillsHash as hash, skillsNoise as noise,
   skillsTerrainHeight, skillsTerrainBaseHeight, skillsTerrainHeightAtTravel,
   skillsTerrainBandHeight, skillsTerrainBuildDelay } from './skillsTerrainMath'
@@ -252,7 +253,8 @@ function createTerrain(uniforms) {
     const start=-144+tile*88,end=start+88
     for(const [z0,z1,rows,band] of [[-255,-150,18,'distant'],[-150,-88,28,'secondary'],[-88,-22,65,'primary'],[-22,28,52,'foreground']]) {
       if((band==='primary'||band==='foreground')&&(tile<0||tile>=20))continue
-      group.add(new THREE.Mesh(createTerrainTile(start,end,z0,z1,90,rows,band),material))
+      const geometry=createTerrainTile(start,end,z0,z1,90,rows,band)
+      group.add(new THREE.Mesh(geometry,material))
     }
   }
   return group
@@ -392,7 +394,81 @@ function createMarkers() {
   return {entries,beams,halos,points,rings,markers,summits,checkpoints}
 }
 
-function createWorld() {
+function mobileMountainPoint(u,v) {
+  const t=THREE.MathUtils.clamp((1.08-v)/.80,0,1)
+  const left=.08+.82*Math.pow(t,1.1),right=1.52-.62*t
+  const across=THREE.MathUtils.clamp((u-left)/Math.max(.001,right-left),0,1)
+  // Sharp descending ridges and recessed gullies give the face real relief.
+  // The silhouette stays fixed while the middle folds catch the cold key light.
+  const mainRidge=Math.max(0,1-Math.abs(across-.32)*4.4)*1.48
+  const sideRidge=Math.max(0,1-Math.abs(across-.72)*5.8)*.92
+  const crags=Math.abs(Math.sin(across*16+t*8))*.24+Math.sin(t*37+across*21)*.11
+  return [u-.5,.5-v,(mainRidge+sideRidge+crags)*Math.pow(1-t,.58)]
+}
+
+function createMobileMountain() {
+  const positions=[],colors=[],rows=23,columns=13
+  const vertices=[]
+  for(let row=0;row<=rows;row++){
+    const t=row/rows,v=1.08-t*.80
+    const left=.08+.82*Math.pow(t,1.1),right=1.52-.62*t
+    for(let col=0;col<=columns;col++){
+      const edge=col===0||col===columns||row===0||row===rows
+      const u=THREE.MathUtils.lerp(left,right,col/columns)+(edge?0:(hash(row,col)-.5)*.025)
+      vertices.push(mobileMountainPoint(u,v+(edge?0:(hash(col,row+32)-.5)*.016)))
+    }
+  }
+  for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
+    const a=row*(columns+1)+col,b=a+1,c=a+columns+1,d=c+1
+    const faces=(row+col)%2?[[a,c,b],[b,c,d]]:[[a,c,d],[a,d,b]]
+    faces.forEach((triangle,index)=>{
+      const t=(row+.5)/rows,across=(col+.5)/columns
+      const shade=.62+hash(row*2+index,col)*.38
+      const ridge=Math.max(0,1-Math.abs(across-.32)*4.4)
+      const snow=THREE.MathUtils.clamp((t-.47)*1.45+ridge*.7+(hash(row+13,col)-.5)*.32,0,1)
+      const icy=new THREE.Color('#477b90').lerp(new THREE.Color('#e7f4f3'),snow).multiplyScalar(shade)
+      for(const id of triangle){positions.push(...vertices[id]);colors.push(icy.r,icy.g,icy.b)}
+    })
+  }
+  const geometry=new THREE.BufferGeometry()
+  geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3))
+  geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geometry.computeVertexNormals()
+  const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide,
+    roughness:.94,metalness:.01,emissive:'#527c8b',emissiveIntensity:.12})
+  const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false
+  return {mesh,angle:0,lastFace:-1,lastTick:0}
+}
+
+function updateMobileMountain(world,motion,formation,time) {
+  const mountain=world.mobileMountain
+  if(!mountain)return
+  const face=mobileSkillFace(motion.mobileFaceIndex??motion.chapterIndex)
+  const targetAngle=face.pageIndex*.24+(Number(motion.mobileFaceTurn)||0)*.24
+  const dt=Math.min(.06,Math.max(0,time-mountain.lastTick));mountain.lastTick=time
+  mountain.angle+= (targetAngle-mountain.angle)*(1-Math.exp(-dt*11))
+  const height=2*Math.tan(THREE.MathUtils.degToRad(world.camera.fov*.5))*20
+  const width=height*world.camera.aspect
+  mountain.mesh.scale.set(width,height,1)
+  mountain.mesh.rotation.y=mountain.angle
+  mountain.mesh.visible=formation>.001
+  mountain.mesh.material.transparent=formation<.999
+  mountain.mesh.material.opacity=formation
+  mountain.mesh.updateMatrixWorld(true)
+  const opacity=clamp01(motion.mobileFaceOpacity??1)*smooth(formation,.7,1)*(1-clamp01(motion.endingReveal))
+  const locations=mobileFaceIconLayout(face.markerIds.length)
+  const output={markers:[],summits:[],checkpoints:[],ending:{x:0,y:0,visible:false,opacity:0}}
+  face.markerIds.forEach((id,index)=>{
+    const [u,v]=locations[index]
+    const point=mobileMountainPoint(u,v)
+    world.projected.set(...point).applyMatrix4(mountain.mesh.matrixWorld).project(world.camera)
+    const x=world.projected.x*.5+.5,y=.5-world.projected.y*.5
+    output.markers.push({id,x,y,visible:opacity>.015&&x>.02&&x<.98&&y>.4&&y<.98,opacity})
+  })
+  motion.skillsProjection=output
+  if(typeof window!=='undefined')window.dispatchEvent(new Event('skills:projection'))
+}
+
+function createWorld(mobile=false) {
   const scene=new THREE.Scene();scene.background=new THREE.Color('#01040b')
   scene.fog=new THREE.FogExp2('#050f21',.0058)
   const camera=new THREE.PerspectiveCamera(52,16/9,.1,390)
@@ -404,9 +480,15 @@ function createWorld() {
     vertexShader:SKY_VERTEX,fragmentShader:SKY_FRAGMENT,depthWrite:false,depthTest:false,toneMapped:false}))
   sky.frustumCulled=false;sky.renderOrder=-1000;scene.add(sky)
   const uniforms={formation:{value:0},cameraX:{value:-70},route:{value:0}}
-  const terrain=createTerrain(uniforms),stars=createStars(),rocks=createRocks(),route=createRoute(),markers=createMarkers(),relations=createRelations()
+  const terrain=mobile?new THREE.Group():createTerrain(uniforms),stars=createStars(),rocks=createRocks(),route=createRoute(),markers=createMarkers(),relations=createRelations()
   scene.add(terrain,stars.points,rocks.mesh,route.mesh,route.glow,relations.mesh,
     markers.beams.mesh,markers.halos.mesh,markers.points.mesh,markers.rings.mesh)
+  const mobileMountain=mobile?createMobileMountain():null
+  if(mobileMountain){
+    scene.add(mobileMountain.mesh)
+    const iceKey=new THREE.DirectionalLight('#edfaff',2.25)
+    iceKey.position.set(-7,12,16);scene.add(iceKey)
+  }
   const ambient=new THREE.HemisphereLight('#667b94','#02040a',.85)
   const key=new THREE.DirectionalLight('#b2c8dc',1.8);key.position.set(-26,26,-25)
   const rim=new THREE.DirectionalLight('#219cff',2.25);rim.position.set(35,11,-65)
@@ -420,7 +502,7 @@ function createWorld() {
     const fog=new THREE.Mesh(new THREE.PlaneGeometry(180,120),fogMaterial)
     fog.rotation.x=-Math.PI/2;fog.position.set(0,1.4+i*.42,-54-i*6);fog.renderOrder=2;scene.add(fog);fogs.push(fog)
   }
-  return {scene,camera,skyUniforms,uniforms,terrain,stars,rocks,route,markers,relations,fogUniforms,fogs,
+  return {scene,camera,skyUniforms,uniforms,terrain,stars,rocks,route,markers,relations,fogUniforms,fogs,mobileMountain,
     placeholder,lights:[ambient,key,rim,fill],lightIntensities:[.85,1.8,2.25,.5],cosmosTexture:null,
     dummy:new THREE.Object3D(),projected:new THREE.Vector3()}
 }
@@ -486,7 +568,7 @@ function updateMarkers(world,motion,cameraX,formation) {
 /** One shared hybrid world supplies the real laptop screen and the viewport. */
 export default function SkillsWorld({motionRef,textureRef,active=true}) {
   const {gl,size,invalidate}=useThree()
-  const world=useMemo(createWorld,[])
+  const world=useMemo(()=>createWorld(Boolean(motionRef.current?.mobile)),[motionRef])
   const resources=useMemo(()=>({target:new THREE.WebGLRenderTarget(16,9,{depthBuffer:true,stencilBuffer:false,
     type:THREE.HalfFloatType,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,generateMipmaps:false}),
     viewport:new THREE.Vector4(),scissor:new THREE.Vector4(),clearColor:new THREE.Color(),width:0,height:0,key:''}),[])
@@ -545,7 +627,7 @@ export default function SkillsWorld({motionRef,textureRef,active=true}) {
     world.skyUniforms.uTime.value=time;world.stars.uniforms.uTime.value=time;world.route.uniforms.uTime.value=time
     const key=[width,height,travel,formation,cameraX,progress,motion.chapterIndex,motion.chapterActivation,
       motion.routeHead,motion.routeReveal,motion.checkpointIndex,motion.checkpointReveal,motion.checkpointDim,
-      motion.endingReveal,motion.exitLight,motion.cosmosReveal,motion.introHold,motion.introMorph,fullscreen].join('|')
+      motion.endingReveal,motion.exitLight,motion.cosmosReveal,motion.introHold,motion.introMorph,motion.mobileFaceIndex,motion.mobileFaceTurn,motion.mobileFaceOpacity,fullscreen].join('|')
     const changed=resources.key!==key
     if(!changed&&resources.tick===tick)return
     resources.tick=tick
@@ -555,28 +637,31 @@ export default function SkillsWorld({motionRef,textureRef,active=true}) {
     if(changed){
     world.camera.aspect=width/height
     // Preserve the mountain's horizontal room on tall desktop windows.
-    world.camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(52)/2)*Math.max(1,(16/9)/world.camera.aspect)))
-    world.camera.position.set(cameraX+8+THREE.MathUtils.lerp(.25,0,travel),4.7,THREE.MathUtils.lerp(31,17,travel))
-    world.camera.lookAt(cameraX+8,10.5,-55);world.camera.updateProjectionMatrix();world.camera.updateMatrixWorld()
+    world.camera.fov=motion.mobile?40:THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(52)/2)*Math.max(1,(16/9)/world.camera.aspect)))
+    if(motion.mobile){world.camera.position.set(0,0,20);world.camera.lookAt(0,0,0)}
+    else {world.camera.position.set(cameraX+8+THREE.MathUtils.lerp(.25,0,travel),4.7,THREE.MathUtils.lerp(31,17,travel));world.camera.lookAt(cameraX+8,10.5,-55)}
+    world.camera.updateProjectionMatrix();world.camera.updateMatrixWorld()
     world.skyUniforms.uAspect.value=width/height;world.skyUniforms.uTravel.value=travel
     world.skyUniforms.uCameraX.value=cameraX;world.skyUniforms.uReveal.value=smooth(clamp01(motion.cosmosReveal),0,.85)
     world.skyUniforms.uDim.value=clamp01(motion.checkpointDim)
     world.skyUniforms.uIntro.value=clamp01(motion.introHold)*(1-clamp01(motion.introMorph)*.45)
-    world.stars.uniforms.uCameraX.value=cameraX;world.stars.uniforms.uTravel.value=travel
+    world.stars.uniforms.uCameraX.value=motion.mobile?0:cameraX;world.stars.uniforms.uTravel.value=travel
     world.stars.uniforms.uReveal.value=smooth(clamp01(motion.cosmosReveal),0,.7)
     world.stars.uniforms.uDim.value=clamp01(motion.checkpointDim)
     world.uniforms.formation.value=formation;world.uniforms.cameraX.value=cameraX
     world.uniforms.route.value=clamp01(motion.routeReveal)
-    world.terrain.visible=formation>.001
+    world.terrain.visible=!motion.mobile&&formation>.001
     world.fogUniforms.uFormation.value=smooth(formation,.14,.9);world.fogUniforms.uCameraX.value=cameraX
-    world.fogUniforms.uEnding.value=0;world.fogs.forEach(fog=>{fog.position.x=cameraX})
+    world.fogUniforms.uEnding.value=0;world.fogs.forEach(fog=>{fog.position.x=cameraX;fog.visible=!motion.mobile})
+    world.route.mesh.visible=world.route.glow.visible=world.relations.mesh.visible=!motion.mobile
+    for(const kind of ['beams','halos','points','rings'])world.markers[kind].mesh.visible=!motion.mobile
     world.lights.forEach((light,index)=>{light.intensity=world.lightIntensities[index]*(1-clamp01(motion.checkpointDim)*.34)})
     world.route.uniforms.uHead.value=Number.isFinite(motion.routeHead)?motion.routeHead:0
     world.route.uniforms.uReveal.value=clamp01(motion.routeReveal)*smooth(formation,.8,1)
     world.route.uniforms.uEnding.value=clamp01(motion.exitLight)
     world.relations.uniforms.uCameraX.value=cameraX
     world.relations.uniforms.uReveal.value=smooth(formation,.85,1)*clamp01(motion.chapterActivation)
-    world.rocks.mesh.visible=formation>.5
+    world.rocks.mesh.visible=!motion.mobile&&formation>.5
     if(world.rocks.mesh.visible){
       const {mesh,bodies}=world.rocks,{dummy}=world
       bodies.forEach((body,index)=>{
@@ -587,8 +672,9 @@ export default function SkillsWorld({motionRef,textureRef,active=true}) {
         dummy.scale.set(...body.scale.map(v=>v*build));dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix)
       });mesh.instanceMatrix.needsUpdate=true
     }
-    updateMarkers(world,motion,cameraX,formation)
+    if(!motion.mobile)updateMarkers(world,motion,cameraX,formation)
     }
+    if(motion.mobile)updateMobileMountain(world,motion,formation,time)
     // Once the screen boundary has gone, the same scene renders directly to
     // the viewport. Returning below full expansion refreshes the shared target
     // before the laptop's physical screen needs to sample it again.

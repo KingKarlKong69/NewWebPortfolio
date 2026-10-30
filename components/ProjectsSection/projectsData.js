@@ -40,7 +40,7 @@ export const PROJECTS = [
     description: 'A configurable project entry for a comprehensive e-commerce coffee shop platform with customer and administrator interfaces, featuring an integrated Point of Sale (POS) system for managing in-store sales, online orders, inventory, products, customers, and business analytics.',
     role: 'Full Stack Web Developer',
     impact: null,
-    technologies: ['HTML', 'CSS', 'PHP', 'MySQL', 'Xampp'],
+    technologies: ['HTML', 'CSS', 'PHP', 'MySQL', 'XAMPP'],
     liveUrl: null,
     screenshot: '/projects/CoffeeShop.png',
     screenshotAvailable: true,

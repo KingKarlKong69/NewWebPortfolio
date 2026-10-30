@@ -10,7 +10,7 @@ export default function ProjectTechnologyMarks({ technologies = [], className })
   return <ul className={className} aria-label="Technology stack">
     {technologies.map(technology => {
       const iconName = ICON_NAMES[technology]
-      const extra = {'Inertia.js':'Inertia-icon.png', XAMPP:'xampp-icon.webp'}[technology]
+      const extra = {'Inertia.js':'Inertia-icon.png', Inertia:'Inertia-icon.png', XAMPP:'xampp-icon.webp', Xampp:'xampp-icon.webp'}[technology]
       const src = extra ? `/more-icons/${extra}` : iconName ? `/tech-stack-icons/${iconName}.svg` : null
       return <li key={technology} title={technology} data-text-mark={!src || undefined}>
         {src

@@ -17,7 +17,7 @@ Vue.js → vuejs; Laravel → laravel; MySQL → mysql; React.js → react.
 
 Additional Skills assets: nuxtjs, nextjs, nodejs, python, django, mariadb,
 sqlite, git, github, electron, figma, canva, photoshop, premierepro, openai,
-copilotgithub, gemini, claude, and vitejs. Files with a `-dark` suffix use the exact
+copilotgithub, gemini, claude, vitejs, postgresql, vercel, threejs, and railway. Files with a `-dark` suffix use the exact
 official dark-background variant so monochrome logos remain legible. Other
 files use the original light variant and retain the brand's source colors.
 
